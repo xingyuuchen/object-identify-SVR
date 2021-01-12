@@ -2,14 +2,16 @@
 ## 编译方法
 
 ### UNIX
+```
+git clone https://github.com/xingyuuchen/object-identify-SVR.git
+cd OI-Svr
+```
 编译运行
 ```
-cd OI-Svr
 bash cmake.sh -b -r
 ```
 仅编译
 ```
-cd OI-Svr
 bash cmake.sh -b
 ```
 

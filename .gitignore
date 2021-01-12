@@ -2,4 +2,4 @@
 ./client
 ./.idea
 ./client.cc
-build
+build/*
