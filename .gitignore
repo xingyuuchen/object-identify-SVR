@@ -1,5 +1,5 @@
 ./server
 ./client
 ./.idea
-./client.cc
+test_client.cc
 build/*

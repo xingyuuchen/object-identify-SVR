@@ -15,6 +15,10 @@ done
 
 if ${isBuild}; then
   echo "building..."
+  if [ ! -d "./build" ]; then
+    mkdir build
+  fi
+
   cd build
   cmake ..
   make
