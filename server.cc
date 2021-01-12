@@ -4,10 +4,10 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <signal.h>
-#include <boost/bind.hpp>
+#include "netscenedispatcher.h"
 
 
-const int kMaxLine = 1024;
+const int kMaxLine = 128;
 
 int running = 1;
 int listenfd = -1;
@@ -30,15 +30,11 @@ void Stop(int _sig) {
 }
 
 
-
-
-
 int main() {
     printf("Server On...\n");
     signal(2, Stop);
 
     struct sockaddr_in sock_addr;
-    char buff[kMaxLine];
 
     memset(&sock_addr, 0, sizeof(sock_addr));
     sock_addr.sin_family = AF_INET;
@@ -46,7 +42,7 @@ int main() {
     sock_addr.sin_port = htons(5002);
 
     int connfd;
-    listenfd = socket(AF_INET, SOCK_STREAM, 0);  // return value is a descriptor referencing the socket
+    listenfd = socket(AF_INET, SOCK_STREAM, 0);
     if (listenfd < 0) {
         printf("create socket error: %s errno :%d\n", strerror(errno), errno);
         return -1;
@@ -55,19 +51,18 @@ int main() {
     bind_res = bind(listenfd, (struct sockaddr *) &sock_addr, sizeof(sock_addr)); // create a special socket file
     listen(listenfd, 1024); // 1024 defines the maximum length for the queue of pending connections
 
-    ssize_t n;
     while (running) {
         if ((connfd = accept(listenfd, (struct sockaddr *) NULL, NULL)) == -1) {
             printf("accept socket error: %s errno :%d\n", strerror(errno), errno);
             continue;
         }
-        printf("new connect!\n");
-        n = recv(connfd, buff, kMaxLine, 0);
-        buff[n] = '\0';
-        printf("recv %ld bytes from client: %s\n", n, buff);
-        char send_back[] = "I am svr!";
-        send(connfd, send_back, strlen(send_back), 0);
-        
+        AutoBuffer recv_buff;
+        recv_buff.AddCapacity(128);
+        ssize_t n = recv(connfd, recv_buff.Ptr(), kMaxLine, 0);
+        recv_buff.SetLength(n);
+
+        NetSceneDispatcher::GetInstance().Dispatch(connfd, &recv_buff);
+
         close(connfd);
     }
     Exit();

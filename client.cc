@@ -56,12 +56,12 @@ void *StartRoutine(void *arg) {
     return NULL;
 }
 
-int main(int argc, char **argv) {
-    pthread_t tid;
-    int arg = 2;
-    pthread_create(&tid, NULL, StartRoutine, &arg);
-    printf("%d\n", pthread_join(tid, NULL));
-//    sleep(1);
-    return 0;
-}
+//int main(int argc, char **argv) {
+//    pthread_t tid;
+//    int arg = 2;
+//    pthread_create(&tid, NULL, StartRoutine, &arg);
+//    printf("%d\n", pthread_join(tid, NULL));
+////    sleep(1);
+//    return 0;
+//}
 
