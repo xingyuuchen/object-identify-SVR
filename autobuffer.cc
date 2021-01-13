@@ -1,10 +1,10 @@
 #include "autobuffer.h"
 #include <stdlib.h>
-#include <string>
+#include <string.h>
+#include <stdio.h>
 #include "log.h"
+#include <errno.h>
 
-
-extern int errno;
 
 AutoBuffer::AutoBuffer(size_t _malloc_unit_size)
         : byte_array_(NULL)
