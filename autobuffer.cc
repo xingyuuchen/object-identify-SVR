@@ -31,13 +31,16 @@ void AutoBuffer::Write(const unsigned char *_byte_array, size_t _len) {
         }
         AddCapacity(enlarge_size);
     }
-    memcpy(Ptr(), _byte_array, _len);
-    // fixme: Ptr()
+    memcpy(Ptr(length_), _byte_array, _len);
     length_ += _len;
 }
 
 size_t AutoBuffer::Pos() const {
     return pos_;
+}
+
+void AutoBuffer::Seek(const size_t _pos) {
+    pos_ = _pos;
 }
 
 size_t AutoBuffer::Length() const {

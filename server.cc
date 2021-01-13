@@ -7,7 +7,7 @@
 #include "netscenedispatcher.h"
 
 
-const int kMaxLine = 128;
+const int kBuffSize = 1024;
 
 int running = 1;
 int listenfd = -1;
@@ -56,10 +56,9 @@ int main() {
             printf("accept socket error: %s errno :%d\n", strerror(errno), errno);
             continue;
         }
+        
         AutoBuffer recv_buff;
-        recv_buff.AddCapacity(128);
-        ssize_t n = recv(connfd, recv_buff.Ptr(), kMaxLine, 0);
-        recv_buff.SetLength(n);
+        UnixSocket::BlockSocketReceive(connfd, recv_buff, kBuffSize);
 
         NetSceneDispatcher::GetInstance().Dispatch(connfd, &recv_buff);
 

@@ -24,15 +24,17 @@ class AutoBuffer {
     
     void AddCapacity(size_t _size);
     
+    void Seek(const size_t _pos);
+    
     void Reset();
 
 
   private:
-    unsigned char * byte_array_;
-    size_t           pos_;
-    size_t          length_;
-    size_t          capacity_;
-    const size_t    malloc_unit_size_;
+    unsigned char *     byte_array_;
+    size_t              pos_;
+    size_t              length_;
+    size_t              capacity_;
+    const size_t        malloc_unit_size_;
     
 };
 

@@ -20,10 +20,10 @@ if ${isBuild}; then
   fi
 
   cd build
-  cmake ..
-  make
+  if ${isRun}; then
+    cmake .. && make && ./oi_svr
+  else
+    cmake .. && make
+  fi
 fi
 
-if ${isRun}; then
-  ./oi_svr
-fi
