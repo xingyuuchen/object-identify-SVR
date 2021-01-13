@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "util.h"
 #include <string>
+#include "log.h"
+
 
 extern int errno;
 
@@ -53,13 +55,13 @@ unsigned char *AutoBuffer::Ptr(const size_t _offset) const {
 
 void AutoBuffer::AddCapacity(size_t _size_to_add) {
     if (_size_to_add <= 0) {
-        printf("Illegal arg _size:%ld", _size_to_add);
+        Log("Illegal arg _size:%ld", _size_to_add);
         return;
     }
-    printf("[AutoBuffer::AddCapacity] _size_to_add: %ld", _size_to_add);
+    Log("[AutoBuffer::AddCapacity] _size_to_add: %ld", _size_to_add);
     void *p = realloc(byte_array_, capacity_ + _size_to_add);
     if (p == NULL) {
-        printf("[AutoBuffer::AddCapacity] realloc failed, errno(%d): %s", errno, strerror(errno));
+        Log("[AutoBuffer::AddCapacity] realloc failed, errno(%d): %s", errno, strerror(errno));
         return;
     }
     capacity_ += _size_to_add;

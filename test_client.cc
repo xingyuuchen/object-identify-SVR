@@ -8,6 +8,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <pthread.h>
+#include "log.h"
+
 
 const int kMaxLine = 1024;
 int socket_;
@@ -25,11 +27,11 @@ bool Connect() {
     sockaddr.sin_addr.s_addr = inet_addr(svrInetAddr);   // inet_pton(AF_INET, svrInetAddr, &sockaddr.sin_addr);
     
     if (connect(socket_, (struct sockaddr *) &sockaddr, sizeof(sockaddr)) < 0) {
-        printf("connect failed\n");
+        Log("connect failed");
         close(socket_);
         return false;
     }
-    printf("connect succeed!\n");
+    Log("connect succeed!");
     return true;
 }
 

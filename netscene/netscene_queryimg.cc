@@ -1,6 +1,8 @@
 #include "netscene_queryimg.h"
 #include "../constantsprotocol.h"
 #include <string>
+#include "../log.h"
+
 
 NetSceneQueryImg::NetSceneQueryImg() : NetSceneBase() {
 
@@ -11,16 +13,16 @@ int NetSceneQueryImg::GetType() {
 }
 
 int NetSceneQueryImg::DoScene(const AutoBuffer& _buffer) {
-    printf("%s\n", _buffer.Ptr());
+    Log("[NetSceneQueryImg::DoScene] %s", _buffer.Ptr());
     if (socket_ <= 0) {
-        printf("socket not open\n");
+        Log("socket not open");
         return -1;
     }
     // todo: recognize by _buffer
     
     item_type_ = kTypePlant;
-    item_name_ = "猪笼草";
-    item_desc_ = "这是来着svr的猪笼草信息...";
+    item_name_ = "Grass";
+    item_desc_ = "This is grass message from svr...";
     
     send_body_.Reset();
     
