@@ -1,6 +1,5 @@
 #include "autobuffer.h"
 #include <stdlib.h>
-#include "util.h"
 #include <string>
 #include "log.h"
 
