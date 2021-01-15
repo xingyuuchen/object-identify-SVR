@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ `uname` != "Darwin1" ]; then
+  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+fi
+
 isRun=false
 isBuild=false
 
