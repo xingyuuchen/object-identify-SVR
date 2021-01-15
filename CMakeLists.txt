@@ -9,4 +9,8 @@ file(GLOB_RECURSE src_files "*.cc")
 
 message(src_files: ${src_files})
 
+include_directories(/usr/local/include)
+
+link_directories(/usr/local/lib)
+
 add_executable(${PROJECT_NAME} ${src_files})

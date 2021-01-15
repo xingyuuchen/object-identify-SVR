@@ -3,6 +3,8 @@
 isRun=false
 isBuild=false
 
+cd ..
+
 while [ $# != 0 ]
 do
   if [ "$1" == "-r" ]; then
