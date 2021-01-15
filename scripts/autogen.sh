@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Before you run this script, make sure you have installed ProtoBuffer.
+# Before you run this script, make sure you have installed protobuf.
 
 cd ..
 
