@@ -12,14 +12,14 @@ int NetSceneQueryImg::GetType() {
     return kNetSceneTypeQueryImg;
 }
 
-int NetSceneQueryImg::DoScene(const AutoBuffer& _in_buffer) {
-    Log("[NetSceneQueryImg::DoScene] %s", _in_buffer.Ptr());
+int NetSceneQueryImg::DoScene(const std::string &_in_buffer) {
+    Log("[NetSceneQueryImg::DoScene] len: %ld", _in_buffer.size());
     if (socket_ <= 0) {
         Log("Socket NOT open");
         return -1;
     }
-//    NetSceneQueryImgProto::NetSceneQueryImgReq req;
-//    req.ParseFromArray(_in_buffer.Ptr(), _in_buffer.Length());
+    NetSceneQueryImgProto::NetSceneQueryImgReq req;
+    req.ParseFromArray(_in_buffer.data(), _in_buffer.size());
     // todo: recognize by _buffer
     
     item_type_ = NetSceneQueryImgProto::NetSceneQueryImgResp::PLANT;

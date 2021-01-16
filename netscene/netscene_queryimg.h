@@ -16,7 +16,7 @@ class NetSceneQueryImg : public NetSceneBase {
     
     int GetType();
     
-    int DoScene(const AutoBuffer& _buffer);
+    int DoScene(const std::string &_in_buffer);
 
   public:
   
