@@ -17,7 +17,7 @@ class NetSceneBase {
 
   protected:
     SOCKET      socket_;
-    AutoBuffer  send_body_;
+    AutoBuffer  send_buff_;
 
   private:
   

@@ -4,15 +4,11 @@
 #include <string>
 #include "../netscenebase.h"
 #include "../autobuffer.h"
+#include "../autogen/netscenequeryimg.pb.h"
 
 
 class NetSceneQueryImg : public NetSceneBase {
   public:
-    enum ItemType {
-        kTypePlant      = 0,
-        kTypeAnimal     = 1,
-        kTypeLandMark   = 2,
-    };
     
     NetSceneQueryImg();
     
@@ -28,7 +24,7 @@ class NetSceneQueryImg : public NetSceneBase {
   private:
     std::string item_name_;
     std::string item_desc_;
-    ItemType    item_type_;
+    NetSceneQueryImgProto::NetSceneQueryImgResp_ItemType item_type_;
     
 };
 

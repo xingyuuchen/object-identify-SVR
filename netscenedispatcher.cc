@@ -16,14 +16,14 @@ NetSceneDispatcher::~NetSceneDispatcher() {
     }
 }
 
-int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_buffer) {
-    Log("[Dispatch] recv: %s, len: %ld", _buffer->Ptr(), _buffer->Length());
+int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) {
+    Log("[Dispatch] recv: %s, len: %ld", _in_buffer->Ptr(), _in_buffer->Length());
     int type = 0;   // TODO: decode
     
     for (auto iter = selectors_.begin(); iter != selectors_.end(); iter++) {
         if ((*iter)->GetType() == type) {
             (*iter)->SetSocket(_conn_fd);
-            return (*iter)->DoScene(*_buffer);
+            return (*iter)->DoScene(*_in_buffer);
         }
     }
     Log("NO such NetScene: type: %d", type);

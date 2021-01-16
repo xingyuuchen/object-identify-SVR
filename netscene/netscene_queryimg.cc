@@ -12,24 +12,33 @@ int NetSceneQueryImg::GetType() {
     return kNetSceneTypeQueryImg;
 }
 
-int NetSceneQueryImg::DoScene(const AutoBuffer& _buffer) {
-    Log("[NetSceneQueryImg::DoScene] %s", _buffer.Ptr());
+int NetSceneQueryImg::DoScene(const AutoBuffer& _in_buffer) {
+    Log("[NetSceneQueryImg::DoScene] %s", _in_buffer.Ptr());
     if (socket_ <= 0) {
-        Log("socket not open");
+        Log("Socket NOT open");
         return -1;
     }
+//    NetSceneQueryImgProto::NetSceneQueryImgReq req;
+//    req.ParseFromArray(_in_buffer.Ptr(), _in_buffer.Length());
     // todo: recognize by _buffer
     
-    item_type_ = kTypePlant;
-    item_name_ = "Grass";
-    item_desc_ = "This is grass message from svr...";
+    item_type_ = NetSceneQueryImgProto::NetSceneQueryImgResp::PLANT;
+    item_name_ = "豌豆尖";
+    item_desc_ = "可以结出豌豆，和瘦肉一起炒很好吃";
     
-    send_body_.Reset();
+    NetSceneQueryImgProto::NetSceneQueryImgResp resp;
+    resp.set_item_name(item_name_);
+    resp.set_item_type(item_type_);
+    resp.set_item_desc(item_desc_);
     
-    send_body_.Write((unsigned char *) &item_type_, sizeof(item_type_));
-    send_body_.Write((unsigned char *) item_name_.c_str(), item_name_.length());
-    send_body_.Write((unsigned char *) item_desc_.c_str(), item_desc_.length());
-    send(socket_, send_body_.Ptr(), send_body_.Length(), 0);
+    size_t size = resp.ByteSizeLong();
+    std::string byte_string;
+    resp.SerializeToString(&byte_string);
+    
+    send_buff_.Reset();
+    Log("[NetSceneQueryImg::DoScene] resp.length = %ld", size);
+    send_buff_.Write((unsigned char *) byte_string.data(), size);
+    send(socket_, send_buff_.Ptr(), send_buff_.Length(), 0);
     
     return 0;
 }
