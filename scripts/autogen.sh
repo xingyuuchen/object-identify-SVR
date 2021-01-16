@@ -6,6 +6,10 @@ cd ..
 
 project_dir=$(pwd)
 
+if [ ! -d "/autogen" ]; then
+  mkdir -p autogen
+fi 
+
 cd protos
 
 for file in `ls`
