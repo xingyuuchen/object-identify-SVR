@@ -54,10 +54,9 @@ unsigned char *AutoBuffer::Ptr(const size_t _offset) const {
 
 void AutoBuffer::AddCapacity(size_t _size_to_add) {
     if (_size_to_add <= 0) {
-        Log("Illegal arg _size:%ld", _size_to_add);
+        Log("Illegal arg _size:%zd", _size_to_add);
         return;
     }
-    Log("[AutoBuffer::AddCapacity] _size_to_add: %ld", _size_to_add);
     void *p = realloc(byte_array_, capacity_ + _size_to_add);
     if (p == NULL) {
         Log("[AutoBuffer::AddCapacity] realloc failed, errno(%d): %s", errno, strerror(errno));
@@ -69,6 +68,10 @@ void AutoBuffer::AddCapacity(size_t _size_to_add) {
 
 size_t AutoBuffer::GetCapacity() const {
     return capacity_;
+}
+
+size_t AutoBuffer::AvailableSize() const {
+    return capacity_ - length_;
 }
 
 AutoBuffer::~AutoBuffer() {
@@ -91,3 +94,8 @@ void AutoBuffer::SetLength(size_t _len) {
     }
 }
 
+void AutoBuffer::AddLength(size_t _len) {
+    if (_len > 0) {
+        length_ += _len;
+    }
+}
