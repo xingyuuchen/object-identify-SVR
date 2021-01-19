@@ -1,7 +1,7 @@
 #ifndef OI_SVR_NETSCENEBASE_H
 #define OI_SVR_NETSCENEBASE_H
 #include <string>
-#include "unix_socket.h"
+#include "socket/unix_socket.h"
 
 
 class NetSceneBase {

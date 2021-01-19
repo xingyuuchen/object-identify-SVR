@@ -23,7 +23,7 @@ void Exit() {
 
 
 void Stop(int _sig) {
-    Log("Stop is captured, %d", _sig);
+    Log("signal: %d, process Exit", _sig);
     running = 0;
     if (_sig == 2) {
         Exit();
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
         AutoBuffer recv_buff;
     
         int security = 0;
-        while (security < 1000) {
+        while (security < 1024) {
             size_t nsize = UnixSocket::BlockSocketReceive(connfd, recv_buff, kBuffSize);
             if (nsize <= 0) {
                 Log("UnixSocket::BlockSocketReceive ret: %zd", nsize);

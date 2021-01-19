@@ -18,7 +18,7 @@ NetSceneDispatcher::~NetSceneDispatcher() {
 }
 
 int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) {
-    Log("[Dispatch], _in_buffer.len: %zd", _in_buffer->Length());
+    Log("[Dispatch] _in_buffer.len: %zd", _in_buffer->Length());
     
     BaseNetSceneReq::BaseNetSceneReq base_req;
     base_req.ParseFromArray(_in_buffer->Ptr(), _in_buffer->Length());
@@ -33,6 +33,7 @@ int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) 
                     return (*iter)->DoScene(req_buffer);
                 } else {
                     Log("[Dispatch] type:%d, base_req.has_net_scene_req_buff(): false", type)
+                    return -1;
                 }
             }
         }
