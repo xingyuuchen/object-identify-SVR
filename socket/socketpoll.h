@@ -1,6 +1,7 @@
 #ifndef OI_SVR_SOCKETSELECT_H
 #define OI_SVR_SOCKETSELECT_H
 
+#include <algorithm>
 #include <vector>
 #include <poll.h>
 #include "unix_socket.h"
