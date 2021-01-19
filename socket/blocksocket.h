@@ -9,7 +9,7 @@ size_t BlockSocketReceive(SOCKET _socket,
                             AutoBuffer &_recv_buff,
                             SocketPoll &_socket_poll,
                             size_t _buff_size,
-                            int _timeout_mills = 3000);
+                            int _timeout_mills = 5000);
 
 
 #endif //OI_SVR_BLOCKSOCKET_H

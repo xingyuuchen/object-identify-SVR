@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ `uname` != "Darwin1" ]; then
+if [ `uname` != "Darwin" ]; then
   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
 fi
 

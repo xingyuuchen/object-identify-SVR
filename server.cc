@@ -66,19 +66,16 @@ int main(int argc, char **argv) {
         
         AutoBuffer recv_buff;
 
-        int security = 0;
-        while (security < 1024) {
+        while (true) {
             size_t nsize = BlockSocketReceive(connfd, recv_buff, socket_poll, kBuffSize);
             if (nsize <= 0) {
-                Log("UnixSocket::BlockSocketReceive ret: %zd", nsize);
+                Log("BlockSocketReceive ret: %zd", nsize);
                 break;
             }
             if (nsize < kBuffSize) {
-                Log("UnixSocket::BlockSocketReceive ret: %zd", nsize);
+                Log("BlockSocketReceive ret: %zd", nsize);
                 break;
             }
-
-            security++;
         }
 
         NetSceneDispatcher::GetInstance().Dispatch(connfd, &recv_buff);
