@@ -72,6 +72,7 @@ int main(int argc, char **argv) {
                 Log("UnixSocket::BlockSocketReceive ret: %zd", nsize);
                 break;
             }
+            
             security++;
         }
         

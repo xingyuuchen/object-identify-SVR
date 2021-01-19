@@ -41,11 +41,10 @@ class UnixSocket {
         pollfds.push_back(fd);
         
         while (true) {
-            for (pollfd fd : pollfds) {
+            for (pollfd &fd : pollfds) {
                 fd.revents = 0;
             }
-    
-            // poll函数跟select一样，可以处理多路复用。可以通过设置关注的描述符事件，灵活等待事件的到来。
+            
             int poll_timeout = _timeout_mills > cost_time ? _timeout_mills - cost_time : 0;
             int ret = poll(&pollfds[0], (nfds_t) pollfds.size(), poll_timeout);
             
@@ -54,12 +53,13 @@ class UnixSocket {
                 Log("[BlockSocketReceive] poll errno: %d", errno_)
                 return -1;
             } else if (ret == 0) {
-                Log("[BlockSocketReceive] timeout, nrecv = %zd", nrecv)
+                Log("[BlockSocketReceive] timeout, nrecv = %zd, poll_timeout = %d", nrecv, poll_timeout)
                 return nrecv;
             } else {
                 Log("[BlockSocketReceive] poll ret: %d", ret)
                 for (int i = 0; i < pollfds.size(); ++i) {
                     if (pollfds[i].revents == 0) {
+                        Log("[BlockSocketReceive] revents = 0")
                         continue;
                     }
                     if (pollfds[i].revents & POLLIN) {
@@ -67,7 +67,7 @@ class UnixSocket {
                                          _buff_size - nrecv, 0);
                         
                         if (n > 0) {
-                            _recv_buff.AddLength(nrecv);
+                            _recv_buff.AddLength(n);
                             nrecv += n;
                             if (nrecv >= _buff_size) {
                                 return nrecv;
