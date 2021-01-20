@@ -3,6 +3,7 @@
 #include "headerfield.h"
 #include "../log.h"
 #include <string.h>
+#include "../strutil.h"
 
 
 namespace http { namespace request {
@@ -57,7 +58,7 @@ void Parser::Recv(AutoBuffer &_buff) {
     } else if (position_ == kRequestLine) {
         LogI("[Parser::Recv] kRequestLine")
         char *start = _buff.Ptr();
-        char *ret = strnstr(start, "\r\n", unresolved_len);
+        char *ret = oi::strnstr(start, "\r\n", unresolved_len);
         if (ret != NULL) {
             std::string req_line(start, ret - start);
             if (request_line_.ParseFromString(req_line)) {
@@ -75,7 +76,7 @@ void Parser::Recv(AutoBuffer &_buff) {
     
     } else if (position_ == kRequestHeaders) {
         LogI("[Parser::Recv] kRequestHeaders")
-        char *ret = strnstr(_buff.Ptr(resolved_len_), "\r\n\r\n", unresolved_len);
+        char *ret = oi::strnstr(_buff.Ptr(resolved_len_), "\r\n\r\n", unresolved_len);
         if (ret == NULL) {
             return;
         }

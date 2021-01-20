@@ -1,5 +1,6 @@
 #include "headerfield.h"
 #include "../log.h"
+#include <string.h>
 
 
 namespace http {
