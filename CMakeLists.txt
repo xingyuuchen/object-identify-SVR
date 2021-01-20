@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.4.1)
 project(oi_svr)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lprotobuf -pthread")
-# or set(CMAKE_CXX_STANDARD 11)
+if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+endif()
 
 # aux_source_directory(. src_files)
 file(GLOB_RECURSE src_files "*.cc")
