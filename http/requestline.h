@@ -10,7 +10,8 @@ namespace http {
 class RequestLine {
   public:
     enum THttpMethod {
-        kGET = 0,
+        kUnknownMethod = 0,
+        kGET,
         kPOST,   // only support post
         kDELETE,
         // ...
@@ -19,7 +20,8 @@ class RequestLine {
     static const char *const method2string[kMethodMax];
     
     enum THttpVersion {
-        kHTTP_0_9 = 0,
+        kUnknownVer = 0,
+        kHTTP_0_9,
         kHTTP_1_0,
         kHTTP_1_1,   // only support 1.1
         kHTTP_2_0,
@@ -40,7 +42,14 @@ class RequestLine {
     
     void ToString(std::string &_target);
     
+    bool ParseFromString(std::string &_from);
+    
     void AppendToBuffer(AutoBuffer &_buffer);
+    
+    static THttpMethod __GetHttpMethod(const std::string &_str);
+    
+    static THttpVersion __GetHttpVersion(const std::string &_str);
+    
 
   private:
     THttpMethod method_;

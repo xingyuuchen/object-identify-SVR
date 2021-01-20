@@ -37,7 +37,7 @@ int NetSceneQueryImg::DoScene(const std::string &_in_buffer) {
     
     send_buff_.Reset();
     Log("[NetSceneQueryImg::DoScene] resp.len = %zd", size);
-    send_buff_.Write((unsigned char *) byte_string.data(), size);
+    send_buff_.Write(byte_string.data(), size);
     send(socket_, send_buff_.Ptr(), send_buff_.Length(), 0);
     
     return 0;

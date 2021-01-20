@@ -8,6 +8,7 @@
 #include "netscenedispatcher.h"
 #include "socket/socketpoll.h"
 #include "socket/blocksocket.h"
+#include "http/httprequest.h"
 
 
 const int kBuffSize = 1024;
@@ -33,7 +34,7 @@ void Stop(int _sig) {
 }
 
 
-int main(int argc, char **argv) {
+int main1(int argc, char **argv) {
     printf("Server On...\n");
     signal(2, Stop);
 
@@ -62,23 +63,28 @@ int main(int argc, char **argv) {
         }
         Log("new connect");
     
-        socket_poll.AddSocketToRead(connfd);
+        socket_poll.SetEventRead(connfd);
+        socket_poll.SetEventError(connfd);
+        
+        http::request::Parser parser;
         
         AutoBuffer recv_buff;
-
         while (true) {
             size_t nsize = BlockSocketReceive(connfd, recv_buff, socket_poll, kBuffSize);
             if (nsize <= 0) {
                 Log("BlockSocketReceive ret: %zd", nsize);
                 break;
             }
-            if (nsize < kBuffSize) {
-                Log("BlockSocketReceive ret: %zd", nsize);
+            parser.Recv(recv_buff);
+            if (parser.IsEnd()) {
+                break;
+            } else if (parser.IsErr()) {
+                Log("parser error")
                 break;
             }
         }
 
-        NetSceneDispatcher::GetInstance().Dispatch(connfd, &recv_buff);
+        NetSceneDispatcher::GetInstance().Dispatch(connfd, &parser.GetBody());
 
         socket_poll.RemoveSocket(connfd);
         close(connfd);
@@ -86,4 +92,15 @@ int main(int argc, char **argv) {
     Exit();
 }
 
+
+
+int main() {
+    std::string s("123ddd123");
+    
+    printf("%lu\n", s.find("23"));
+    printf("%lu\n", s.find("12", 2));
+    if (s.find(",,,") == std::string::npos) {
+        printf("ds\n");
+    }
+}
 

@@ -19,7 +19,7 @@ AutoBuffer::AutoBuffer(const AutoBuffer &_auto_buffer)
     
 }
 
-void AutoBuffer::Write(const unsigned char *_byte_array, size_t _len) {
+void AutoBuffer::Write(const char *_byte_array, size_t _len) {
     if (_len <= 0 || _byte_array == NULL) {
         return;
     }
@@ -48,7 +48,7 @@ size_t AutoBuffer::Length() const {
     return length_;
 }
 
-unsigned char *AutoBuffer::Ptr(const size_t _offset) const {
+char *AutoBuffer::Ptr(const size_t _offset) const {
     return byte_array_ + _offset;
 }
 
@@ -63,7 +63,7 @@ void AutoBuffer::AddCapacity(size_t _size_to_add) {
         return;
     }
     capacity_ += _size_to_add;
-    byte_array_ = (unsigned char *) p;
+    byte_array_ = (char *) p;
 }
 
 size_t AutoBuffer::GetCapacity() const {
