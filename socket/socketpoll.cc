@@ -23,7 +23,7 @@ int SocketPoll::Poll(int _msec) {
     return ret;
 }
 
-void SocketPoll::AddSocketToRead(SOCKET _socket) {
+void SocketPoll::SetEventRead(SOCKET _socket) {
     if (_socket < 0) {
         return;
     }
@@ -41,7 +41,7 @@ void SocketPoll::AddSocketToRead(SOCKET _socket) {
     pollfds_.push_back(fd);
 }
 
-void SocketPoll::AddSocketToWrite(SOCKET _socket) {
+void SocketPoll::SetEventWrite(SOCKET _socket) {
     if (_socket < 0) {
         return;
     }
@@ -55,6 +55,24 @@ void SocketPoll::AddSocketToWrite(SOCKET _socket) {
     pollfd fd;
     fd.fd = _socket;
     fd.events = POLLOUT;
+    fd.revents = 0;
+    pollfds_.push_back(fd);
+}
+
+void SocketPoll::SetEventError(SOCKET _socket) {
+    if (_socket < 0) {
+        return;
+    }
+    auto find = FindPollfd(_socket);
+    if (find != pollfds_.end()) {
+        find->events |= POLLERR;
+        Log("[AddSocketToWrite] %d already added", _socket)
+        return;
+    }
+    
+    pollfd fd;
+    fd.fd = _socket;
+    fd.events = POLLERR;
     fd.revents = 0;
     pollfds_.push_back(fd);
 }

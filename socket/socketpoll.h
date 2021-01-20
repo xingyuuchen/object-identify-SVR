@@ -16,13 +16,15 @@ class SocketPoll {
     
     int Poll(int _msec);
     
-    void AddSocketToRead(SOCKET _socket);
+    void SetEventRead(SOCKET _socket);
+    
+    void SetEventWrite(SOCKET _socket);
+    
+    void SetEventError(SOCKET _socket);
     
     bool IsReadSet(SOCKET _socket);
     
     bool IsErrSet(SOCKET _socket);
-    
-    void AddSocketToWrite(SOCKET _socket);
     
     void ClearEvents();
     
