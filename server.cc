@@ -26,7 +26,7 @@ void Exit() {
 
 
 void Stop(int _sig) {
-    Log("signal: %d, process Exit", _sig);
+    LogI("signal: %d, process Exit", _sig);
     running = 0;
     if (_sig == 2) {
         Exit();
@@ -48,7 +48,7 @@ int main1(int argc, char **argv) {
     int connfd;
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
     if (listenfd < 0) {
-        Log("create socket error: %s errno :%d", strerror(errno), errno);
+        LogI("create socket error: %s errno :%d", strerror(errno), errno);
         return -1;
     }
 
@@ -58,10 +58,10 @@ int main1(int argc, char **argv) {
     SocketPoll socket_poll;
     while (running) {
         if ((connfd = accept(listenfd, (struct sockaddr *) NULL, NULL)) == -1) {
-            Log("accept socket error: %s errno :%d", strerror(errno), errno);
+            LogI("accept socket error: %s errno :%d", strerror(errno), errno);
             continue;
         }
-        Log("new connect");
+        LogI("new connect");
     
         socket_poll.SetEventRead(connfd);
         socket_poll.SetEventError(connfd);
@@ -72,14 +72,14 @@ int main1(int argc, char **argv) {
         while (true) {
             size_t nsize = BlockSocketReceive(connfd, recv_buff, socket_poll, kBuffSize);
             if (nsize <= 0) {
-                Log("BlockSocketReceive ret: %zd", nsize);
+                LogI("BlockSocketReceive ret: %zd", nsize);
                 break;
             }
             parser.Recv(recv_buff);
             if (parser.IsEnd()) {
                 break;
             } else if (parser.IsErr()) {
-                Log("parser error")
+                LogI("parser error")
                 break;
             }
         }

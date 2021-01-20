@@ -42,12 +42,12 @@ void Parser::Recv(AutoBuffer &_buff) {
     if (_buff.Length() <= 0) { return; }
     size_t unresolved_len = _buff.Length() - resolved_len_;
     if (unresolved_len <= 0) {    // FIXME +1 -1
-        Log("[Parser::Recv] no bytes need to be resolved: %zd", unresolved_len)
+        LogI("[Parser::Recv] no bytes need to be resolved: %zd", unresolved_len)
         return;
     }
     
     if (position_ == kNone) {
-        Log("[Parser::Recv] kNone")
+        LogI("[Parser::Recv] kNone")
         if (resolved_len_ == 0 && _buff.Length() > 0) {
             position_ = kRequestLine;
             Recv(_buff);
@@ -55,7 +55,7 @@ void Parser::Recv(AutoBuffer &_buff) {
         }
         
     } else if (position_ == kRequestLine) {
-        Log("[Parser::Recv] kRequestLine")
+        LogI("[Parser::Recv] kRequestLine")
         char *start = _buff.Ptr();
         char *ret = strnstr(start, "\r\n", unresolved_len);
         if (ret != NULL) {
@@ -74,7 +74,7 @@ void Parser::Recv(AutoBuffer &_buff) {
         }
     
     } else if (position_ == kRequestHeaders) {
-        Log("[Parser::Recv] kRequestHeaders")
+        LogI("[Parser::Recv] kRequestHeaders")
         char *ret = strnstr(_buff.Ptr(resolved_len_), "\r\n\r\n", unresolved_len);
         if (ret == NULL) {
             return;
@@ -95,13 +95,13 @@ void Parser::Recv(AutoBuffer &_buff) {
     } else if (position_ == kBody) {
         uint64_t content_length = headers_.GetContentLength();
         if (content_length == 0) {
-            Log("[Parser::Recv] content_length = 0")
+            LogI("[Parser::Recv] content_length = 0")
             position_ = kError;
             return;
         }
         body_.Write(_buff.Ptr(resolved_len_), unresolved_len);
         if (content_length < body_.Length()) {
-            Log("[Parser::Recv] recv more %zd bytes than Content-Length(%lld)",
+            LogI("[Parser::Recv] recv more %zd bytes than Content-Length(%lld)",
                 body_.Length(), content_length)
             position_ = kError;
             return;
@@ -112,10 +112,10 @@ void Parser::Recv(AutoBuffer &_buff) {
         resolved_len_ += unresolved_len;
     
     } else if (position_ == kEnd) {
-        Log("[Parser::Recv] kEnd")
+        LogI("[Parser::Recv] kEnd")
     
     } else if (position_ == kError) {
-        Log("[Parser::Recv] error already occurred, do nothing.")
+        LogI("[Parser::Recv] error already occurred, do nothing.")
     }
 }
 

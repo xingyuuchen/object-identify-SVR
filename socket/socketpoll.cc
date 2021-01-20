@@ -30,7 +30,7 @@ void SocketPoll::SetEventRead(SOCKET _socket) {
     auto find = FindPollfd(_socket);
     if (find != pollfds_.end()) {
         find->events |= POLLIN;
-        Log("[AddSocketToRead] socket:%d already added", _socket)
+        LogI("[AddSocketToRead] socket:%d already added", _socket)
         return;
     }
     
@@ -48,7 +48,7 @@ void SocketPoll::SetEventWrite(SOCKET _socket) {
     auto find = FindPollfd(_socket);
     if (find != pollfds_.end()) {
         find->events |= POLLOUT;
-        Log("[AddSocketToWrite] %d already added", _socket)
+        LogI("[AddSocketToWrite] %d already added", _socket)
         return;
     }
     
@@ -66,7 +66,7 @@ void SocketPoll::SetEventError(SOCKET _socket) {
     auto find = FindPollfd(_socket);
     if (find != pollfds_.end()) {
         find->events |= POLLERR;
-        Log("[AddSocketToWrite] %d already added", _socket)
+        LogI("[AddSocketToWrite] %d already added", _socket)
         return;
     }
     

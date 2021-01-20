@@ -27,11 +27,11 @@ bool Connect() {
     sockaddr.sin_addr.s_addr = inet_addr(svrInetAddr);   // inet_pton(AF_INET, svrInetAddr, &sockaddr.sin_addr);
     
     if (connect(socket_, (struct sockaddr *) &sockaddr, sizeof(sockaddr)) < 0) {
-        Log("connect failed");
+        LogI("connect failed");
         close(socket_);
         return false;
     }
-    Log("connect succeed!");
+    LogI("connect succeed!");
     return true;
 }
 

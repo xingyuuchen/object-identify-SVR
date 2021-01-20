@@ -36,7 +36,7 @@ uint64_t HeaderField::GetContentLength() const {
             return strtoul(iter->second.c_str(), NULL, 10);
         }
     }
-    Log("[HeaderField::GetContentLength()] No such field: Content-Length")
+    LogI("[HeaderField::GetContentLength()] No such field: Content-Length")
     return 0;
 }
 

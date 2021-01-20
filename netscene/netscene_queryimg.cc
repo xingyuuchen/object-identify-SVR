@@ -13,9 +13,9 @@ int NetSceneQueryImg::GetType() {
 }
 
 int NetSceneQueryImg::DoScene(const std::string &_in_buffer) {
-    Log("[NetSceneQueryImg::DoScene] req.len: %zd", _in_buffer.size());
+    LogI("[NetSceneQueryImg::DoScene] req.len: %zd", _in_buffer.size());
     if (socket_ <= 0) {
-        Log("Socket NOT open");
+        LogI("Socket NOT open");
         return -1;
     }
     NetSceneQueryImgProto::NetSceneQueryImgReq req;
@@ -36,7 +36,7 @@ int NetSceneQueryImg::DoScene(const std::string &_in_buffer) {
     resp.SerializeToString(&byte_string);
     
     send_buff_.Reset();
-    Log("[NetSceneQueryImg::DoScene] resp.len = %zd", size);
+    LogI("[NetSceneQueryImg::DoScene] resp.len = %zd", size);
     send_buff_.Write(byte_string.data(), size);
     send(socket_, send_buff_.Ptr(), send_buff_.Length(), 0);
     

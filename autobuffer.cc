@@ -54,12 +54,12 @@ char *AutoBuffer::Ptr(const size_t _offset) const {
 
 void AutoBuffer::AddCapacity(size_t _size_to_add) {
     if (_size_to_add <= 0) {
-        Log("Illegal arg _size:%zd", _size_to_add);
+        LogI("Illegal arg _size:%zd", _size_to_add);
         return;
     }
     void *p = realloc(byte_array_, capacity_ + _size_to_add);
     if (p == NULL) {
-        Log("[AutoBuffer::AddCapacity] realloc failed, errno(%d): %s", errno, strerror(errno));
+        LogI("[AutoBuffer::AddCapacity] realloc failed, errno(%d): %s", errno, strerror(errno));
         return;
     }
     capacity_ += _size_to_add;

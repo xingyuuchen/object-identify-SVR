@@ -18,7 +18,7 @@ NetSceneDispatcher::~NetSceneDispatcher() {
 }
 
 int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) {
-    Log("[Dispatch] _in_buffer.len: %zd", _in_buffer->Length());
+    LogI("[Dispatch] _in_buffer.len: %zd", _in_buffer->Length());
     
     BaseNetSceneReq::BaseNetSceneReq base_req;
     base_req.ParseFromArray(_in_buffer->Ptr(), _in_buffer->Length());
@@ -32,14 +32,14 @@ int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) 
                     (*iter)->SetSocket(_conn_fd);
                     return (*iter)->DoScene(req_buffer);
                 } else {
-                    Log("[Dispatch] type:%d, base_req.has_net_scene_req_buff(): false", type)
+                    LogI("[Dispatch] type:%d, base_req.has_net_scene_req_buff(): false", type)
                     return -1;
                 }
             }
         }
-        Log("ERR: NO such NetScene: type: %d, did not processing this request.", type);
+        LogI("ERR: NO such NetScene: type: %d, did not processing this request.", type);
     } else {
-        Log("[Dispatch] base_req.has_net_scene_type(): false")
+        LogI("[Dispatch] base_req.has_net_scene_type(): false")
     }
     
     return -1;
