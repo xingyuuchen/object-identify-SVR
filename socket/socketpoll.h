@@ -28,7 +28,7 @@ class SocketPoll {
     
     void RemoveSocket(SOCKET _socket);
     
-    int GetErrNo() const;
+    int GetErrno() const;
 
   private:
     

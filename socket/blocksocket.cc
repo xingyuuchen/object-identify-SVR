@@ -5,7 +5,9 @@
 size_t BlockSocketReceive(SOCKET _socket, AutoBuffer &_recv_buff,
                           SocketPoll &_socket_poll,
                           size_t _buff_size,
-                          int _timeout_mills) {
+                          int _timeout_mills/* = 5000*/) {
+    
+    uint64_t start_time = GetCurrentTimeMillis();
     
     if (_timeout_mills < -1) { _timeout_mills = -1; }
     size_t available = _recv_buff.AvailableSize();
@@ -14,18 +16,16 @@ size_t BlockSocketReceive(SOCKET _socket, AutoBuffer &_recv_buff,
     }
     
     ssize_t nrecv = 0;
-    uint64_t start_time = GetCurrentTimeMillis();
     uint64_t cost_time = 0;
     
     
     while (true) {
-        _socket_poll.ClearEvents();
         
         int poll_timeout = _timeout_mills > cost_time ? _timeout_mills - cost_time : 0;
         int ret = _socket_poll.Poll(poll_timeout);
         
         if (ret < 0) {
-            int errno_ = _socket_poll.GetErrNo();
+            int errno_ = _socket_poll.GetErrno();
             Log("[BlockSocketReceive] poll errno: %d", errno_)
             return -1;
         } else if (ret == 0) {

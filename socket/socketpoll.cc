@@ -14,9 +14,7 @@ int SocketPoll::Poll() {
 
 int SocketPoll::Poll(int _msec) {
     if (_msec < -1) { _msec = -1; }
-    for (pollfd &fd : pollfds_) {
-        fd.revents = 0;
-    }
+    ClearEvents();
     
     int ret = poll(&pollfds_[0], (nfds_t) pollfds_.size(), _msec);
     if (ret < 0) {
@@ -90,7 +88,7 @@ void SocketPoll::RemoveSocket(SOCKET _socket) {
     }
 }
 
-int SocketPoll::GetErrNo() const {
+int SocketPoll::GetErrno() const {
     return errno_;
 }
 
