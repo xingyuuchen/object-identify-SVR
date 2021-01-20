@@ -1,4 +1,5 @@
 #include "requestline.h"
+#include <string.h>
 
 
 namespace http {
