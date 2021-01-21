@@ -35,7 +35,7 @@ void Stop(int _sig) {
 }
 
 
-int main1(int argc, char **argv) {
+int main(int argc, char **argv) {
     printf("Server On...\n");
     signal(2, Stop);
 
@@ -59,7 +59,7 @@ int main1(int argc, char **argv) {
     SocketPoll socket_poll;
     while (running) {
         if ((connfd = accept(listenfd, (struct sockaddr *) NULL, NULL)) == -1) {
-            LogI("accept socket error: %s errno :%d", strerror(errno), errno);
+            LogE("accept socket error: %s errno :%d", strerror(errno), errno);
             continue;
         }
         LogI("new connect");
@@ -93,7 +93,7 @@ int main1(int argc, char **argv) {
     Exit();
 }
 
-int main() {
-//    LogE("ds")
-}
+//int main() {
+//
+//}
 
