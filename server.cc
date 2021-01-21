@@ -80,7 +80,7 @@ int main1(int argc, char **argv) {
             if (parser.IsEnd()) {
                 break;
             } else if (parser.IsErr()) {
-                LogI("parser error")
+                LogE("parser error")
                 break;
             }
         }
