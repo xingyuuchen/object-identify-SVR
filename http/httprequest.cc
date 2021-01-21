@@ -1,5 +1,5 @@
 #include "httprequest.h"
-#include "requestline.h"
+#include "firstline.h"
 #include "headerfield.h"
 #include "../log.h"
 #include <string.h>
@@ -14,8 +14,8 @@ void Pack(const std::string &_host, const std::string &_url, const std::map<std:
     _out_buff.Reset();
     
     RequestLine request_line;
-    request_line.SetMethod(http::RequestLine::kPOST);
-    request_line.SetVersion(http::RequestLine::kHTTP_1_1);
+    request_line.SetMethod(http::kPOST);
+    request_line.SetVersion(http::kHTTP_1_1);
     request_line.SetUrl(_url);
     request_line.AppendToBuffer(_out_buff);
     
@@ -40,8 +40,7 @@ Parser::Parser()
     : position_(TPosition::kNone)
     , resolved_len_(0)
     , request_line_len_(0)
-    , request_header_len_(0)
-    , request_line_ok_(false) {}
+    , request_header_len_(0) {}
         
 
 void Parser::__ResolveRequestLine(AutoBuffer &_buff) {
@@ -50,7 +49,6 @@ void Parser::__ResolveRequestLine(AutoBuffer &_buff) {
     if (crlf != NULL) {
         std::string req_line(start, crlf - start);
         if (request_line_.ParseFromString(req_line)) {
-            request_line_ok_ = true;
             position_ = kRequestHeaders;
             resolved_len_ = crlf - start + 2;   // 2 for CRLF
             request_line_len_ = resolved_len_;
