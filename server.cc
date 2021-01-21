@@ -12,7 +12,7 @@
 #include "http/httprequest.h"
 
 
-const int kBuffSize = 1024;
+static const int kBuffSize = 1024;
 
 int running = 1;
 int listenfd = -1;
@@ -73,10 +73,12 @@ int main(int argc, char **argv) {
         while (true) {
             size_t nsize = BlockSocketReceive(connfd, recv_buff, socket_poll, kBuffSize);
             if (nsize <= 0) {
-                LogI("BlockSocketReceive ret: %zd", nsize);
+                LogE("BlockSocketReceive ret: %zd", nsize);
                 break;
             }
+            
             parser.Recv(recv_buff);
+            
             if (parser.IsEnd()) {
                 break;
             } else if (parser.IsErr()) {

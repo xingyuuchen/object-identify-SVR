@@ -52,6 +52,7 @@ size_t BlockSocketReceive(SOCKET _socket, AutoBuffer &_recv_buff,
                         returned.
                      */
                     LogI("[BlockSocketReceive] n == 0, nrecv = %zd", nrecv)
+                    return 0;
                 } else {
                     LogI("[BlockSocketReceive] n:%zd, nrecv = %zd", n, nrecv)
                     return nrecv;

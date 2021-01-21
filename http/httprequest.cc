@@ -31,6 +31,8 @@ void Pack(const std::string &_host, const std::string &_url, const std::map<std:
     header_field.InsertOrUpdateHeader(HeaderField::KContentLength, len_str);
     
     header_field.AppendToBuffer(_out_buff);
+    _out_buff.Write(_send_body.Ptr(), _send_body.Length());
+    
 }
 
 
@@ -104,7 +106,7 @@ void Parser::__ResolveBody(AutoBuffer &_buff) {
     } else if (content_length == body_.Length()) {
         position_ = kEnd;
     }
-    LogI("%ld %lld", body_.Length(), content_length)
+
 }
 
 
