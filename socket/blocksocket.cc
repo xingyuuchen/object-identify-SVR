@@ -5,7 +5,8 @@
 size_t BlockSocketReceive(SOCKET _socket, AutoBuffer &_recv_buff,
                           SocketPoll &_socket_poll,
                           size_t _buff_size,
-                          int _timeout_mills/* = 5000*/) {
+                          int _timeout_mills/* = 5000*/,
+                          bool _wait_full/* = false*/) {
     
     uint64_t start_time = GetCurrentTimeMillis();
     
@@ -41,9 +42,9 @@ size_t BlockSocketReceive(SOCKET _socket, AutoBuffer &_recv_buff,
                 if (n > 0) {
                     _recv_buff.AddLength(n);
                     nrecv += n;
-                    if (nrecv >= _buff_size) {
-                        return nrecv;
-                    }
+                    if (!_wait_full) { return nrecv; }
+                    
+                    if (nrecv >= _buff_size) { return nrecv; }
                     
                 } else if (n == 0) {
                     /*  If no messages are available to be

@@ -36,13 +36,82 @@ void Pack(const std::string &_host, const std::string &_url, const std::map<std:
 
 Parser::Parser()
     : position_(TPosition::kNone)
+    , resolved_len_(0)
+    , request_line_len_(0)
+    , request_header_len_(0)
     , request_line_ok_(false) {}
         
+
+void Parser::__ResolveRequestLine(AutoBuffer &_buff) {
+    char *start = _buff.Ptr();
+    char *crlf = oi::strnstr(start, "\r\n", _buff.Length());
+    if (crlf != NULL) {
+        std::string req_line(start, crlf - start);
+        if (request_line_.ParseFromString(req_line)) {
+            request_line_ok_ = true;
+            position_ = kRequestHeaders;
+            resolved_len_ = crlf - start + 2;   // 2 for CRLF
+            request_line_len_ = resolved_len_;
+    
+            if (_buff.Length() > resolved_len_) {
+                __ResolveRequestHeaders(_buff);
+            }
+            return;
+            
+        } else {
+            position_ = kError;
+        }
+    }
+    resolved_len_ = 0;
+}
+
+void Parser::__ResolveRequestHeaders(AutoBuffer &_buff) {
+    char *ret = oi::strnstr(_buff.Ptr(resolved_len_),
+                    "\r\n\r\n", _buff.Length() - resolved_len_);
+    if (ret == NULL) { return; }
+    
+    std::string headers_str(_buff.Ptr(resolved_len_), ret - _buff.Ptr(resolved_len_));
+    
+    if (headers_.ParseFromString(headers_str)) {
+        resolved_len_ += ret - _buff.Ptr(resolved_len_) + 4;  // 4 for \r\n\r\n
+        request_header_len_ = resolved_len_ - request_line_len_;
+        position_ = kBody;
+        
+        if (_buff.Length() > resolved_len_) {
+            __ResolveBody(_buff);
+        }
+    } else {
+        position_ = kError;
+        LogE("[__ResolveRequestHeaders] headers_.ParseFromString Err")
+    }
+}
+
+void Parser::__ResolveBody(AutoBuffer &_buff) {
+    uint64_t content_length = headers_.GetContentLength();
+    if (content_length == 0) {
+        LogI("[Parser::Recv] content_length = 0")
+        position_ = kError;
+        return;
+    }
+    size_t new_size = _buff.Length() - resolved_len_;
+    body_.Write(_buff.Ptr(resolved_len_), new_size);
+    resolved_len_ += new_size;
+    
+    if (content_length < body_.Length()) {
+        LogI("[Parser::Recv] recv more %zd bytes than Content-Length(%lld)",
+             body_.Length(), content_length)
+        position_ = kError;
+    } else if (content_length == body_.Length()) {
+        position_ = kEnd;
+    }
+    LogI("%ld %lld", body_.Length(), content_length)
+}
+
 
 void Parser::Recv(AutoBuffer &_buff) {
     if (_buff.Length() <= 0) { return; }
     size_t unresolved_len = _buff.Length() - resolved_len_;
-    if (unresolved_len <= 0) {    // FIXME +1 -1
+    if (unresolved_len <= 0) {
         LogI("[Parser::Recv] no bytes need to be resolved: %zd", unresolved_len)
         return;
     }
@@ -51,66 +120,19 @@ void Parser::Recv(AutoBuffer &_buff) {
         LogI("[Parser::Recv] kNone")
         if (resolved_len_ == 0 && _buff.Length() > 0) {
             position_ = kRequestLine;
-            Recv(_buff);
-            return;
+            __ResolveRequestLine(_buff);
         }
         
     } else if (position_ == kRequestLine) {
         LogI("[Parser::Recv] kRequestLine")
-        char *start = _buff.Ptr();
-        char *ret = oi::strnstr(start, "\r\n", unresolved_len);
-        if (ret != NULL) {
-            std::string req_line(start, ret - start);
-            if (request_line_.ParseFromString(req_line)) {
-                request_line_ok_ = true;
-                position_ = kRequestHeaders;
-                resolved_len_ = ret - start;
-                Recv(_buff);
-                return;
-            } else {
-                position_ = kError;
-                resolved_len_ = 0;  // parse next time
-                return;
-            }
-        }
+        __ResolveRequestLine(_buff);
     
     } else if (position_ == kRequestHeaders) {
         LogI("[Parser::Recv] kRequestHeaders")
-        char *ret = oi::strnstr(_buff.Ptr(resolved_len_), "\r\n\r\n", unresolved_len);
-        if (ret == NULL) {
-            return;
-        }
-    
-        std::string headers_str(_buff.Ptr(resolved_len_), unresolved_len);
-    
-        if (headers_.ParseFromString(headers_str)) {
-            resolved_len_ += unresolved_len;
-            position_ = kBody;
-            Recv(_buff);
-            return;
-        } else {
-            position_ = kError;
-            return;
-        }
+        __ResolveRequestHeaders(_buff);
     
     } else if (position_ == kBody) {
-        uint64_t content_length = headers_.GetContentLength();
-        if (content_length == 0) {
-            LogI("[Parser::Recv] content_length = 0")
-            position_ = kError;
-            return;
-        }
-        body_.Write(_buff.Ptr(resolved_len_), unresolved_len);
-        if (content_length < body_.Length()) {
-            LogI("[Parser::Recv] recv more %zd bytes than Content-Length(%lld)",
-                body_.Length(), content_length)
-            position_ = kError;
-            return;
-        } else if (content_length == body_.Length()) {
-            position_ = kEnd;
-            return;
-        }
-        resolved_len_ += unresolved_len;
+        __ResolveBody(_buff);
     
     } else if (position_ == kEnd) {
         LogI("[Parser::Recv] kEnd")
