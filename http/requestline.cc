@@ -14,7 +14,7 @@ const char *const RequestLine::method2string[] = {
         "unknown",
         "GET",
         "POST",
-        "DELETE"
+        "DELETE",
 };
 
 const char *const RequestLine::version2string[] = {

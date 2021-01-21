@@ -16,7 +16,7 @@ inline char *strnstr(const char *_haystack,
     
     if (!len2) { return (char *) _haystack; }
     
-    len1 = (int) strlen(_haystack);
+    len1 = (int) strnlen(_haystack, _len);
     _len = _len > len1 ? len1 : _len;
     
     while (_len >= len2) {
