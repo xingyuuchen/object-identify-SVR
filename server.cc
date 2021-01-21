@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdio.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <netinet/in.h>
@@ -34,7 +35,7 @@ void Stop(int _sig) {
 }
 
 
-int main(int argc, char **argv) {
+int main1(int argc, char **argv) {
     printf("Server On...\n");
     signal(2, Stop);
 
@@ -92,15 +93,7 @@ int main(int argc, char **argv) {
     Exit();
 }
 
-//#include "strutil.h"
-//int main() {
-//    std::string _from("\r\nname:cxy\r\n\r\nCl:132123\r\nhost:12313221\r\n\r\n");
-//
-//    std::vector<std::string> res;
-//    oi::split(_from, "\r\n", res);
-//    for (auto & s : res) {
-//        printf("%s ", s.c_str());
-//        printf("%ld\n", s.size());
-//    }
-//}
+int main() {
+//    LogE("ds")
+}
 

@@ -27,13 +27,12 @@ size_t BlockSocketReceive(SOCKET _socket, AutoBuffer &_recv_buff,
         
         if (ret < 0) {
             int errno_ = _socket_poll.GetErrno();
-            LogI("[BlockSocketReceive] poll errno: %d", errno_)
+            LogE("[BlockSocketReceive] poll errno: %d", errno_)
             return -1;
         } else if (ret == 0) {
-            LogI("[BlockSocketReceive] timeout, nrecv = %zd, poll_timeout = %d", nrecv, poll_timeout)
+            LogE("[BlockSocketReceive] timeout, nrecv = %zd, poll_timeout = %d", nrecv, poll_timeout)
             return nrecv;
         } else {
-            LogI("[BlockSocketReceive] poll ret: %d", ret)
             
             if (_socket_poll.IsReadSet(_socket)) {
                 ssize_t n = recv(_socket, _recv_buff.Ptr(_recv_buff.Length()),

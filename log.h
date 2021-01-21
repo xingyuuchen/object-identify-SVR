@@ -3,12 +3,13 @@
 
 #include "stdio.h"
 
-#define LogI(...)    printf(__VA_ARGS__); \
+#define LogI(...)    printf("I/")\
+    printf(__VA_ARGS__); \
     printf("\n");
 
-// TODO LogE
 
-#define LogE(...)    printf(__VA_ARGS__); \
+#define LogE(...)    printf("E/")\
+    printf(__VA_ARGS__); \
     printf("\n");
 
 
