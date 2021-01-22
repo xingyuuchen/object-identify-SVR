@@ -1,4 +1,5 @@
 # svr for object-identify
+### 此工程不使用第三方库，网络请求从unix的系统调用写起。
 ## 编译方法
 
 ### UNIX
@@ -16,4 +17,4 @@ bash cmake.sh -b
 ```
 
 ### Windows
-暂不支持
+不支持

@@ -1,8 +1,5 @@
 #include <iostream>
-#include <stdio.h>
-#include <sys/socket.h>
 #include <unistd.h>
-#include <netinet/in.h>
 #include <string.h>
 #include <signal.h>
 #include "log.h"
@@ -14,7 +11,7 @@
 
 static const int kBuffSize = 1024;
 
-int running = 1;
+bool running = true;
 int listenfd = -1;
 int bind_res = -1;
 
@@ -28,7 +25,7 @@ void Exit() {
 
 void Stop(int _sig) {
     LogI("signal: %d, process Exit", _sig);
-    running = 0;
+    running = false;
     if (_sig == 2) {
         Exit();
     }
@@ -36,7 +33,7 @@ void Stop(int _sig) {
 
 
 int main(int argc, char **argv) {
-    printf("Server On...\n");
+    LogI("Server On...");
     signal(2, Stop);
 
     struct sockaddr_in sock_addr;
@@ -95,7 +92,5 @@ int main(int argc, char **argv) {
     Exit();
 }
 
-//int main() {
-//
-//}
+
 
