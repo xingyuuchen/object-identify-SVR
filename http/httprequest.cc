@@ -26,7 +26,7 @@ void Pack(const std::string &_host, const std::string &_url, const std::map<std:
     header_field.InsertOrUpdateHeader(HeaderField::KHost, _host);
     header_field.InsertOrUpdateHeader(HeaderField::KConnection, HeaderField::KConnectionClose);
     
-    char len_str[8] = {0, };
+    char len_str[9] = {0, };
     snprintf(len_str, sizeof(len_str), "%zu", _send_body.Length());
     header_field.InsertOrUpdateHeader(HeaderField::KContentLength, len_str);
     
@@ -89,7 +89,7 @@ void Parser::__ResolveRequestHeaders(AutoBuffer &_buff) {
 void Parser::__ResolveBody(AutoBuffer &_buff) {
     uint64_t content_length = headers_.GetContentLength();
     if (content_length == 0) {
-        LogI("[Parser::Recv] content_length = 0")
+        LogI("[req::Parser::Recv] content_length = 0")
         position_ = kError;
         return;
     }
@@ -98,7 +98,7 @@ void Parser::__ResolveBody(AutoBuffer &_buff) {
     resolved_len_ += new_size;
     
     if (content_length < body_.Length()) {
-        LogI("[Parser::Recv] recv more %zd bytes than Content-Length(%lld)",
+        LogI("[req::Parser::__ResolveBody] recv more %zd bytes than Content-Length(%lld)",
              body_.Length(), content_length)
         position_ = kError;
     } else if (content_length == body_.Length()) {
@@ -112,33 +112,33 @@ void Parser::Recv(AutoBuffer &_buff) {
     if (_buff.Length() <= 0) { return; }
     size_t unresolved_len = _buff.Length() - resolved_len_;
     if (unresolved_len <= 0) {
-        LogI("[Parser::Recv] no bytes need to be resolved: %zd", unresolved_len)
+        LogI("[req::Parser::Recv] no bytes need to be resolved: %zd", unresolved_len)
         return;
     }
     
     if (position_ == kNone) {
-        LogI("[Parser::Recv] kNone")
+        LogI("[req::Parser::Recv] kNone")
         if (resolved_len_ == 0 && _buff.Length() > 0) {
             position_ = kRequestLine;
             __ResolveRequestLine(_buff);
         }
         
     } else if (position_ == kRequestLine) {
-        LogI("[Parser::Recv] kRequestLine")
+        LogI("[req::Parser::Recv] kRequestLine")
         __ResolveRequestLine(_buff);
     
     } else if (position_ == kRequestHeaders) {
-        LogI("[Parser::Recv] kRequestHeaders")
+        LogI("[req::Parser::Recv] kRequestHeaders")
         __ResolveRequestHeaders(_buff);
     
     } else if (position_ == kBody) {
         __ResolveBody(_buff);
     
     } else if (position_ == kEnd) {
-        LogI("[Parser::Recv] kEnd")
+        LogI("[req::Parser::Recv] kEnd")
     
     } else if (position_ == kError) {
-        LogI("[Parser::Recv] error already occurred, do nothing.")
+        LogI("[req::Parser::Recv] error already occurred, do nothing.")
     }
 }
 

@@ -67,9 +67,9 @@ class RequestLine {
     
 
   private:
-    THttpMethod method_;
-    std::string url_;
-    THttpVersion version_;
+    THttpMethod     method_;
+    std::string     url_;
+    THttpVersion    version_;
     
 };
 
@@ -78,11 +78,25 @@ class RequestLine {
 
 class StatusLine {
   public:
+    StatusLine();
+
+    void SetVersion(THttpVersion _version);
+
+    void SetStatusCode(int _status_code);
+
+    void SetStatusDesc(std::string &_desc);
+
+    void ToString(std::string &_target);
+
+    bool ParseFromString(std::string &_from);
+
+    void AppendToBuffer(AutoBuffer &_buffer);
 
 
   private:
-
-
+    THttpVersion    version_;
+    int             status_code_;
+    std::string     status_desc_;
 
 };
 

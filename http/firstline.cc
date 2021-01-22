@@ -53,7 +53,7 @@ bool RequestLine::ParseFromString(std::string &_from) {
     std::vector<std::string> res;
     oi::split(_from, " ", res);
     if (res.size() != 3) {
-        LogI("[RequestLine::ParseFromString] res.size(): %ld", res.size())
+        LogI("[RequestLine::ParseFromString] res.size(): %zd", res.size())
         return false;
     }
     method_ = GetHttpMethod(res[0]);
@@ -68,6 +68,53 @@ void RequestLine::AppendToBuffer(AutoBuffer &_buffer) {
     _buffer.Write(str.data(), str.size());
 }
 
+
+
+
+StatusLine::StatusLine()
+    : status_code_(200)
+    , version_(kHTTP_1_1)
+    , status_desc_() {}
+
+
+void StatusLine::SetVersion(THttpVersion _version) { version_ = _version; }
+
+void StatusLine::SetStatusCode(int _status_code) { status_code_ = _status_code; }
+
+void StatusLine::SetStatusDesc(std::string &_desc) { status_desc_ = _desc; }
+
+void StatusLine::ToString(std::string &_target) {
+    _target.clear();
+    _target += version2string[version_];
+    _target += " ";
+    char status_code_str[4] = {0, };
+    snprintf(status_code_str, sizeof(status_code_str), "%u", status_code_);
+    _target += status_code_str;
+    _target += " ";
+    _target += status_desc_;
+    _target += "\r\n";
+}
+
+bool StatusLine::ParseFromString(std::string &_from) {
+    std::vector<std::string> res;
+    oi::split(_from, " ", res);
+    if (res.size() != 3) {
+        LogI("[StatusLine::ParseFromString] res.size(): %zd", res.size())
+        return false;
+    }
+    version_ = GetHttpVersion(res[0]);
+    status_desc_ = GetHttpVersion(res[2]);
+    
+    status_code_ = strtoul(res[1].c_str(), NULL, 10);
+    if (status_code_ < 0 || status_code_ > 1000) { return false; }
+    return true;
+}
+
+void StatusLine::AppendToBuffer(AutoBuffer &_buffer) {
+    std::string str;
+    ToString(str);
+    _buffer.Write(str.data(), str.size());
+}
 
 
 }
