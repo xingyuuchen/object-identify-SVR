@@ -5,7 +5,7 @@
 ### UNIX
 ```
 git clone https://github.com/xingyuuchen/object-identify-SVR.git
-cd object-identify-SVR
+cd object-identify-SVR/scripts
 ```
 编译运行
 ```
