@@ -11,13 +11,12 @@ AutoBuffer::AutoBuffer(size_t _malloc_unit_size)
         , pos_(0)
         , length_(0)
         , capacity_(0)
-        , malloc_unit_size_(_malloc_unit_size) {
-}
+        , malloc_unit_size_(_malloc_unit_size) {}
+
 
 AutoBuffer::AutoBuffer(const AutoBuffer &_auto_buffer)
-        : malloc_unit_size_(128) {
-    
-}
+        : malloc_unit_size_(128) {}
+
 
 void AutoBuffer::Write(const char *_byte_array, size_t _len) {
     if (_len <= 0 || _byte_array == NULL) {
