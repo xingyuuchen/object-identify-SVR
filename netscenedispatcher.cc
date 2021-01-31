@@ -1,13 +1,14 @@
 #include "netscenedispatcher.h"
 #include <stdio.h>
 #include "autogen/basenetscenereq.pb.h"
-#include "netscene/netscene_queryimg.h"
 #include "log.h"
+#include "netscene/netscene_queryimg.h"
+#include "netscene/netscene_gettrainprogress.h"
 
 
 NetSceneDispatcher::NetSceneDispatcher() {
     selectors_.push_back(new NetSceneQueryImg());
-    
+    selectors_.push_back(new NetSceneGetTrainProgress());
     
 }
 
