@@ -19,6 +19,8 @@ class NetSceneBase {
     int DoScene(const std::string &_in_buffer);
     
     void PackAndSend();
+    
+    void CopyRespToSendBody(std::string &_resp, size_t _size);
 
 
 protected:

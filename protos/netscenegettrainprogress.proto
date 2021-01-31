@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package NetSceneGetTrainProgress;
+package NetSceneGetTrainProgressProto;
 
 
 message NetSceneGetTrainProgressReq {
@@ -10,7 +10,8 @@ message NetSceneGetTrainProgressReq {
 
 message NetSceneGetTrainProgressResp {
   optional bool is_running = 1;
-  optional uint32 percent = 2;
+  optional uint32 curr_epoch = 2;
+  optional uint32 total_epoch = 3;
 
 }
 

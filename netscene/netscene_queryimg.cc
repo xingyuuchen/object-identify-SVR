@@ -15,12 +15,12 @@ int NetSceneQueryImg::GetType() {
 int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
     LogI("[NetSceneQueryImg::DoSceneImpl] req.len: %zd", _in_buffer.size());
     if (socket_ <= 0) {
-        LogI("Socket NOT open");
+        LogE("[NetSceneQueryImg] Socket NOT open");
         return -1;
     }
     NetSceneQueryImgProto::NetSceneQueryImgReq req;
     req.ParseFromArray(_in_buffer.data(), _in_buffer.size());
-    // TODO: recognize by _buffer
+    // TODO: recognize by _in_buffer
     
     item_type_ = NetSceneQueryImgProto::NetSceneQueryImgResp::PLANT;
     item_name_ = "豌豆尖";
@@ -34,11 +34,7 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
     size_t size = resp.ByteSizeLong();
     std::string byte_string;
     resp.SerializeToString(&byte_string);
-    
-    send_body_.Reset();
-    LogI("[NetSceneQueryImg::DoSceneImpl] resp body len = %zd", size);
-    send_body_.Write(byte_string.data(), size);
-    
+    CopyRespToSendBody(byte_string, size);
     return 0;
 }
 

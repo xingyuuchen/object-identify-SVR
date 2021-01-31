@@ -15,6 +15,11 @@ int NetSceneBase::DoScene(const std::string &_in_buffer) {
     return ret;
 }
 
+void NetSceneBase::CopyRespToSendBody(std::string &_resp, size_t _size) {
+    send_body_.Reset();
+    LogI("[type%d CopyRespToSendBody] resp body len = %zd", GetType(), _size);
+    send_body_.Write(_resp.data(), _size);
+}
 
 void NetSceneBase::PackAndSend() {
     AutoBuffer out_buff;
