@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package NetSceneGetTrainProgress;
+
+
+message NetSceneGetTrainProgressReq {
+  optional bool nop = 1;  // no req body, this is for padding.
+
+}
+
+message NetSceneGetTrainProgressResp {
+  optional bool is_running = 1;
+  optional uint32 percent = 2;
+
+}
+
