@@ -4,7 +4,9 @@
 #include "../netscenebase.h"
 #include "../autobuffer.h"
 
-
+/**
+ * 业务代码，获取目前训练进度。
+ */
 class NetSceneGetTrainProgress : public NetSceneBase {
   public:
     

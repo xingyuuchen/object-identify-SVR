@@ -3,7 +3,9 @@
 #include <string>
 #include "../log.h"
 
-
+/**
+ * 业务代码，查询图片类别。
+ */
 NetSceneQueryImg::NetSceneQueryImg() : NetSceneBase() {
 
 }

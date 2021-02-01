@@ -6,7 +6,9 @@
 #include "../autobuffer.h"
 #include "../autogen/netscenequeryimg.pb.h"
 
-
+/**
+ * 业务代码，查询图片类别。
+ */
 class NetSceneQueryImg : public NetSceneBase {
   public:
     

@@ -38,7 +38,7 @@ int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) 
                 }
             }
         }
-        LogI("ERR: NO such NetScene: type: %d, did not processing this request.", type);
+        LogI("ERR: NO such NetScene: type=%d, did not processing this request.", type);
     } else {
         LogI("[Dispatch] base_req.has_net_scene_type(): false")
     }

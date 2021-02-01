@@ -3,7 +3,10 @@
 #include "../constantsprotocol.h"
 #include "../autogen/netscenegettrainprogress.pb.h"
 
-
+/**
+ * 业务代码，获取目前训练进度。
+ */
+ 
 NetSceneGetTrainProgress::NetSceneGetTrainProgress() {
 
 }
@@ -19,6 +22,11 @@ int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
         LogE("[NetSceneGetTrainProgress] Socket NOT open");
         return -1;
     }
+    
+    FILE* file = fopen("/root/cxy/trainprogress.txt", "r");
+    char ch[10] = {0, };
+    fread(ch, sizeof(ch), sizeof(ch), file);
+    
     
     send_body_.Reset();
     NetSceneGetTrainProgressProto::NetSceneGetTrainProgressResp resp;
