@@ -113,6 +113,6 @@ if __name__ == '__main__':
     PATH = './cifar_net'
 
     start = time.perf_counter()
-    train(PATH, 20)
+    train(PATH, 200)
     # test(PATH)
     print("{:.4f}s".format(time.perf_counter() - start))
