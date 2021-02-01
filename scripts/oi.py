@@ -45,7 +45,7 @@ def train(savePath, epochs):
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
     for epoch in range(epochs):  # loop over the dataset multiple times
 
-        os.system('echo "{} {}" > /root/cxy/trainprogress.txt'.format(epoch, epochs - 1))
+        os.system('echo "{} {}" > /root/cxy/trainprogress.txt'.format(epoch + 1, epochs))
         running_loss = 0.0
         for i, data in enumerate(trainloader, 0):
             # get the inputs; data is a list of [inputs, labels]
@@ -113,6 +113,6 @@ if __name__ == '__main__':
     PATH = './cifar_net'
 
     start = time.perf_counter()
-    train(PATH, 5)
+    train(PATH, 20)
     # test(PATH)
     print("{:.4f}s".format(time.perf_counter() - start))

@@ -4,3 +4,4 @@
 test_client.cc
 build/*
 autogen/*
+logs/*

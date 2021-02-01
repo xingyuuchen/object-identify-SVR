@@ -9,7 +9,7 @@ cd object-identify-SVR/scripts
 ```
 编译运行
 ```
-bash cmake.sh -b -r
+bash cmake.sh -b -r -B      # -n for nohup background
 ```
 仅编译
 ```
