@@ -20,8 +20,8 @@ class NetSceneGetTrainProgress : public NetSceneBase {
     
     
   private:
-    uint32_t    curr_epoch_;
-    uint32_t    total_epoch_;
+    int32_t     curr_epoch_;
+    int32_t     total_epoch_;
     bool        is_running_;
     
 };

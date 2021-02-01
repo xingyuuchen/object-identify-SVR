@@ -32,15 +32,15 @@ inline char *strnstr(const char *_haystack,
     return NULL;
 }
 
-inline void split(const std::string &_src, const std::string &_split,
+inline void split(const std::string &_src, const std::string &_separator,
                   std::vector<std::string> &_res) {
     _res.clear();
     if (_src.size() == 0) { return; }
-    size_t size = _split.size();
+    size_t size = _separator.size();
     
     std::string::size_type curr, last = 0;
     bool has = false;
-    while ((curr = _src.find(_split, last)) != std::string::npos) {
+    while ((curr = _src.find(_separator, last)) != std::string::npos) {
         if (curr == last) {
             last = curr + size;
             continue;
