@@ -1,7 +1,5 @@
-./server
-./client
-./.idea
+.idea/
 test_client.cc
-build/*
-autogen/*
-logs/*
+build/
+autogen/
+logs/
