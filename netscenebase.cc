@@ -3,6 +3,10 @@
 #include "http/firstline.h"
 #include "log.h"
 
+NetSceneBase::NetSceneBase()
+    : status_code_(200)
+    , status_desc_("OK")
+    , socket_(-1) {}
 
 void NetSceneBase::SetSocket(SOCKET _socket) {
     if (_socket > 0) { socket_ = _socket; }
@@ -24,9 +28,8 @@ void NetSceneBase::CopyRespToSendBody(std::string &_resp, size_t _size) {
 void NetSceneBase::PackAndSend() {
     AutoBuffer out_buff;
     std::map <std::string, std::string> empty;
-    std::string status_desc("OK");
-    http::response::Pack(http::kHTTP_1_1, 200,
-                         status_desc, empty, out_buff, send_body_);
+    http::response::Pack(http::kHTTP_1_1, status_code_,
+                         status_desc_, empty, out_buff, send_body_);
     LogI("[NetSceneBase::PackAndSend] send len: %ld", out_buff.Length())
 //    for (int i = 0; i < out_buff.Length() - send_body_.Length(); ++i) {
 //        if (*out_buff.Ptr(i) == 0x0d || *out_buff.Ptr(i) == 0x0a) {

@@ -8,6 +8,8 @@
 class NetSceneBase {
 
   public:
+    NetSceneBase();
+    
     virtual int GetType() = 0;
     
     virtual int DoSceneImpl(const std::string &_in_buffer) = 0;
@@ -23,9 +25,11 @@ class NetSceneBase {
     void CopyRespToSendBody(std::string &_resp, size_t _size);
 
 
-protected:
+  protected:
     SOCKET      socket_;
     AutoBuffer  send_body_;
+    int         status_code_;
+    std::string status_desc_;
 
   private:
   
