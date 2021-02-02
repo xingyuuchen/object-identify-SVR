@@ -24,15 +24,15 @@ class NetSceneBase {
     
     void CopyRespToSendBody(std::string &_resp, size_t _size);
 
-
+  private:
+    void __ShowHttpHeader(AutoBuffer &_out);
+    
   protected:
     SOCKET      socket_;
     AutoBuffer  send_body_;
     int         status_code_;
     std::string status_desc_;
 
-  private:
-  
 };
 
 

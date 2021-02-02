@@ -2,13 +2,14 @@
 #include "../log.h"
 #include "../constantsprotocol.h"
 #include "../autogen/netscenegettrainprogress.pb.h"
-#include "../strutil.h"
+#include <fstream>
 
 /**
  * 业务代码，获取目前训练进度。
  */
 NetSceneGetTrainProgress::NetSceneGetTrainProgress()
-    : curr_epoch_(-1)
+    : NetSceneBase()
+    , curr_epoch_(-1)
     , total_epoch_(-1)
     , is_running_(false) {}
 
@@ -24,28 +25,27 @@ int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
         return -1;
     }
     
-    FILE* file = fopen("/root/cxy/trainprogress.txt", "r");
-    if (file) {
-        do {
-            char ch[10] = {0, };
-            fread(ch, sizeof(char), sizeof(ch), file);
-            fclose(file);
-            std::vector<std::string> res;
-            oi::split(ch, " ", res);
-            if (res.size() != 2) {
-                LogE("[NetSceneGetTrainProgress::DoSceneImpl] res.size=%zd", res.size())
-                break;
-            }
-            is_running_ = true;
-            curr_epoch_ = std::stoi(res[0]);
-            total_epoch_ = std::stoi(res[1]);
-        } while (false);
+    NetSceneGetTrainProgressProto::NetSceneGetTrainProgressResp resp;
+    std::ifstream infile("/root/cxy/trainprogress.txt");
+    if (infile) {
+        infile >> total_epoch_;
+        curr_epoch_ = 0;
+        float hit_rate;
+        while (infile >> hit_rate) {
+            curr_epoch_++;
+            resp.add_hit_rates(hit_rate);
+        }
+        is_running_ = true;
+        infile.close();
+    } else {
+        status_desc_ = "/root/cxy/trainprogress.txt-FileNotOpen";
+        status_code_ = 404;
+        LogE("[NetSceneGetTrainProgress::DoSceneImpl] infile.is_open() = false")
     }
     LogI("[NetSceneGetTrainProgress] isRunning:%d, currEpoch:%d, totalEpoch:%d",
          is_running_, curr_epoch_, total_epoch_)
     
     send_body_.Reset();
-    NetSceneGetTrainProgressProto::NetSceneGetTrainProgressResp resp;
     resp.set_is_running(is_running_);
     resp.set_curr_epoch(curr_epoch_);
     resp.set_total_epoch(total_epoch_);

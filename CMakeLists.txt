@@ -9,7 +9,7 @@ endif()
 # aux_source_directory(. src_files)
 file(GLOB_RECURSE src_files "*.cc")
 
-message(src_files: ${src_files})
+# message(src_files: ${src_files})
 
 include_directories(/usr/local/include)
 

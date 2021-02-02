@@ -31,14 +31,18 @@ void NetSceneBase::PackAndSend() {
     http::response::Pack(http::kHTTP_1_1, status_code_,
                          status_desc_, empty, out_buff, send_body_);
     LogI("[NetSceneBase::PackAndSend] send len: %ld", out_buff.Length())
-//    for (int i = 0; i < out_buff.Length() - send_body_.Length(); ++i) {
-//        if (*out_buff.Ptr(i) == 0x0d || *out_buff.Ptr(i) == 0x0a) {
-//            LogI("0x%x ", *out_buff.Ptr(i))
-//        } else {
-//            LogI("0x%x %c", *out_buff.Ptr(i), *out_buff.Ptr(i))
-//        }
-//    }
+//    __ShowHttpHeader(out_buff);
     send_body_.Reset();
     send(socket_, out_buff.Ptr(), out_buff.Length(), 0);
     
+}
+
+void NetSceneBase::__ShowHttpHeader(AutoBuffer &_out) {
+    for (size_t i = 0; i < _out.Length() - send_body_.Length(); ++i) {
+        if (*_out.Ptr(i) == 0x0d || *_out.Ptr(i) == 0x0a) {
+            LogI("0x%x ", *_out.Ptr(i))
+        } else {
+            LogI("0x%x %c", *_out.Ptr(i), *_out.Ptr(i))
+        }
+    }
 }
