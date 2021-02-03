@@ -6,5 +6,6 @@
 
 uint64_t GetCurrentTimeMillis();
 
+void PrintCurrTime();
 
 #endif //OI_SVR_TIMEUTIL_H

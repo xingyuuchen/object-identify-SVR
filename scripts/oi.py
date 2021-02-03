@@ -41,7 +41,7 @@ class Net(nn.Module):
 def train(savePath, epochs):
     net = Net()
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+    optimizer = optim.SGD(net.parameters(), lr=1e-3, momentum=0.9)
     os.system('echo "{}" > /root/cxy/trainprogress.txt'.format(epochs))
     for epoch in range(epochs):  # loop over the dataset multiple times
 
@@ -118,7 +118,7 @@ if __name__ == '__main__':
     NET_PATH = './cifar_net'
 
     start = time.perf_counter()
-    train(NET_PATH, 5)
+    train(NET_PATH, 200)
     # test(True, None, NET_PATH)
     print("{:.4f}s".format(time.perf_counter() - start))
 
