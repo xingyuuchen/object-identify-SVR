@@ -12,6 +12,8 @@ class NetSceneBase {
     
     virtual int GetType() = 0;
     
+    virtual NetSceneBase *NewInstance() = 0;
+    
     virtual int DoSceneImpl(const std::string &_in_buffer) = 0;
     
     virtual ~NetSceneBase() {}

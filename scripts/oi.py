@@ -17,6 +17,8 @@ def imshow(img):
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
 
+# import ssl
+# ssl._create_default_https_context = ssl._create_unverified_context
 
 class Net(nn.Module):
     def __init__(self):
@@ -39,34 +41,37 @@ class Net(nn.Module):
 
 
 def train(savePath, epochs):
-    net = Net()
+    # net = Net()
+    net = torchvision.models.resnet18()
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=1e-3, momentum=0.9)
     os.system('echo "{}" > /root/cxy/trainprogress.txt'.format(epochs))
     for epoch in range(epochs):  # loop over the dataset multiple times
 
         running_loss = 0.0
+        start = time.perf_counter()
+        net.train()
         for i, data in enumerate(trainloader, 0):
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
-
-            # zero the parameter gradients
             optimizer.zero_grad()
-
-            # forward + backward + optimize
             outputs = net(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
 
-            # print statistics
             running_loss += loss.item()
-            # if i % 2000 == 1999:  # print every 2000 mini-batches
-            #     print('[%d, %5d] loss: %.3f' %
-            #           (epoch + 1, i + 1, running_loss / 2000))
-            #     running_loss = 0.0
-        hit_rate = test(False, net)
-        os.system('echo "{}" >> /root/cxy/trainprogress.txt'.format(hit_rate))
+            if i % 20 == 19:  # print every 20 mini-batches
+                print('[%d, %5d] loss: %.3f' %
+                      (epoch + 1, i + 1, running_loss / 20))
+                running_loss = 0.0
+        net.eval()
+        accuracy = test(False, net)
+        print(accuracy)
+        os.system('echo "{}" >> /root/cxy/trainprogress.txt'.format(accuracy))
+
+        duration = time.perf_counter() - start
+        print("epoch time: {:.4f}s".format(duration))
     print('Finished Training')
     torch.save(net.state_dict(), savePath)
 
@@ -75,26 +80,18 @@ def test(isLoad: bool, net, modelPath: str = '') -> float:
     if isLoad:
         net = Net()
         net.load_state_dict(torch.load(modelPath))
-
-    dataiter = iter(testloader)
     hit = 0
     total = 0
-    for data in dataiter:
+    for data in iter(testloader):
         images, labels = data
+        batchSize = len(labels)
 
         outputs = net(images)
         _, predicted = torch.max(outputs, 1)
-        # print(outputs)
-        # print(_)
-        # print(predicted)
-        for i in range(4):
-            total += 1
+        total += batchSize
+        for i in range(batchSize):
             if labels[i] == predicted[i]:
                 hit += 1
-        # print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(4)))
-        # print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
-        #                               for j in range(4)))
-    print('hit rate: {:.4f}%'.format(hit * 100 / total))
     return hit / total
 
 
@@ -104,12 +101,11 @@ if __name__ == '__main__':
 
     CIFAR_PATH = '.' if 'Darwin' in os.uname() else '/root/cxy/cifar10'
     trainset = torchvision.datasets.CIFAR10(root=CIFAR_PATH, transform=transform)
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=128,
                                               shuffle=True, num_workers=2)
-
     testset = torchvision.datasets.CIFAR10(root=CIFAR_PATH, train=False,
                                            transform=transform)
-    testloader = torch.utils.data.DataLoader(testset, batch_size=4,
+    testloader = torch.utils.data.DataLoader(testset, batch_size=128,
                                              shuffle=False, num_workers=2)
 
     classes = ('plane', 'car', 'bird', 'cat',
@@ -117,8 +113,6 @@ if __name__ == '__main__':
 
     NET_PATH = './cifar_net'
 
-    start = time.perf_counter()
-    train(NET_PATH, 200)
+    train(NET_PATH, 100)
     # test(True, None, NET_PATH)
-    print("{:.4f}s".format(time.perf_counter() - start))
 

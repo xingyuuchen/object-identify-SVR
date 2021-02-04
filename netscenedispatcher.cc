@@ -30,8 +30,15 @@ int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) 
             if ((*iter)->GetType() == type) {
                 if (base_req.has_net_scene_req_buff()) {
                     std::string req_buffer = base_req.net_scene_req_buff();
-                    (*iter)->SetSocket(_conn_fd);
-                    return (*iter)->DoScene(req_buffer);
+                    
+                    NetSceneBase *net_scene = (*iter)->NewInstance();
+                    
+                    net_scene->SetSocket(_conn_fd);
+                    int ret = net_scene->DoScene(req_buffer);
+                    
+                    delete net_scene;
+                    
+                    return ret;
                 } else {
                     LogI("[Dispatch] type:%d, base_req.has_net_scene_req_buff(): false", type)
                     return -1;

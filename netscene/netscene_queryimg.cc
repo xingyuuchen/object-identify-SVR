@@ -10,9 +10,9 @@ NetSceneQueryImg::NetSceneQueryImg() : NetSceneBase() {
 
 }
 
-int NetSceneQueryImg::GetType() {
-    return kNetSceneTypeQueryImg;
-}
+int NetSceneQueryImg::GetType() { return kNetSceneTypeQueryImg; }
+
+NetSceneBase *NetSceneQueryImg::NewInstance() { return new NetSceneQueryImg(); }
 
 int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
     LogI("[NetSceneQueryImg::DoSceneImpl] req.len: %zd", _in_buffer.size());

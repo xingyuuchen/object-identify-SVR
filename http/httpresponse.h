@@ -31,12 +31,6 @@ class Parser {
     
     void Recv(AutoBuffer &_buff);
     
-    void __ResolveStatusLine(AutoBuffer &_buff);
-    
-    void __ResolveResponseHeaders(AutoBuffer &_buff);
-    
-    void __ResolveBody(AutoBuffer &_buff);
-    
     bool IsEnd() const;
     
     bool IsErr() const;
@@ -45,6 +39,13 @@ class Parser {
     
     AutoBuffer *GetBody();
 
+  private:
+    void __ResolveStatusLine(AutoBuffer &_buff);
+    
+    void __ResolveResponseHeaders(AutoBuffer &_buff);
+    
+    void __ResolveBody(AutoBuffer &_buff);
+    
   private:
     TPosition                               position_;
     http::StatusLine                        status_line_;
