@@ -1,66 +1,64 @@
-#include <iostream>
-#include <unistd.h>
-#include <string.h>
-#include <signal.h>
-#include "log.h"
-#include "netscenedispatcher.h"
+#include "httpserver.h"
+#include "utils/log.h"
+#include "netscene/netscenedispatcher.h"
 #include "socket/socketpoll.h"
 #include "socket/blocksocket.h"
 #include "http/httprequest.h"
+#include <unistd.h>
+#include <iostream>
+#include <string.h>
 
 
-static const int kBuffSize = 1024;
+HttpServer::HttpServer()
+    : listenfd_(-1)
+    , running_(true) {}
 
-bool running = true;
-int listenfd = -1;
-int bind_res = -1;
+const int HttpServer::kBuffSize = 1024;
 
-void Exit() {
-    if (listenfd != -1) {
-        close(listenfd);
+
+void HttpServer::__Exit() {
+    if (listenfd_ != -1) {
+        close(listenfd_);
     }
     exit(0);
 }
 
-
-void Stop(int _sig) {
-    LogI("signal: %d, process Exit", _sig);
-    running = false;
-    if (_sig == 2) {
-        Exit();
-    }
+void HttpServer::Stop() {
+    running_ = false;
+    __Exit();
 }
 
-
-int main(int argc, char **argv) {
-    LogI("Server On...");
-    signal(2, Stop);
-
+void HttpServer::Run() {
+    listenfd_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (listenfd_ < 0) {
+        LogE("create socket error: %s errno :%d", strerror(errno), errno);
+        return;
+    }
+    
     struct sockaddr_in sock_addr;
-
+    
     memset(&sock_addr, 0, sizeof(sock_addr));
     sock_addr.sin_family = AF_INET;
     sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     sock_addr.sin_port = htons(5002);
-
-    int connfd;
-    listenfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (listenfd < 0) {
-        LogI("create socket error: %s errno :%d", strerror(errno), errno);
-        return -1;
+    
+    int bind_res = bind(listenfd_, (struct sockaddr *) &sock_addr, sizeof(sock_addr)); // create a special socket file
+    if (bind_res < 0) {
+        LogE("bind failed")
+        return;
     }
-
-    bind_res = bind(listenfd, (struct sockaddr *) &sock_addr, sizeof(sock_addr)); // create a special socket file
-    listen(listenfd, 1024); // 1024 defines the maximum length for the queue of pending connections
+    int connfd;
+    
+    listen(listenfd_, 1024); // 1024 defines the maximum length for the queue of pending connections
     
     SocketPoll socket_poll;
-    while (running) {
-        if ((connfd = accept(listenfd, (struct sockaddr *) NULL, NULL)) == -1) {
+    while (running_) {
+        if ((connfd = accept(listenfd_, (struct sockaddr *) NULL, NULL)) == -1) {
             LogE("accept socket error: %s errno :%d", strerror(errno), errno);
             continue;
         }
         LogI("new connect");
-    
+        
         socket_poll.SetEventRead(connfd);
         socket_poll.SetEventError(connfd);
         
@@ -83,14 +81,11 @@ int main(int argc, char **argv) {
                 break;
             }
         }
-
+        
         NetSceneDispatcher::GetInstance().Dispatch(connfd, &parser.GetBody());
-
+        
         socket_poll.RemoveSocket(connfd);
         close(connfd);
     }
-    Exit();
+    __Exit();
 }
-
-
-

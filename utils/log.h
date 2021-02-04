@@ -2,7 +2,7 @@
 #define OI_SVR_LOG_H
 
 #include "stdio.h"
-#include "time/timeutil.h"
+#include "timeutil.h"
 
 #define LogI(...) PrintCurrTime(); \
     printf(" I/"); \

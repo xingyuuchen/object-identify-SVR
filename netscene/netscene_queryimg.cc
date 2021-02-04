@@ -1,7 +1,7 @@
 #include "netscene_queryimg.h"
 #include "../constantsprotocol.h"
 #include <string>
-#include "../log.h"
+#include "../utils/log.h"
 
 /**
  * 业务代码，查询图片类别。

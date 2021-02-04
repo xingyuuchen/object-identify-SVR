@@ -1,9 +1,9 @@
 #include "netscenedispatcher.h"
 #include <stdio.h>
-#include "autogen/basenetscenereq.pb.h"
-#include "log.h"
-#include "netscene/netscene_queryimg.h"
-#include "netscene/netscene_gettrainprogress.h"
+#include "../autogen/basenetscenereq.pb.h"
+#include "../utils/log.h"
+#include "netscene_queryimg.h"
+#include "netscene_gettrainprogress.h"
 
 
 NetSceneDispatcher::NetSceneDispatcher() {

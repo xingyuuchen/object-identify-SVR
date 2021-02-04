@@ -1,7 +1,7 @@
 #include "netscenebase.h"
-#include "http/httpresponse.h"
-#include "http/firstline.h"
-#include "log.h"
+#include "../http/httpresponse.h"
+#include "../http/firstline.h"
+#include "../utils/log.h"
 
 NetSceneBase::NetSceneBase()
     : status_code_(200)

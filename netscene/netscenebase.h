@@ -1,8 +1,8 @@
 #ifndef OI_SVR_NETSCENEBASE_H
 #define OI_SVR_NETSCENEBASE_H
 #include <string>
-#include "socket/unix_socket.h"
-#include "autobuffer.h"
+#include "../socket/unix_socket.h"
+#include "../utils/autobuffer.h"
 
 
 class NetSceneBase {
