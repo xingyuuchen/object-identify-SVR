@@ -16,19 +16,15 @@ HttpServer::HttpServer()
 const int HttpServer::kBuffSize = 1024;
 
 
-void HttpServer::__Exit() {
+void HttpServer::Stop() {
+    running_ = false;
     if (listenfd_ != -1) {
         close(listenfd_);
     }
     exit(0);
 }
 
-void HttpServer::Stop() {
-    running_ = false;
-    __Exit();
-}
-
-void HttpServer::Run() {
+void HttpServer::Run(uint16_t _port) {
     listenfd_ = socket(AF_INET, SOCK_STREAM, 0);
     if (listenfd_ < 0) {
         LogE("create socket error: %s errno :%d", strerror(errno), errno);
@@ -40,11 +36,11 @@ void HttpServer::Run() {
     memset(&sock_addr, 0, sizeof(sock_addr));
     sock_addr.sin_family = AF_INET;
     sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    sock_addr.sin_port = htons(5002);
+    sock_addr.sin_port = htons(_port);
     
     int bind_res = bind(listenfd_, (struct sockaddr *) &sock_addr, sizeof(sock_addr)); // create a special socket file
     if (bind_res < 0) {
-        LogE("bind failed")
+        LogE("bind error: %s errno :%d", strerror(errno), errno);
         return;
     }
     int connfd;
@@ -87,5 +83,5 @@ void HttpServer::Run() {
         socket_poll.RemoveSocket(connfd);
         close(connfd);
     }
-    __Exit();
+    Stop();
 }
