@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <string.h>
+#include "utils/threadpool.h"
 
 
 HttpServer::HttpServer()
@@ -58,30 +59,32 @@ void HttpServer::Run(uint16_t _port) {
         socket_poll.SetEventRead(connfd);
         socket_poll.SetEventError(connfd);
         
-        http::request::Parser parser;
+        ThreadPool::Instance().Execute([=, &socket_poll] {
+            http::request::Parser parser;
+    
+            AutoBuffer recv_buff;
+            while (true) {
+                size_t nsize = BlockSocketReceive(connfd, recv_buff, socket_poll, kBuffSize);
+                if (nsize <= 0) {
+                    LogE("BlockSocketReceive ret: %zd", nsize);
+                    break;
+                }
         
-        AutoBuffer recv_buff;
-        while (true) {
-            size_t nsize = BlockSocketReceive(connfd, recv_buff, socket_poll, kBuffSize);
-            if (nsize <= 0) {
-                LogE("BlockSocketReceive ret: %zd", nsize);
-                break;
+                parser.Recv(recv_buff);
+        
+                if (parser.IsEnd()) {
+                    break;
+                } else if (parser.IsErr()) {
+                    LogE("parser error")
+                    break;
+                }
             }
-            
-            parser.Recv(recv_buff);
-            
-            if (parser.IsEnd()) {
-                break;
-            } else if (parser.IsErr()) {
-                LogE("parser error")
-                break;
-            }
-        }
+            NetSceneDispatcher::Instance().Dispatch(connfd, &parser.GetBody());
+
+            socket_poll.RemoveSocket(connfd);
+            close(connfd);
+        });
         
-        NetSceneDispatcher::GetInstance().Dispatch(connfd, &parser.GetBody());
-        
-        socket_poll.RemoveSocket(connfd);
-        close(connfd);
     }
     Stop();
 }

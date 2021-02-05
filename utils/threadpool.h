@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <functional>
 #include <future>
 #include <queue>
 
@@ -26,7 +27,7 @@ class ThreadPool {
         using return_t = typename std::result_of<F(Args...)>::type;
         using pack_task_t = std::packaged_task<return_t(void)>;
         
-        std::shared_ptr<pack_task_t> task = std::make_shared<pack_task_t>(std::bind(_f, _args...));
+        auto task = std::make_shared<pack_task_t>(std::bind(_f, _args...));
         {
             std::unique_lock<std::mutex> lock(mutex_);
             tasks_.emplace([=] () -> void { (*task)(); });

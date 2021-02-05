@@ -6,7 +6,7 @@
 
 class NetSceneDispatcher {
   public:
-    static NetSceneDispatcher& GetInstance() {
+    static NetSceneDispatcher& Instance() {
         static NetSceneDispatcher instance;
         return instance;
     }
