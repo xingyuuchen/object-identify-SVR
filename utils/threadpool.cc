@@ -12,12 +12,11 @@ ThreadPool::ThreadPool(size_t _n_threads)
                     cv_.wait(lock, [this] () -> bool {
                         return !tasks_.empty() || !working_;
                     });
-                    if (!working_ &&
-                        tasks_.empty() /* make sure all tasks done before destruct*/) {
+                    if (!working_ && tasks_.empty()) {
                         return;
                     }
-                    task = tasks_.back();
-                    tasks_.pop_back();
+                    task = std::move(tasks_.front());
+                    tasks_.pop();
                 }
                 task();
             }
