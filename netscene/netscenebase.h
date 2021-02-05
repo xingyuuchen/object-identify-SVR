@@ -4,7 +4,9 @@
 #include "../socket/unix_socket.h"
 #include "../utils/autobuffer.h"
 
-
+/**
+ * Base class for all NetScene.
+ */
 class NetSceneBase {
 
   public:
