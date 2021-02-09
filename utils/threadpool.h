@@ -22,17 +22,19 @@ class ThreadPool {
     
     
     template<class F, class... Args>
-    void
+    std::future<typename std::result_of<F(Args...)>::type>
     Execute(F&& _f, Args&&... _args) {
         using return_t = typename std::result_of<F(Args...)>::type;
         using pack_task_t = std::packaged_task<return_t(void)>;
         
         auto task = std::make_shared<pack_task_t>(std::bind(_f, _args...));
+        std::future<return_t> ret = task->get_future();
         {
             std::unique_lock<std::mutex> lock(mutex_);
             tasks_.emplace([=] () -> void { (*task)(); });
         }
         cv_.notify_one();
+        return ret;
     }
 
   private:

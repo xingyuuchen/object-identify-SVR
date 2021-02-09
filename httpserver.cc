@@ -83,6 +83,7 @@ void HttpServer::Run(uint16_t _port) {
 
             socket_poll.RemoveSocket(connfd);
             close(connfd);
+            return 0;
         });
         
     }
