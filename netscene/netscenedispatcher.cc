@@ -7,12 +7,14 @@
 
 
 NetSceneDispatcher::NetSceneDispatcher() {
+    std::unique_lock<std::mutex> lock(mutex_);
     selectors_.push_back(new NetSceneQueryImg());
     selectors_.push_back(new NetSceneGetTrainProgress());
     
 }
 
 NetSceneDispatcher::~NetSceneDispatcher() {
+    std::unique_lock<std::mutex> lock(mutex_);
     for (std::vector<NetSceneBase *>::iterator iter = selectors_.begin(); iter != selectors_.end(); iter++) {
         delete *iter;
     }
@@ -26,22 +28,25 @@ int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) 
     
     if (base_req.has_net_scene_type()) {
         int type = base_req.net_scene_type();
-        for (auto iter = selectors_.begin(); iter != selectors_.end(); iter++) {
-            if ((*iter)->GetType() == type) {
-                if (base_req.has_net_scene_req_buff()) {
-                    std::string req_buffer = base_req.net_scene_req_buff();
-                    
-                    NetSceneBase *net_scene = (*iter)->NewInstance();
-                    
-                    net_scene->SetSocket(_conn_fd);
-                    int ret = net_scene->DoScene(req_buffer);
-                    
-                    delete net_scene;
-                    
-                    return ret;
-                } else {
-                    LogI("[Dispatch] type:%d, base_req.has_net_scene_req_buff(): false", type)
-                    return -1;
+        {
+            std::unique_lock<std::mutex> lock(mutex_);
+            for (auto iter = selectors_.begin(); iter != selectors_.end(); iter++) {
+                if ((*iter)->GetType() == type) {
+                    if (base_req.has_net_scene_req_buff()) {
+                        std::string req_buffer = base_req.net_scene_req_buff();
+                
+                        NetSceneBase *net_scene = (*iter)->NewInstance();
+                
+                        net_scene->SetSocket(_conn_fd);
+                        int ret = net_scene->DoScene(req_buffer);
+                
+                        delete net_scene;
+                
+                        return ret;
+                    } else {
+                        LogI("[Dispatch] type:%d, base_req.has_net_scene_req_buff(): false", type)
+                        return -1;
+                    }
                 }
             }
         }

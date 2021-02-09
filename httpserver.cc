@@ -56,10 +56,10 @@ void HttpServer::Run(uint16_t _port) {
         }
         LogI("new connect");
         
-        socket_poll.SetEventRead(connfd);
-        socket_poll.SetEventError(connfd);
-        
         ThreadPool::Instance().Execute([=, &socket_poll] {
+            socket_poll.SetEventRead(connfd);
+            socket_poll.SetEventError(connfd);
+            
             http::request::Parser parser;
     
             AutoBuffer recv_buff;

@@ -2,6 +2,7 @@
 #define OI_SVR_NETSCENEDISPATCHER_H
 #include "netscenebase.h"
 #include <vector>
+#include <mutex>
 
 
 class NetSceneDispatcher {
@@ -25,6 +26,7 @@ class NetSceneDispatcher {
     
   private:
     std::vector<NetSceneBase *>     selectors_;
+    std::mutex                      mutex_;
     
 };
 
