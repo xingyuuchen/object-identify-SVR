@@ -2,11 +2,16 @@
 #include "../http/httpresponse.h"
 #include "../http/firstline.h"
 #include "../utils/log.h"
+#include "../http/headerfield.h"
 
 NetSceneBase::NetSceneBase()
-    : status_code_(200)
-    , status_desc_("OK")
-    , socket_(-1) {}
+        : status_code_(200)
+        , status_desc_("OK")
+        , socket_(-1) {
+    http_headers_[http::HeaderField::KContentType] = http::HeaderField::KOctetStream;
+    http_headers_[http::HeaderField::KConnection] = http::HeaderField::KConnectionClose;
+    
+}
 
 void NetSceneBase::SetSocket(SOCKET _socket) {
     if (_socket > 0) { socket_ = _socket; }
@@ -27,12 +32,12 @@ void NetSceneBase::CopyRespToSendBody(std::string &_resp, size_t _size) {
 
 void NetSceneBase::PackAndSend() {
     AutoBuffer out_buff;
-    std::map <std::string, std::string> empty;
     http::response::Pack(http::kHTTP_1_1, status_code_,
-                         status_desc_, empty, out_buff, send_body_);
+                         status_desc_, http_headers_, out_buff, send_body_);
     LogI("[NetSceneBase::PackAndSend] send len: %ld", out_buff.Length())
 //    __ShowHttpHeader(out_buff);
     send_body_.Reset();
+    // TODO: replace send with block socket send
     send(socket_, out_buff.Ptr(), out_buff.Length(), 0);
     
 }

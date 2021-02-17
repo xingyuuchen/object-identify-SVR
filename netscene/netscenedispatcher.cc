@@ -2,12 +2,14 @@
 #include <stdio.h>
 #include "../autogen/basenetscenereq.pb.h"
 #include "../utils/log.h"
+#include "netscene_getindexpage.h"
 #include "netscene_queryimg.h"
 #include "netscene_gettrainprogress.h"
 
 
 NetSceneDispatcher::NetSceneDispatcher() {
     std::unique_lock<std::mutex> lock(mutex_);
+    selectors_.push_back(new NetSceneGetIndexPage());
     selectors_.push_back(new NetSceneQueryImg());
     selectors_.push_back(new NetSceneGetTrainProgress());
     
@@ -50,9 +52,12 @@ int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) 
                 }
             }
         }
-        LogI("ERR: NO such NetScene: type=%d, did not processing this request.", type);
+        LogI("ERR: NO such NetScene: type=%d, give up processing this request.", type);
     } else {
-        LogI("[Dispatch] base_req.has_net_scene_type(): false")
+        LogI("[Dispatch] base_req.has_net_scene_type(): false, return index page.")
+        NetSceneGetIndexPage net_scene;
+        net_scene.SetSocket(_conn_fd);
+        return net_scene.DoScene("");
     }
     
     return -1;

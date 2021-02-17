@@ -1,6 +1,7 @@
 #ifndef OI_SVR_NETSCENEBASE_H
 #define OI_SVR_NETSCENEBASE_H
 #include <string>
+#include <map>
 #include "../socket/unix_socket.h"
 #include "../utils/autobuffer.h"
 
@@ -32,10 +33,11 @@ class NetSceneBase {
     void __ShowHttpHeader(AutoBuffer &_out);
     
   protected:
-    SOCKET      socket_;
-    AutoBuffer  send_body_;
-    int         status_code_;
-    std::string status_desc_;
+    SOCKET                              socket_;
+    AutoBuffer                          send_body_;
+    int                                 status_code_;
+    std::string                         status_desc_;
+    std::map <std::string, std::string> http_headers_;
 
 };
 

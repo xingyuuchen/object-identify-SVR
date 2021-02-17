@@ -42,7 +42,7 @@ class Net(nn.Module):
 
 def train(savePath, epochs):
     # net = Net()
-    net = torchvision.models.resnet50(pretrained=True)
+    net = torchvision.models.resnet34(pretrained=True)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=1e-3, momentum=0.9)
     os.system('echo "{}" > /root/cxy/trainprogress.txt'.format(epochs))
