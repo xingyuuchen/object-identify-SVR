@@ -6,7 +6,8 @@
 class AutoBuffer {
   public:
     AutoBuffer(size_t _malloc_unit_size = 128);
-    AutoBuffer(const AutoBuffer &_auto_buffer);
+
+    AutoBuffer(const AutoBuffer &_auto_buffer) = delete;
     
     ~AutoBuffer();
     
@@ -34,7 +35,7 @@ class AutoBuffer {
 
 
   private:
-    char *     byte_array_;
+    char *              byte_array_;
     size_t              pos_;
     size_t              length_;
     size_t              capacity_;

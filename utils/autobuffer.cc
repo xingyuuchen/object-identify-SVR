@@ -14,22 +14,10 @@ AutoBuffer::AutoBuffer(size_t _malloc_unit_size)
         , malloc_unit_size_(_malloc_unit_size) {}
 
 
-AutoBuffer::AutoBuffer(const AutoBuffer &_auto_buffer)
-        : malloc_unit_size_(128) {}
-
-
 void AutoBuffer::Write(const char *_byte_array, size_t _len) {
-    if (_len <= 0 || _byte_array == NULL) {
-        return;
-    }
+    if (_len <= 0 || _byte_array == NULL) { return; }
     if (capacity_ < length_ + _len) {
-        size_t enlarge_size;
-        if ((length_ + _len - capacity_) % malloc_unit_size_ == 0) {
-            enlarge_size = length_ + _len - capacity_;
-        } else {
-            enlarge_size = ((length_ + _len - capacity_) / malloc_unit_size_ + 1) * malloc_unit_size_;
-        }
-        AddCapacity(enlarge_size);
+        AddCapacity(length_ + _len - capacity_);
     }
     memcpy(Ptr(length_), _byte_array, _len);
     length_ += _len;
@@ -53,12 +41,19 @@ char *AutoBuffer::Ptr(const size_t _offset) const {
 
 void AutoBuffer::AddCapacity(size_t _size_to_add) {
     if (_size_to_add <= 0) {
-        LogI("Illegal arg _size:%zd", _size_to_add);
+        LogE("Illegal arg _size_to_add:%zd", _size_to_add);
         return;
     }
+    if (_size_to_add % malloc_unit_size_ != 0) {
+        _size_to_add = (_size_to_add / malloc_unit_size_ + 1) * malloc_unit_size_;
+    }
+    
     void *p = realloc(byte_array_, capacity_ + _size_to_add);
     if (p == NULL) {
-        LogI("[AutoBuffer::AddCapacity] realloc failed, errno(%d): %s", errno, strerror(errno));
+        LogE("[AutoBuffer::AddCapacity] realloc failed, errno(%d): %s", errno, strerror(errno));
+        free(byte_array_);
+        byte_array_ = NULL;
+        capacity_ = 0;
         return;
     }
     capacity_ += _size_to_add;
