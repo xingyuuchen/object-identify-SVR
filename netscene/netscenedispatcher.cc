@@ -25,6 +25,12 @@ NetSceneDispatcher::~NetSceneDispatcher() {
 int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) {
     LogI("[Dispatch] _in_buffer.len: %zd", _in_buffer->Length());
     
+    if (_in_buffer->Ptr() == NULL) {
+        LogI("[Dispatch] _in_buffer->Ptr() == NULL, return index page.")
+        NetSceneGetIndexPage net_scene;
+        net_scene.SetSocket(_conn_fd);
+        return net_scene.DoScene("");
+    }
     BaseNetSceneReq::BaseNetSceneReq base_req;
     base_req.ParseFromArray(_in_buffer->Ptr(), _in_buffer->Length());
     
@@ -52,12 +58,7 @@ int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) 
                 }
             }
         }
-        LogI("ERR: NO such NetScene: type=%d, give up processing this request.", type);
-    } else {
-        LogI("[Dispatch] base_req.has_net_scene_type(): false, return index page.")
-        NetSceneGetIndexPage net_scene;
-        net_scene.SetSocket(_conn_fd);
-        return net_scene.DoScene("");
+        LogE("NO such NetScene: type=%d, give up processing this request.", type);
     }
     
     return -1;

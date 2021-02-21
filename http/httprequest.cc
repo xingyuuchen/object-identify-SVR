@@ -93,9 +93,8 @@ void Parser::__ResolveRequestHeaders(AutoBuffer &_buff) {
 void Parser::__ResolveBody(AutoBuffer &_buff) {
     LogI("[req::Parser::__ResolveBody]")
     uint64_t content_length = headers_.GetContentLength();
-    LogI("?????? %llu", content_length)
     if (content_length == 0) {
-        LogI("[req::Parser::Recv] Content-Length = 0")
+        LogE("[req::Parser::Recv] Content-Length = 0")
         position_ = kError;
         return;
     }

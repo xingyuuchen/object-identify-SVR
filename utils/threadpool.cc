@@ -10,7 +10,7 @@ ThreadPool::ThreadPool(size_t _n_threads)
                 {
                     std::unique_lock<std::mutex> lock(mutex_);
                     cv_.wait(lock, [this] () -> bool {
-                        return !tasks_.empty() || !working_;
+                        return !this->tasks_.empty() || !this->working_;
                     });
                     if (!working_ && tasks_.empty()) {
                         return;
