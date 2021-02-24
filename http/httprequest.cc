@@ -165,6 +165,7 @@ AutoBuffer *Parser::GetBody() {
     }
     body_.SetPtr(buff_.Ptr(buff_.Length() - content_len));
     body_.SetLength(content_len);
+    body_.ShareFromOther(true);
     return &body_;
 }
 

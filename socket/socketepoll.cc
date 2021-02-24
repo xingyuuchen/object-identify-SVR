@@ -1,6 +1,7 @@
 #include "socketepoll.h"
 #include <unistd.h>
 #include <errno.h>
+#include <string.h>
 #include "../utils/log.h"
 
 
@@ -26,7 +27,6 @@ SocketEpoll::SocketEpoll(int _max_fds)
 
 int SocketEpoll::AddSocketRead(int _fd) {
     struct epoll_event event;
-    // The default behavior for epoll is level-triggered.
     event.events = EPOLLIN | EPOLLET;
     event.data.fd = _fd;
     return __EpollCtl(EPOLL_CTL_ADD, _fd, &event);
@@ -44,7 +44,10 @@ int SocketEpoll::__EpollCtl(int _op, int _fd, struct epoll_event *_event/* = NUL
         return -1;
     }
     int ret = epoll_ctl(epoll_fd_, _op, _fd, _event);
-    if (ret < 0) { errno_ = errno; }
+    if (ret < 0) {
+        errno_ = errno;
+        LogE("[SocketEpoll::__EpollCtl] errno(%d): %s", errno_, strerror(errno))
+    }
     return ret;
 }
 
@@ -54,7 +57,10 @@ int SocketEpoll::EpollWait(int _max_events/* = kMaxFds_*/,
     if (_timeout_mills < -1) { _timeout_mills = -1; }
     
     int nfds = epoll_wait(epoll_fd_, epoll_events_, _max_events, _timeout_mills);
-    if (nfds < 0) { errno_ = errno; }
+    if (nfds < 0) {
+        errno_ = errno;
+        LogE("[SocketEpoll::EpollWait] errno(%d): %s", errno_, strerror(errno))
+    }
     return nfds;
 }
 

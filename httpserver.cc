@@ -27,14 +27,15 @@ void HttpServer::Run(uint16_t _port) {
     listen(listenfd_, 1024); // 1024 defines the maximum length for the queue of pending connections
     
     SocketEpoll::Instance().SetListenFd(listenfd_);
-    int nfds;
+    
     while (running_) {
-        nfds = SocketEpoll::Instance().EpollWait();
+        int nfds = SocketEpoll::Instance().EpollWait();
         LogI("[HttpServer::Run] nfds: %d", nfds)
         
         for (int i = 0; i < nfds; i++) {
             int fd;
             if (SocketEpoll::Instance().IsNewConnect(i)) {
+                LogI("IsNewConnect")
                 __HandleConnect();
                 
             } else if ((fd = SocketEpoll::Instance().IsReadSet(i)) > 0) {
@@ -64,22 +65,29 @@ int HttpServer::__HandleRead(SOCKET _fd) {
         }
         ssize_t n = recv(_fd, recv_buff->Ptr(recv_buff->Length()),
                          kBuffSize, 0);
-        if (n < 0 && errno == EAGAIN) {
-            // no messages are available and fd is nonblocking,
+        if (n == -1 && errno == EAGAIN) {
+            // no messages available and fd is nonblocking,
             LogI("[HttpServer::__HandleRead] EAGAIN")
             return 0;
         }
+        if (n == 0) {
+            LogI("[HttpServer::__HandleRead] Conn closed by peer")
+            break;
+        }
         if (n > 0) { recv_buff->AddLength(n); }
 
+        LogI("[HttpServer::__HandleRead] n: %zd", n)
         parser->DoParse();
         
-        if (parser->IsEnd()) {
+        if (parser->IsEnd() || parser->IsErr()) {
             ParserManager::Instance().DeleteParser(_fd);
+            SocketEpoll::Instance().DelSocket(_fd);
+            if (parser->IsErr()) {
+                LogE("[HttpServer::__HandleRead] parser error")
+                return -1;
+            }
+            
             break;
-        } else if (parser->IsErr()) {
-            LogE("parser error")
-            ParserManager::Instance().DeleteParser(_fd);
-            return -1;
         }
     }
     int ret = NetSceneDispatcher::Instance().Dispatch(_fd, parser->GetBody());
@@ -110,8 +118,11 @@ int HttpServer::__CreateListenFd() {
              " error: %s, errno: %d", strerror(errno), errno);
         return -1;
     }
-    bool b = false;
-    setsockopt(listenfd_, SOL_SOCKET, SO_LINGER, &b, sizeof(b));
+    // TODO
+    struct linger ling;
+    ling.l_linger = 0;
+    ling.l_onoff = 1;
+    setsockopt(listenfd_, SOL_SOCKET, SO_LINGER, &ling, sizeof(ling));
     return 0;
 }
 
@@ -123,10 +134,10 @@ int HttpServer::__Bind(uint16_t _port) {
     sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     sock_addr.sin_port = htons(_port);
     
-    int bind_res = bind(listenfd_, (struct sockaddr *) &sock_addr,
+    int ret = bind(listenfd_, (struct sockaddr *) &sock_addr,
                         sizeof(sock_addr)); // create a special socket file
-    if (bind_res < 0) {
-        LogE("[HttpServer::__Bind] bind error: %s, errno: %d", strerror(errno), errno);
+    if (ret < 0) {
+        LogE("[HttpServer::__Bind] errno(%d): %s", errno, strerror(errno));
         return -1;
     }
     return 0;
