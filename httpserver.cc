@@ -13,7 +13,6 @@
 
 const int HttpServer::kBuffSize = 1024;
 
-
 HttpServer::HttpServer()
     : listenfd_(-1)
     , running_(true) {}
@@ -23,7 +22,8 @@ void HttpServer::Run(uint16_t _port) {
     if (__CreateListenFd() < 0) { return; }
     if (__Bind(_port) < 0) { Stop(); }
     
-    listen(listenfd_, 1024); // 1024 defines the maximum length for the queue of pending connections
+    // 1024 defines the maximum length for the queue of pending connections
+    ::listen(listenfd_, 1024);
     
     SocketEpoll::Instance().SetListenFd(listenfd_);
     
@@ -60,7 +60,7 @@ int HttpServer::__HandleRead(SOCKET _fd) {
         if (available < kBuffSize) {
             recv_buff->AddCapacity(kBuffSize - available);
         }
-        ssize_t n = recv(_fd, recv_buff->Ptr(recv_buff->Length()),
+        ssize_t n = ::recv(_fd, recv_buff->Ptr(recv_buff->Length()),
                          kBuffSize, 0);
         if (n == -1 && errno == EAGAIN) {
             LogI("[HttpServer::__HandleRead] EAGAIN")
@@ -86,14 +86,14 @@ int HttpServer::__HandleRead(SOCKET _fd) {
         }
     }
     int ret = NetSceneDispatcher::Instance().Dispatch(_fd, parser->GetBody());
-    close(_fd);
+    ::close(_fd);
     return ret;
 }
 
 int HttpServer::__HandleConnect() {
     int fd;
     while (true) {
-        fd = accept(listenfd_, (struct sockaddr *) NULL, NULL);
+        fd = ::accept(listenfd_, (struct sockaddr *) NULL, NULL);
         if (fd < 0) {
             if (errno == EAGAIN) { return 0; }
             LogE("[HttpServer::__HandleConnect] errno(%d): %s",
@@ -107,7 +107,7 @@ int HttpServer::__HandleConnect() {
 }
 
 int HttpServer::__CreateListenFd() {
-    listenfd_ = socket(AF_INET, SOCK_STREAM, 0);
+    listenfd_ = ::socket(AF_INET, SOCK_STREAM, 0);
     if (listenfd_ < 0) {
         LogE("[HttpServer::__CreateListenFd] create socket"
              " error: %s, errno: %d", strerror(errno), errno);
@@ -117,7 +117,7 @@ int HttpServer::__CreateListenFd() {
     struct linger ling;
     ling.l_linger = 0;
     ling.l_onoff = 1;
-    setsockopt(listenfd_, SOL_SOCKET, SO_LINGER, &ling, sizeof(ling));
+    ::setsockopt(listenfd_, SOL_SOCKET, SO_LINGER, &ling, sizeof(ling));
     SetNonblocking(listenfd_);
     return 0;
 }
@@ -129,7 +129,7 @@ int HttpServer::__Bind(uint16_t _port) {
     sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     sock_addr.sin_port = htons(_port);
     
-    int ret = bind(listenfd_, (struct sockaddr *) &sock_addr,
+    int ret = ::bind(listenfd_, (struct sockaddr *) &sock_addr,
                         sizeof(sock_addr)); // create a special socket file
     if (ret < 0) {
         LogE("[HttpServer::__Bind] errno(%d): %s", errno, strerror(errno));
@@ -141,7 +141,7 @@ int HttpServer::__Bind(uint16_t _port) {
 void HttpServer::Stop() {
     running_ = false;
     if (listenfd_ != -1) {
-        close(listenfd_);
+        ::close(listenfd_);
     }
     exit(0);
 }

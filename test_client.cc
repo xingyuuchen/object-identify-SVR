@@ -26,9 +26,9 @@ bool Connect() {
     sockaddr.sin_port = htons(5002);
     sockaddr.sin_addr.s_addr = inet_addr(svrInetAddr);   // inet_pton(AF_INET, svrInetAddr, &sockaddr.sin_addr);
     
-    if (connect(socket_, (struct sockaddr *) &sockaddr, sizeof(sockaddr)) < 0) {
+    if (::connect(socket_, (struct sockaddr *) &sockaddr, sizeof(sockaddr)) < 0) {
         LogI("connect failed");
-        close(socket_);
+        ::close(socket_);
         return false;
     }
     LogI("connect succeed!");
@@ -47,12 +47,12 @@ void *StartRoutine(void *arg) {
     while (strcmp(sendline, "q") != 0) {
         printf("--hi--: \n");
         fgets(sendline, 1024, stdin);
-        if (send(socket_, sendline, strlen(sendline), 0) < 0) {
+        if (::send(socket_, sendline, strlen(sendline), 0) < 0) {
             printf("send msg error: %s errno: %d\n", strerror(errno), errno);
             break;
         }
     }
-    close(socket_);
+    ::close(socket_);
     printf("exit\n");
     
     return NULL;

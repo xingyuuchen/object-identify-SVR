@@ -14,7 +14,7 @@ SocketEpoll::SocketEpoll(int _max_fds)
         , errno_(0) {
     if (_max_fds <= 0) { return; }
     
-    epoll_events_ = new epoll_event[_max_fds];
+    epoll_events_ = new struct epoll_event[_max_fds];
     
     int ret = epoll_create(_max_fds);
     if (ret < 0) {
@@ -109,7 +109,7 @@ SocketEpoll::~SocketEpoll() {
         delete[] epoll_events_;
     }
     if (epoll_fd_ != -1) {
-        close(epoll_fd_);
+        ::close(epoll_fd_);
     }
 }
 

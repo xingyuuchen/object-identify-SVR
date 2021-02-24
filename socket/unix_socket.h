@@ -14,8 +14,8 @@
 #define RECV_FAILED -4
 
 inline int SetNonblocking(SOCKET _fd) {
-    int old_flags = fcntl(_fd, F_GETFL);
-    if (fcntl(_fd, F_SETFL, old_flags | O_NONBLOCK) == -1) {
+    int old_flags = ::fcntl(_fd, F_GETFL);
+    if (::fcntl(_fd, F_SETFL, old_flags | O_NONBLOCK) == -1) {
         return -1;
     }
     return 0;

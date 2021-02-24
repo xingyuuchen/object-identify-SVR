@@ -38,7 +38,7 @@ void NetSceneBase::PackAndSend() {
 //    __ShowHttpHeader(out_buff);
     send_body_.Reset();
     // TODO: replace send with block socket send
-    send(socket_, out_buff.Ptr(), out_buff.Length(), 0);
+    ::send(socket_, out_buff.Ptr(), out_buff.Length(), 0);
     
 }
 
