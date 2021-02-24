@@ -8,6 +8,7 @@
 
 AutoBuffer::AutoBuffer(size_t _malloc_unit_size)
         : byte_array_(NULL)
+        , share_from_other_(false)
         , pos_(0)
         , length_(0)
         , capacity_(0)
@@ -76,7 +77,12 @@ AutoBuffer::~AutoBuffer() {
     Reset();
 }
 
+void AutoBuffer::ShareFromOther(bool _val) {
+    share_from_other_ = _val;
+}
+
 void AutoBuffer::Reset() {
+    if (share_from_other_) { return; }
     capacity_ = 0;
     length_ = 0;
     pos_ = 0;

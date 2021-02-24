@@ -34,10 +34,12 @@ class AutoBuffer {
     void Seek(const size_t _pos);
     
     void Reset();
-
+    
+    void ShareFromOther(bool _val);
 
   private:
     char *              byte_array_;
+    bool                share_from_other_;
     size_t              pos_;
     size_t              length_;
     size_t              capacity_;
