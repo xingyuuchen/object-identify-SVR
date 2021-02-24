@@ -21,6 +21,12 @@ class HttpServer {
   private:
     HttpServer();
     
+    int __CreateListenFd();
+    
+    int __Bind(uint16_t _port);
+    
+    int __HandleConnect();
+    
   private:
     static const int    kBuffSize;
     bool                running_;
