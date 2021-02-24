@@ -9,7 +9,6 @@
 #include <unistd.h>
 #include <iostream>
 #include <string.h>
-#include <fcntl.h>
 
 
 const int HttpServer::kBuffSize = 1024;
@@ -33,17 +32,15 @@ void HttpServer::Run(uint16_t _port) {
         LogI("[HttpServer::Run] nfds: %d", nfds)
         
         for (int i = 0; i < nfds; i++) {
-            int fd;
+            SOCKET fd;
             if (SocketEpoll::Instance().IsNewConnect(i)) {
                 LogI("IsNewConnect")
                 __HandleConnect();
                 
             } else if ((fd = SocketEpoll::Instance().IsReadSet(i)) > 0) {
                 LogI("IsReadSet, fd: %d", fd)
-//                ThreadPool::Instance().Execute([=] {
-                    __HandleRead(fd);
-//                    return __HandleRead(fd);
-//                });
+//                __HandleRead(fd);
+                ThreadPool::Instance().Execute([=] { return __HandleRead(fd); });
                 
             } else if ((fd = SocketEpoll::Instance().IsErrSet(i)) > 0) {
                 LogE("[HttpServer::Run] IsErrSet, fd:%d, i:%d", fd, i)
@@ -66,13 +63,12 @@ int HttpServer::__HandleRead(SOCKET _fd) {
         ssize_t n = recv(_fd, recv_buff->Ptr(recv_buff->Length()),
                          kBuffSize, 0);
         if (n == -1 && errno == EAGAIN) {
-            // no messages available and fd is nonblocking,
             LogI("[HttpServer::__HandleRead] EAGAIN")
             return 0;
         }
         if (n == 0) {
             LogI("[HttpServer::__HandleRead] Conn closed by peer")
-            break;
+            return 0;
         }
         if (n > 0) { recv_buff->AddLength(n); }
 
@@ -86,7 +82,6 @@ int HttpServer::__HandleRead(SOCKET _fd) {
                 LogE("[HttpServer::__HandleRead] parser error")
                 return -1;
             }
-            
             break;
         }
     }
@@ -96,19 +91,19 @@ int HttpServer::__HandleRead(SOCKET _fd) {
 }
 
 int HttpServer::__HandleConnect() {
-    int fd = accept(listenfd_, (struct sockaddr *) NULL, NULL);
-    if (fd < 0) {
-        LogE("[HttpServer::__HandleConnect] accept socket error: %s, errno: %d",
-             strerror(errno), errno);
-        return fd;
+    int fd;
+    while (true) {
+        fd = accept(listenfd_, (struct sockaddr *) NULL, NULL);
+        if (fd < 0) {
+            if (errno == EAGAIN) { return 0; }
+            LogE("[HttpServer::__HandleConnect] errno(%d): %s",
+                 errno, strerror(errno));
+            return -1;
+        }
+        SetNonblocking(fd);
+        LogI("[HttpServer::__HandleConnect] new connect, fd: %d", fd);
+        SocketEpoll::Instance().AddSocketRead(fd);
     }
-    int old_flags = fcntl(fd, F_GETFL);
-    if (fcntl(fd, F_SETFL, old_flags | O_NONBLOCK) == -1) {
-        LogE("[HttpServer::__HandleConnect] fcntl return -1")
-        return -1;
-    }
-    LogI("[HttpServer::__HandleConnect] new connect, fd: %d", fd);
-    return SocketEpoll::Instance().AddSocketRead(fd);
 }
 
 int HttpServer::__CreateListenFd() {
@@ -123,12 +118,12 @@ int HttpServer::__CreateListenFd() {
     ling.l_linger = 0;
     ling.l_onoff = 1;
     setsockopt(listenfd_, SOL_SOCKET, SO_LINGER, &ling, sizeof(ling));
+    SetNonblocking(listenfd_);
     return 0;
 }
 
 int HttpServer::__Bind(uint16_t _port) {
     struct sockaddr_in sock_addr;
-    
     memset(&sock_addr, 0, sizeof(sock_addr));
     sock_addr.sin_family = AF_INET;
     sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);

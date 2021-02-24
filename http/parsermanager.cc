@@ -26,8 +26,8 @@ std::shared_ptr<http::request::Parser> ParserManager::__CreateParser(SOCKET _fd)
 }
 
 int ParserManager::DeleteParser(SOCKET _fd) {
-    parsers_map_.erase(_fd);
     LogI("[ParserManager::DeleteParser] map size:%lu", parsers_map_.size())
+    return parsers_map_.erase(_fd);
 }
 
 int ParserManager::ContainsParser(SOCKET _fd) {
