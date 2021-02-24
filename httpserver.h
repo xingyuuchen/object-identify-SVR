@@ -1,6 +1,7 @@
 #ifndef OI_SVR_HTTPSERVER_H
 #define OI_SVR_HTTPSERVER_H
 #include <stdint.h>
+#include "socket/unix_socket.h"
 
 
 class HttpServer {
@@ -26,6 +27,8 @@ class HttpServer {
     int __Bind(uint16_t _port);
     
     int __HandleConnect();
+    
+    int __HandleRead(SOCKET _fd);
     
   private:
     static const int    kBuffSize;

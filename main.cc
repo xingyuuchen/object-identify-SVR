@@ -11,7 +11,7 @@ void Stop(int _sig) {
 
 
 int main(int argc, char **argv) {
-    LogI("Server On...");
+    LogI(" Hello World...");
     signal(2, Stop);
     
     HttpServer::Instance().Run();

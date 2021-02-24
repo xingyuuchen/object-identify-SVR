@@ -26,7 +26,8 @@ SocketEpoll::SocketEpoll(int _max_fds)
 
 int SocketEpoll::AddSocketRead(int _fd) {
     struct epoll_event event;
-    event.events = EPOLLIN;
+    // The default behavior for epoll is level-triggered.
+    event.events = EPOLLIN | EPOLLET;
     event.data.fd = _fd;
     return __EpollCtl(EPOLL_CTL_ADD, _fd, &event);
 }

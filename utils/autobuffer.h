@@ -23,6 +23,8 @@ class AutoBuffer {
     
     char *Ptr(const size_t _offset = 0) const;
     
+    void SetPtr(char *_ptr);
+    
     size_t GetCapacity() const;
     
     size_t AvailableSize() const;

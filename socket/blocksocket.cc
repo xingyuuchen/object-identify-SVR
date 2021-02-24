@@ -67,31 +67,3 @@ size_t BlockSocketReceive(SOCKET _socket, AutoBuffer &_recv_buff,
     }
     
 }
-
-size_t BlockSocketReceiveWithoutPoll(SOCKET _socket, AutoBuffer &_recv_buff,
-                                     size_t _buff_size) {
-    
-    size_t available = _recv_buff.AvailableSize();
-    if (available < _buff_size) {
-        _recv_buff.AddCapacity(_buff_size - available);
-    }
-    
-    for (int i = 0; i < 10; ++i) {
-        ssize_t n = recv(_socket, _recv_buff.Ptr(_recv_buff.Length()),
-                         _buff_size, 0);
-    
-        if (n > 0) {
-            _recv_buff.AddLength(n);
-            return n;
-        } else if (n == 0) {
-            /*  If no messages are available to be
-                received and the peer has performed an
-                orderly shutdown, the value 0 is
-                returned.
-             */
-        } else {
-            LogI("[BlockSocketReceiveWithoutPoll] n:%zd", n)
-            return -1;
-        }
-    }
-}

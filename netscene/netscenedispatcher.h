@@ -5,6 +5,9 @@
 #include <mutex>
 
 
+/**
+ * 业务分发枢纽
+ */
 class NetSceneDispatcher {
   public:
     static NetSceneDispatcher& Instance() {

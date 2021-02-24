@@ -2,7 +2,7 @@
 #define OI_SVR_CONSTANTSPROTOCOL_H
 
 /**
- * all NetScene type declared here.
+ * all NetScene types are declared here.
  */
 const int kIndexPage = 0;
 const int kNetSceneTypeQueryImg = 1;

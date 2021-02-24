@@ -13,7 +13,4 @@ size_t BlockSocketReceive(SOCKET _socket,
                             int _timeout_mills = 5000,
                             bool _wait_full = false);
 
-size_t BlockSocketReceiveWithoutPoll(SOCKET _socket, AutoBuffer &_recv_buff,
-                                     size_t _buff_size);
-
 #endif //OI_SVR_BLOCKSOCKET_H

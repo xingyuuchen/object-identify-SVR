@@ -4,10 +4,12 @@
 #include "socket/socketepoll.h"
 #include "socket/blocksocket.h"
 #include "http/httprequest.h"
+#include "http/parsermanager.h"
 #include "utils/threadpool.h"
 #include <unistd.h>
 #include <iostream>
 #include <string.h>
+#include <fcntl.h>
 
 
 const int HttpServer::kBuffSize = 1024;
@@ -38,29 +40,8 @@ void HttpServer::Run(uint16_t _port) {
             } else if ((fd = SocketEpoll::Instance().IsReadSet(i)) > 0) {
                 LogI("IsReadSet, fd: %d", fd)
 //                ThreadPool::Instance().Execute([=] {
-                    http::request::Parser parser;
-        
-                    AutoBuffer recv_buff;
-                    while (true) {
-                        size_t nsize = BlockSocketReceiveWithoutPoll(fd, recv_buff, kBuffSize);
-                        if (nsize < 0) {
-                            LogE("BlockSocketReceive ret: %zd", nsize);
-                            break;
-                        }
-                        
-                        parser.Recv(recv_buff);
-                        
-                        if (parser.IsEnd()) {
-                            break;
-                        } else if (parser.IsErr()) {
-                            LogE("parser error")
-                            break;
-                        }
-                    }
-                    NetSceneDispatcher::Instance().Dispatch(fd, &parser.GetBody());
-        
-                    close(fd);
-//                    return 0;
+                    __HandleRead(fd);
+//                    return __HandleRead(fd);
 //                });
                 
             } else if ((fd = SocketEpoll::Instance().IsErrSet(i)) > 0) {
@@ -71,6 +52,57 @@ void HttpServer::Run(uint16_t _port) {
     Stop();
 }
 
+int HttpServer::__HandleRead(SOCKET _fd) {
+    using http::request::ParserManager;
+    auto parser = ParserManager::Instance().GetParser(_fd);
+    
+    AutoBuffer *recv_buff = parser->GetBuff();
+    while (true) {
+        size_t available = recv_buff->AvailableSize();
+        if (available < kBuffSize) {
+            recv_buff->AddCapacity(kBuffSize - available);
+        }
+        ssize_t n = recv(_fd, recv_buff->Ptr(recv_buff->Length()),
+                         kBuffSize, 0);
+        if (n < 0 && errno == EAGAIN) {
+            // no messages are available and fd is nonblocking,
+            LogI("[HttpServer::__HandleRead] EAGAIN")
+            return 0;
+        }
+        if (n > 0) { recv_buff->AddLength(n); }
+
+        parser->DoParse();
+        
+        if (parser->IsEnd()) {
+            ParserManager::Instance().DeleteParser(_fd);
+            break;
+        } else if (parser->IsErr()) {
+            LogE("parser error")
+            ParserManager::Instance().DeleteParser(_fd);
+            return -1;
+        }
+    }
+    int ret = NetSceneDispatcher::Instance().Dispatch(_fd, parser->GetBody());
+    close(_fd);
+    return ret;
+}
+
+int HttpServer::__HandleConnect() {
+    int fd = accept(listenfd_, (struct sockaddr *) NULL, NULL);
+    if (fd < 0) {
+        LogE("[HttpServer::__HandleConnect] accept socket error: %s, errno: %d",
+             strerror(errno), errno);
+        return fd;
+    }
+    int old_flags = fcntl(fd, F_GETFL);
+    if (fcntl(fd, F_SETFL, old_flags | O_NONBLOCK) == -1) {
+        LogE("[HttpServer::__HandleConnect] fcntl return -1")
+        return -1;
+    }
+    LogI("[HttpServer::__HandleConnect] new connect, fd: %d", fd);
+    return SocketEpoll::Instance().AddSocketRead(fd);
+}
+
 int HttpServer::__CreateListenFd() {
     listenfd_ = socket(AF_INET, SOCK_STREAM, 0);
     if (listenfd_ < 0) {
@@ -78,6 +110,8 @@ int HttpServer::__CreateListenFd() {
              " error: %s, errno: %d", strerror(errno), errno);
         return -1;
     }
+    bool b = false;
+    setsockopt(listenfd_, SOL_SOCKET, SO_LINGER, &b, sizeof(b));
     return 0;
 }
 
@@ -90,24 +124,12 @@ int HttpServer::__Bind(uint16_t _port) {
     sock_addr.sin_port = htons(_port);
     
     int bind_res = bind(listenfd_, (struct sockaddr *) &sock_addr,
-            sizeof(sock_addr)); // create a special socket file
+                        sizeof(sock_addr)); // create a special socket file
     if (bind_res < 0) {
         LogE("[HttpServer::__Bind] bind error: %s, errno: %d", strerror(errno), errno);
         return -1;
     }
     return 0;
-}
-
-int HttpServer::__HandleConnect() {
-    int fd = accept(listenfd_, (struct sockaddr *) NULL, NULL);
-    if (fd > 0) {
-        LogI("[HttpServer::__HandleConnect] new connect, fd: %d", fd);
-        return SocketEpoll::Instance().AddSocketRead(fd);
-    } else {
-        LogE("[HttpServer::__HandleConnect] accept socket error: %s, errno: %d",
-             strerror(errno), errno);
-        return fd;
-    }
 }
 
 void HttpServer::Stop() {
