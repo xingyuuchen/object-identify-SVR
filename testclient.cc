@@ -35,7 +35,7 @@ bool Connect() {
 }
 
 
-int main() {
+int main1() {
     if (!Connect()) {
         return 0;
     }
