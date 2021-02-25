@@ -11,7 +11,7 @@
 #include "utils/log.h"
 
 
-const int kMaxLine = 1024;
+const int kBuffSize = 1024;
 int socket_;
 
 bool Connect() {
@@ -24,7 +24,7 @@ bool Connect() {
     memset(&sockaddr, 0, sizeof(sockaddr));
     sockaddr.sin_family = AF_INET;
     sockaddr.sin_port = htons(5002);
-    sockaddr.sin_addr.s_addr = inet_addr(svrInetAddr);   // inet_pton(AF_INET, svrInetAddr, &sockaddr.sin_addr);
+    sockaddr.sin_addr.s_addr = inet_addr(svrInetAddr);
     
     if (::connect(socket_, (struct sockaddr *) &sockaddr, sizeof(sockaddr)) < 0) {
         LogI("connect failed");
@@ -36,11 +36,9 @@ bool Connect() {
 }
 
 
-void *StartRoutine(void *arg) {
-    int i = *(int *) arg;
-    printf("Thread working... %d \n", i);
+int main() {
     if (!Connect()) {
-        return NULL;
+        return 0;
     }
     
     char sendline[100];
@@ -48,22 +46,12 @@ void *StartRoutine(void *arg) {
         printf("--hi--: \n");
         fgets(sendline, 1024, stdin);
         if (::send(socket_, sendline, strlen(sendline), 0) < 0) {
-            printf("send msg error: %s errno: %d\n", strerror(errno), errno);
+            printf("send errno(%d): %s\n", errno, strerror(errno));
             break;
         }
     }
     ::close(socket_);
-    printf("exit\n");
     
-    return NULL;
+    return 0;
 }
-
-//int main(int argc, char **argv) {
-//    pthread_t tid;
-//    int arg = 2;
-//    pthread_create(&tid, NULL, StartRoutine, &arg);
-//    printf("%d\n", pthread_join(tid, NULL));
-////    sleep(1);
-//    return 0;
-//}
 

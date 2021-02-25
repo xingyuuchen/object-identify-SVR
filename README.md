@@ -1,19 +1,20 @@
 # svr for object-identify
-### 此工程不使用第三方库，网络请求从unix的C标准库写起。
+### 工程不使用第三方库，网络请求从 System Calls 和 Standard C Library Functions 写起。
 ## 编译方法
 
 ### UNIX
 ```
 git clone https://github.com/xingyuuchen/object-identify-SVR.git
 cd object-identify-SVR/scripts
+bash autogen.sh
 ```
 编译运行
 ```
-bash cmake.sh -b -r -n   # -n (optinal) for nohup background running.
+bash cmake.sh -r -n   # -n (optinal) for nohup background running.
 ```
 仅编译
 ```
-bash cmake.sh -b
+bash cmake.sh
 ```
 
 ### Windows
