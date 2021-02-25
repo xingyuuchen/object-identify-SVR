@@ -106,6 +106,7 @@ SocketEpoll::~SocketEpoll() {
         delete[] epoll_events_;
     }
     if (epoll_fd_ != -1) {
+        LogI("[~SocketEpoll] close epfd")
         ::close(epoll_fd_);
     }
 }

@@ -5,7 +5,7 @@
 #include "socket/blocksocket.h"
 #include "http/httprequest.h"
 #include "http/parsermanager.h"
-#include "utils/threadpool.h"
+#include "utils/threadpool/threadpool.h"
 #include <unistd.h>
 #include <iostream>
 #include <string.h>
@@ -54,44 +54,86 @@ void HttpServer::Run(uint16_t _port) {
 }
 
 int HttpServer::__HandleRead(SOCKET _fd) {
-    using http::request::ParserManager;
-    auto parser = ParserManager::Instance().GetParser(_fd);
-    
-    AutoBuffer *recv_buff = parser->GetBuff();
+    LogI("sleeping...")
+    sleep(4);
+    char buff[kBuffSize] = {0, };
+
     while (true) {
-        size_t available = recv_buff->AvailableSize();
-        if (available < kBuffSize) {
-            recv_buff->AddCapacity(kBuffSize - available);
-        }
-        ssize_t n = ::recv(_fd, recv_buff->Ptr(recv_buff->Length()),
-                         kBuffSize, 0);
+        ssize_t n = ::read(_fd, buff, 2);
         if (n == -1 && errno == EAGAIN) {
             LogI("[HttpServer::__HandleRead] EAGAIN")
             return 0;
         }
         if (n == 0) {
             LogI("[HttpServer::__HandleRead] Conn closed by peer")
-            return 0;
-        }
-        if (n > 0) { recv_buff->AddLength(n); }
-
-        LogI("[HttpServer::__HandleRead] n: %zd", n)
-        parser->DoParse();
-        
-        if (parser->IsEnd() || parser->IsErr()) {
-            ParserManager::Instance().DeleteParser(_fd);
-            SocketEpoll::Instance().DelSocket(_fd);
-            if (parser->IsErr()) {
-                LogE("[HttpServer::__HandleRead] parser error")
-                return -1;
-            }
             break;
         }
+        if (n < 0) {
+            LogE("[HttpServer::__HandleRead] err: n=%zd", n)
+            break;
+        }
+        LogI("[HttpServer::__HandleRead] n: %zd", n)
+        if (n > 0) {
+            LogI("read: %s", buff)
+        }
     }
-    int ret = NetSceneDispatcher::Instance().Dispatch(_fd, parser->GetBody());
+    SocketEpoll::Instance().DelSocket(_fd);
     ::close(_fd);
-    return ret;
+    return 0;
 }
+
+//int HttpServer::__HandleRead(SOCKET _fd) {
+//    using http::request::ParserManager;
+//    auto parser = ParserManager::Instance().GetParser(_fd);
+//
+//    AutoBuffer *recv_buff = parser->GetBuff();
+//
+//    while (true) {
+//        size_t available = recv_buff->AvailableSize();
+//        if (available < kBuffSize) {
+//            recv_buff->AddCapacity(kBuffSize - available);
+//        }
+//
+//        ssize_t n = ::read(_fd, recv_buff->Ptr(
+//                recv_buff->Length()), kBuffSize);
+//
+//        if (n == -1 && errno == EAGAIN) {
+//            LogI("[HttpServer::__HandleRead] EAGAIN")
+//            return 0;
+//        }
+//        if (n == 0) {
+//            // 对方退出也会触发一次read事件
+//            LogI("[HttpServer::__HandleRead] Conn closed by peer")
+//            ::close(_fd);
+//            return 0;
+//
+//        } else if (n < 0) {
+//            LogE("[HttpServer::__HandleRead] err: n=%zd", n)
+//            ::close(_fd);
+//            return -1;  // err
+//
+//        } else if (n > 0) {
+//            recv_buff->AddLength(n);
+//        }
+//
+//        LogI("[HttpServer::__HandleRead] n: %zd", n)
+//        parser->DoParse();
+//
+//        if (parser->IsEnd() || parser->IsErr()) {
+//            ParserManager::Instance().DeleteParser(_fd);
+//            SocketEpoll::Instance().DelSocket(_fd);
+//            if (parser->IsErr()) {
+//                LogE("[HttpServer::__HandleRead] parser error")
+//                return -1;
+//            }
+//
+//            break;
+//        }
+//    }
+//    int ret = NetSceneDispatcher::Instance().Dispatch(_fd, parser->GetBody());
+//    ::close(_fd);
+//    return ret;
+//}
 
 int HttpServer::__HandleConnect() {
     int fd;
