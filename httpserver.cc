@@ -42,6 +42,9 @@ void HttpServer::Run(uint16_t _port) {
 //                __HandleRead(fd);
                 ThreadPool::Instance().Execute([=] { return __HandleRead(fd); });
                 
+            } else if ((fd = SocketEpoll::Instance().IsWriteSet(i)) > 0) {
+                // TODO: send
+                
             } else if ((fd = SocketEpoll::Instance().IsErrSet(i)) > 0) {
                 LogE("[HttpServer::Run] IsErrSet, fd:%d, i:%d", fd, i)
             }

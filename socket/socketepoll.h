@@ -27,13 +27,8 @@ class SocketEpoll {
     
     int ModSocket(SOCKET _fd, struct epoll_event *_event);
     
-    /**
-     * @param _idx: varies from 0 to the val as specifies by
-     *              return val of EpollWait().
-     * @return: -1 if not, the fd if it's ready.
-     */
     int IsReadSet(int _idx);
-    
+    int IsWriteSet(int _idx);
     int IsErrSet(int _idx);
     
     bool IsNewConnect(int _idx);
@@ -43,6 +38,14 @@ class SocketEpoll {
     
   private:
     SocketEpoll(int _max_fds = 1024);
+    
+    /**
+     * @param _idx: varies from 0 to the val as specifies by
+     *              return val of EpollWait().
+     * @param _flag: EPOLLIN, EPOLLOUT, EPOLLERR, etc.
+     * @return: -1 if not, the fd if it's ready.
+     */
+    int __IsFlagSet(int _idx, int _flag);
     
     int __EpollCtl(int _op, SOCKET _fd, struct epoll_event *_event = NULL);
     

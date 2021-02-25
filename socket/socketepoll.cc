@@ -64,29 +64,6 @@ int SocketEpoll::EpollWait(int _max_events/* = kMaxFds_*/,
     return nfds;
 }
 
-
-int SocketEpoll::IsReadSet(int _idx) {
-    if (_idx < 0 || _idx >= kMaxFds_) {
-        LogE("[SocketEpoll::IsReadSet] invalid _idx: %d", _idx)
-        return -1;
-    }
-    if (epoll_events_[_idx].events & EPOLLIN) {
-        return epoll_events_[_idx].data.fd;
-    }
-    return -1;
-}
-
-int SocketEpoll::IsErrSet(int _idx) {
-    if (_idx < 0 || _idx >= kMaxFds_) {
-        LogE("[SocketEpoll::IsErrSet] invalid _idx: %d", _idx)
-        return -1;
-    }
-    if (epoll_events_[_idx].events & EPOLLERR) {
-        return epoll_events_[_idx].data.fd;
-    }
-    return -1;
-}
-
 bool SocketEpoll::IsNewConnect(int _idx) {
     if (_idx < 0 || _idx >= kMaxFds_) {
         LogE("[SocketEpoll::IsNewConnect] invalid _idx: %d", _idx)
@@ -94,6 +71,24 @@ bool SocketEpoll::IsNewConnect(int _idx) {
     }
     return epoll_events_[_idx].data.fd == listen_fd_;
 }
+
+int SocketEpoll::IsWriteSet(int _idx) { return __IsFlagSet(_idx, EPOLLOUT); }
+
+int SocketEpoll::IsReadSet(int _idx) { return __IsFlagSet(_idx, EPOLLIN); }
+
+int SocketEpoll::IsErrSet(int _idx) { return __IsFlagSet(_idx, EPOLLERR); }
+
+int SocketEpoll::__IsFlagSet(int _idx, int _flag) {
+    if (_idx < 0 || _idx >= kMaxFds_) {
+        LogE("[SocketEpoll::__IsFlagSet] invalid _idx: %d", _idx)
+        return -1;
+    }
+    if (epoll_events_[_idx].events & _flag) {
+        return epoll_events_[_idx].data.fd;
+    }
+    return -1;
+}
+
 
 void SocketEpoll::SetListenFd(int _listen_fd) {
     if (_listen_fd < 0) {
@@ -104,6 +99,8 @@ void SocketEpoll::SetListenFd(int _listen_fd) {
     listen_fd_ = _listen_fd;
 }
 
+int SocketEpoll::GetErrNo() const { return errno_; }
+
 SocketEpoll::~SocketEpoll() {
     if (epoll_events_ != NULL) {
         delete[] epoll_events_;
@@ -112,5 +109,3 @@ SocketEpoll::~SocketEpoll() {
         ::close(epoll_fd_);
     }
 }
-
-int SocketEpoll::GetErrNo() const { return errno_; }
