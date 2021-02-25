@@ -39,8 +39,8 @@ void HttpServer::Run(uint16_t _port) {
                 
             } else if ((fd = SocketEpoll::Instance().IsReadSet(i)) > 0) {
                 LogI("IsReadSet, fd: %d", fd)
-//                __HandleRead(fd);
-                ThreadPool::Instance().Execute([=] { return __HandleRead(fd); });
+//                __HandleReadTest(fd);
+                ThreadPool::Instance().Execute(fd, [=] { return __HandleRead(fd); });
                 
             } else if ((fd = SocketEpoll::Instance().IsWriteSet(i)) > 0) {
                 // TODO: send
@@ -54,10 +54,62 @@ void HttpServer::Run(uint16_t _port) {
 }
 
 int HttpServer::__HandleRead(SOCKET _fd) {
+    using http::request::ParserManager;
+    auto parser = ParserManager::Instance().GetParser(_fd);
+
+    AutoBuffer *recv_buff = parser->GetBuff();
+
+    while (true) {
+        size_t available = recv_buff->AvailableSize();
+        if (available < kBuffSize) {
+            recv_buff->AddCapacity(kBuffSize - available);
+        }
+
+        ssize_t n = ::read(_fd, recv_buff->Ptr(
+                recv_buff->Length()), kBuffSize);
+
+        if (n == -1 && errno == EAGAIN) {
+            LogI("[HttpServer::__HandleRead] EAGAIN")
+            return 0;
+        }
+        if (n < 0) {
+            LogE("[HttpServer::__HandleRead] err: n=%zd", n)
+            ::close(_fd);
+            return -1;
+
+        } else if (n == 0) {
+            // 对方退出也会触发一次read事件
+            LogI("[HttpServer::__HandleRead] Conn closed by peer")
+            ::close(_fd);
+            return 0;
+
+        } else if (n > 0) {
+            recv_buff->AddLength(n);
+        }
+
+        LogI("[HttpServer::__HandleRead] n: %zd", n)
+        parser->DoParse();
+
+        if (parser->IsEnd() || parser->IsErr()) {
+            ParserManager::Instance().DeleteParser(_fd);
+            SocketEpoll::Instance().DelSocket(_fd);
+            if (parser->IsErr()) {
+                LogE("[HttpServer::__HandleRead] parser error")
+                return -1;
+            }
+            break;
+        }
+    }
+    int ret = NetSceneDispatcher::Instance().Dispatch(_fd, parser->GetBody());
+    ::close(_fd);
+    return ret;
+}
+
+int HttpServer::__HandleReadTest(SOCKET _fd) {
     LogI("sleeping...")
     sleep(4);
     char buff[kBuffSize] = {0, };
-
+    
     while (true) {
         ssize_t n = ::read(_fd, buff, 2);
         if (n == -1 && errno == EAGAIN) {
@@ -81,59 +133,6 @@ int HttpServer::__HandleRead(SOCKET _fd) {
     ::close(_fd);
     return 0;
 }
-
-//int HttpServer::__HandleRead(SOCKET _fd) {
-//    using http::request::ParserManager;
-//    auto parser = ParserManager::Instance().GetParser(_fd);
-//
-//    AutoBuffer *recv_buff = parser->GetBuff();
-//
-//    while (true) {
-//        size_t available = recv_buff->AvailableSize();
-//        if (available < kBuffSize) {
-//            recv_buff->AddCapacity(kBuffSize - available);
-//        }
-//
-//        ssize_t n = ::read(_fd, recv_buff->Ptr(
-//                recv_buff->Length()), kBuffSize);
-//
-//        if (n == -1 && errno == EAGAIN) {
-//            LogI("[HttpServer::__HandleRead] EAGAIN")
-//            return 0;
-//        }
-//        if (n == 0) {
-//            // 对方退出也会触发一次read事件
-//            LogI("[HttpServer::__HandleRead] Conn closed by peer")
-//            ::close(_fd);
-//            return 0;
-//
-//        } else if (n < 0) {
-//            LogE("[HttpServer::__HandleRead] err: n=%zd", n)
-//            ::close(_fd);
-//            return -1;  // err
-//
-//        } else if (n > 0) {
-//            recv_buff->AddLength(n);
-//        }
-//
-//        LogI("[HttpServer::__HandleRead] n: %zd", n)
-//        parser->DoParse();
-//
-//        if (parser->IsEnd() || parser->IsErr()) {
-//            ParserManager::Instance().DeleteParser(_fd);
-//            SocketEpoll::Instance().DelSocket(_fd);
-//            if (parser->IsErr()) {
-//                LogE("[HttpServer::__HandleRead] parser error")
-//                return -1;
-//            }
-//
-//            break;
-//        }
-//    }
-//    int ret = NetSceneDispatcher::Instance().Dispatch(_fd, parser->GetBody());
-//    ::close(_fd);
-//    return ret;
-//}
 
 int HttpServer::__HandleConnect() {
     int fd;

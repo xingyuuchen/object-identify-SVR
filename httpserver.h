@@ -29,6 +29,7 @@ class HttpServer {
     int __HandleConnect();
     
     int __HandleRead(SOCKET _fd);
+    int __HandleReadTest(SOCKET _fd);
     
   private:
     static const int    kBuffSize;
