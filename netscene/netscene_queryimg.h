@@ -18,7 +18,7 @@ class NetSceneQueryImg : public NetSceneBase {
     
     int GetType();
     
-    NetSceneBase *NewInstance();
+    virtual std::shared_ptr<NetSceneBase> NewInstance();
     
     int DoSceneImpl(const std::string &_in_buffer);
 

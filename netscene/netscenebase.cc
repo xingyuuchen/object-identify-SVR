@@ -3,6 +3,8 @@
 #include "../http/firstline.h"
 #include "../utils/log.h"
 #include "../http/headerfield.h"
+#include "../socket/socketepoll.h"
+#include <errno.h>
 
 NetSceneBase::NetSceneBase()
         : status_code_(200)
@@ -19,9 +21,8 @@ void NetSceneBase::SetSocket(SOCKET _socket) {
 
 
 int NetSceneBase::DoScene(const std::string &_in_buffer) {
-    int ret = DoSceneImpl(_in_buffer);
-    PackAndSend();
-    return ret;
+    DoSceneImpl(_in_buffer);
+    return PackAndSend();
 }
 
 void NetSceneBase::CopyRespToSendBody(std::string &_resp, size_t _size) {
@@ -30,16 +31,25 @@ void NetSceneBase::CopyRespToSendBody(std::string &_resp, size_t _size) {
     send_body_.Write(_resp.data(), _size);
 }
 
-void NetSceneBase::PackAndSend() {
+int NetSceneBase::PackAndSend() {
     AutoBuffer out_buff;
     http::response::Pack(http::kHTTP_1_1, status_code_,
                          status_desc_, http_headers_, out_buff, send_body_);
     LogI("[NetSceneBase::PackAndSend] send len: %ld", out_buff.Length())
 //    __ShowHttpHeader(out_buff);
     send_body_.Reset();
-    // TODO: replace send with block socket send
-    ::send(socket_, out_buff.Ptr(), out_buff.Length(), 0);
-    
+    size_t send_size = out_buff.Length();
+    ssize_t nsend = ::send(socket_, out_buff.Ptr(), send_size, 0);
+    if (nsend < send_size) {
+        if (nsend < 0 && errno != EAGAIN) {
+            LogE("[NetSceneBase::PackAndSend] errno(%d): %s", errno, strerror(errno))
+            return -1;
+        }
+        SocketEpoll::Instance().ModSocketWrite(socket_);
+        LogI("[NetSceneBase::PackAndSend] nsend=%zd", nsend)
+        return nsend;
+    }
+    return 0;
 }
 
 void NetSceneBase::__ShowHttpHeader(AutoBuffer &_out) {

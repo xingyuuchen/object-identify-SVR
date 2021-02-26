@@ -17,7 +17,9 @@ NetSceneGetTrainProgress::~NetSceneGetTrainProgress() { }
 
 int NetSceneGetTrainProgress::GetType() { return kNetSceneTypeGetTrainProgress; }
 
-NetSceneBase *NetSceneGetTrainProgress::NewInstance() { return new NetSceneGetTrainProgress(); }
+std::shared_ptr<NetSceneBase> NetSceneGetTrainProgress::NewInstance() {
+    return std::make_shared<NetSceneGetTrainProgress>();
+}
 
 int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
     LogI("[NetSceneGetTrainProgress::DoSceneImpl] req.len: %zd", _in_buffer.size());

@@ -9,7 +9,9 @@ NetSceneGetIndexPage::NetSceneGetIndexPage() : NetSceneBase() {
 
 int NetSceneGetIndexPage::GetType() { return kIndexPage; }
 
-NetSceneBase * NetSceneGetIndexPage::NewInstance() { return new NetSceneGetIndexPage(); }
+std::shared_ptr<NetSceneBase> NetSceneGetIndexPage::NewInstance() {
+    return std::make_shared<NetSceneGetIndexPage>();
+}
 
 int NetSceneGetIndexPage::DoSceneImpl(const std::string &_in_buffer) {
     static int visit_times_since_last_boot_ = 0;

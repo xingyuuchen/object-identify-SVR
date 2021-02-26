@@ -1,7 +1,9 @@
 #ifndef OI_SVR_NETSCENEBASE_H
 #define OI_SVR_NETSCENEBASE_H
 #include <string>
+#include <string.h>
 #include <map>
+#include <memory>
 #include "../socket/unix_socket.h"
 #include "../utils/autobuffer.h"
 
@@ -15,7 +17,7 @@ class NetSceneBase {
     
     virtual int GetType() = 0;
     
-    virtual NetSceneBase *NewInstance() = 0;
+    virtual std::shared_ptr<NetSceneBase> NewInstance() = 0;
     
     virtual int DoSceneImpl(const std::string &_in_buffer) = 0;
     
@@ -25,7 +27,7 @@ class NetSceneBase {
     
     int DoScene(const std::string &_in_buffer);
     
-    void PackAndSend();
+    int PackAndSend();
     
     void CopyRespToSendBody(std::string &_resp, size_t _size);
 
