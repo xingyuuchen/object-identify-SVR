@@ -18,7 +18,7 @@ class ParserManager {
     void operator=(ParserManager const &) = delete;
     ParserManager(ParserManager const &) = delete;
     
-    int DeleteParser(SOCKET _fd);
+    int DelParser(SOCKET _fd);
     
     int ContainsParser(SOCKET _fd);
     

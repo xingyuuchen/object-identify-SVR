@@ -10,22 +10,21 @@
  */
 class NetSceneDispatcher {
   public:
+    ~NetSceneDispatcher();
+    NetSceneDispatcher(NetSceneDispatcher const &)  = delete;
+    void operator=(NetSceneDispatcher const &)      = delete;
+    
     static NetSceneDispatcher& Instance() {
         static NetSceneDispatcher instance;
         return instance;
     }
     
-    int Dispatch(SOCKET _conn_fd, const AutoBuffer* _buffer);
-    
-    ~NetSceneDispatcher();
-    
-    NetSceneDispatcher(NetSceneDispatcher const &)  = delete;
-    
-    void operator=(NetSceneDispatcher const &)      = delete;
-    
+    NetSceneBase *Dispatch(SOCKET _conn_fd, const AutoBuffer *_buffer);
     
   private:
     NetSceneDispatcher();
+    
+    NetSceneBase *__MakeNetScene(int _type);
     
   private:
     std::vector<NetSceneBase *>     selectors_;

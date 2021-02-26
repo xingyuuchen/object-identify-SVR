@@ -17,9 +17,7 @@ NetSceneGetTrainProgress::~NetSceneGetTrainProgress() { }
 
 int NetSceneGetTrainProgress::GetType() { return kNetSceneTypeGetTrainProgress; }
 
-std::shared_ptr<NetSceneBase> NetSceneGetTrainProgress::NewInstance() {
-    return std::make_shared<NetSceneGetTrainProgress>();
-}
+NetSceneBase *NetSceneGetTrainProgress::NewInstance() { return new NetSceneGetTrainProgress(); }
 
 int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
     LogI("[NetSceneGetTrainProgress::DoSceneImpl] req.len: %zd", _in_buffer.size());
@@ -48,7 +46,6 @@ int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
     LogI("[NetSceneGetTrainProgress] isRunning:%d, currEpoch:%d, totalEpoch:%d",
          is_running_, curr_epoch_, total_epoch_)
     
-    send_body_.Reset();
     resp.set_is_running(is_running_);
     resp.set_curr_epoch(curr_epoch_);
     resp.set_total_epoch(total_epoch_);

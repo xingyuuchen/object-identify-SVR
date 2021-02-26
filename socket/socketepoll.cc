@@ -32,11 +32,14 @@ int SocketEpoll::AddSocketRead(int _fd) {
     return __EpollCtl(EPOLL_CTL_ADD, _fd, &event);
 }
 
-int SocketEpoll::DelSocket(int _fd) { return __EpollCtl(EPOLL_CTL_DEL, _fd); }
-
-int SocketEpoll::ModSocket(int _fd, struct epoll_event *_event) {
-    return __EpollCtl(EPOLL_CTL_MOD, _fd, _event);
+int SocketEpoll::ModSocketWrite(int _fd, void *_ptr) {
+    struct epoll_event event;
+    event.events = EPOLLOUT | EPOLLET;
+    event.data.ptr = _ptr;
+    return __EpollCtl(EPOLL_CTL_MOD, _fd, &event);
 }
+
+int SocketEpoll::DelSocket(int _fd) { return __EpollCtl(EPOLL_CTL_DEL, _fd); }
 
 int SocketEpoll::__EpollCtl(int _op, int _fd, struct epoll_event *_event/* = NULL*/) {
     if (_fd < 0) {
@@ -72,21 +75,30 @@ bool SocketEpoll::IsNewConnect(int _idx) {
     return epoll_events_[_idx].data.fd == listen_fd_;
 }
 
-int SocketEpoll::IsWriteSet(int _idx) { return __IsFlagSet(_idx, EPOLLOUT); }
+void *SocketEpoll::IsWriteSet(int _idx) {
+    epoll_data_t *ret = __IsFlagSet(_idx, EPOLLOUT);
+    return ret == NULL ? NULL : ret->ptr;
+}
 
-int SocketEpoll::IsReadSet(int _idx) { return __IsFlagSet(_idx, EPOLLIN); }
+int SocketEpoll::IsReadSet(int _idx) {
+    epoll_data_t *ret = __IsFlagSet(_idx, EPOLLIN);
+    return ret == NULL ? 0 : ret->fd;
+}
 
-int SocketEpoll::IsErrSet(int _idx) { return __IsFlagSet(_idx, EPOLLERR); }
+int SocketEpoll::IsErrSet(int _idx) {
+    epoll_data_t *ret = __IsFlagSet(_idx, EPOLLERR);
+    return ret == NULL ? 0 : ret->fd;
+}
 
-int SocketEpoll::__IsFlagSet(int _idx, int _flag) {
+epoll_data_t *SocketEpoll::__IsFlagSet(int _idx, int _flag) {
     if (_idx < 0 || _idx >= kMaxFds_) {
         LogE("[SocketEpoll::__IsFlagSet] invalid _idx: %d", _idx)
-        return -1;
+        return NULL;
     }
     if (epoll_events_[_idx].events & _flag) {
-        return epoll_events_[_idx].data.fd;
+        return &epoll_events_[_idx].data;
     }
-    return -1;
+    return NULL;
 }
 
 

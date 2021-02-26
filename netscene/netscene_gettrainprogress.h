@@ -16,7 +16,7 @@ class NetSceneGetTrainProgress : public NetSceneBase {
     
     int GetType();
     
-    virtual std::shared_ptr<NetSceneBase> NewInstance();
+    NetSceneBase *NewInstance();
     
     int DoSceneImpl(const std::string &_in_buffer);
     

@@ -23,12 +23,12 @@ class SocketEpoll {
     
     int AddSocketRead(SOCKET _fd);
     
+    int ModSocketWrite(SOCKET _fd, void *_ptr);
+    
     int DelSocket(SOCKET _fd);
     
-    int ModSocket(SOCKET _fd, struct epoll_event *_event);
-    
     int IsReadSet(int _idx);
-    int IsWriteSet(int _idx);
+    void *IsWriteSet(int _idx);
     int IsErrSet(int _idx);
     
     bool IsNewConnect(int _idx);
@@ -43,9 +43,9 @@ class SocketEpoll {
      * @param _idx: varies from 0 to the val as specifies by
      *              return val of EpollWait().
      * @param _flag: EPOLLIN, EPOLLOUT, EPOLLERR, etc.
-     * @return: -1 if not ready, else the fd.
+     * @return: NULL if flag not set, else epoll_event.data.
      */
-    int __IsFlagSet(int _idx, int _flag);
+    epoll_data_t *__IsFlagSet(int _idx, int _flag);
     
     int __EpollCtl(int _op, SOCKET _fd, struct epoll_event *_event = NULL);
     

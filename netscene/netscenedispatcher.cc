@@ -15,49 +15,62 @@ NetSceneDispatcher::NetSceneDispatcher() {
     
 }
 
-NetSceneDispatcher::~NetSceneDispatcher() {
+NetSceneBase *NetSceneDispatcher::__MakeNetScene(int _type) {
     std::unique_lock<std::mutex> lock(mutex_);
-    for (std::vector<NetSceneBase *>::iterator iter = selectors_.begin(); iter != selectors_.end(); iter++) {
-        delete *iter;
+    auto iter = std::find_if(selectors_.begin(), selectors_.end(),
+                        [=] (NetSceneBase *find) { return find->GetType() == _type; });
+    if (iter == selectors_.end()) {
+        LogE("[__MakeNetScene] NO such NetScene:"
+             " type=%d, give up processing this request.", _type)
+        return NULL;
     }
+    return (*iter)->NewInstance();
 }
 
-int NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) {
-    if (_in_buffer == NULL || _in_buffer->Ptr() == NULL) {
-        LogI("[Dispatch] return index page.")
-        NetSceneGetIndexPage net_scene;
-        net_scene.SetSocket(_conn_fd);
-        return net_scene.DoScene("");
-    }
-    LogI("[Dispatch] _in_buffer.len: %zd", _in_buffer->Length());
-    
-    BaseNetSceneReq::BaseNetSceneReq base_req;
-    base_req.ParseFromArray(_in_buffer->Ptr(), _in_buffer->Length());
-    
-    if (base_req.has_net_scene_type()) {
-        int type = base_req.net_scene_type();
-        {
-            std::unique_lock<std::mutex> lock(mutex_);
-            for (auto iter = selectors_.begin(); iter != selectors_.end(); iter++) {
-                if ((*iter)->GetType() == type) {
-                    if (base_req.has_net_scene_req_buff()) {
-                        std::string req_buffer = base_req.net_scene_req_buff();
-                        
-                        auto net_scene = (*iter)->NewInstance();
-                        
-                        net_scene->SetSocket(_conn_fd);
-                        int ret = net_scene->DoScene(req_buffer);
-                        
-                        return ret;
-                    } else {
-                        LogI("[Dispatch] type:%d, base_req.has_net_scene_req_buff(): false", type)
-                        return -1;
-                    }
-                }
-            }
+
+/**
+ * Dispatches the request to corresponding net_scene,
+ * waiting for the latter finished processing.
+ *
+ * @return
+ */
+NetSceneBase *NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_in_buffer) {
+    int type;
+    std::string req_buffer;
+    do {
+        if (_in_buffer == NULL || _in_buffer->Ptr() == NULL) {
+            LogI("[Dispatch] return index page.")
+            type = 0;
+            break;
         }
-        LogE("NO such NetScene: type=%d, give up processing this request.", type);
-    }
+        LogI("[Dispatch] _in_buffer.len: %zd", _in_buffer->Length());
     
-    return -1;
+        BaseNetSceneReq::BaseNetSceneReq base_req;
+        base_req.ParseFromArray(_in_buffer->Ptr(), _in_buffer->Length());
+    
+        if (!base_req.has_net_scene_type()) {
+            LogI("[Dispatch] base_req.has_net_scene_type(): false")
+            return NULL;
+        }
+        type = base_req.net_scene_type();
+        if (!base_req.has_net_scene_req_buff()) {
+            LogI("[Dispatch] type(%d), base_req.has_net_scene_req_buff(): false", type)
+            return NULL;
+        }
+        req_buffer = base_req.net_scene_req_buff();
+    } while (false);
+    
+    NetSceneBase *net_scene = __MakeNetScene(type);
+    if (net_scene) {
+        net_scene->SetSocket(_conn_fd);
+        net_scene->DoScene(req_buffer);
+    }
+    return net_scene;
+}
+
+NetSceneDispatcher::~NetSceneDispatcher() {
+    std::unique_lock<std::mutex> lock(mutex_);
+    for (auto iter = selectors_.begin(); iter != selectors_.end(); iter++) {
+        delete *iter;
+    }
 }

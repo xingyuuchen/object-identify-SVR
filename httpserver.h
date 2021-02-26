@@ -2,6 +2,7 @@
 #define OI_SVR_HTTPSERVER_H
 #include <stdint.h>
 #include "socket/unix_socket.h"
+#include "netscene/netscenebase.h"
 
 
 class HttpServer {
@@ -31,7 +32,7 @@ class HttpServer {
     int __HandleRead(SOCKET _fd);
     int __HandleReadTest(SOCKET _fd);
     
-    int __HandleSend(SOCKET _fd);
+    int __HandleWrite(NetSceneBase *_net_scene, bool _mod_write);
     
     int __HandleErr(SOCKET _fd);
     

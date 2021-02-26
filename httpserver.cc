@@ -28,26 +28,26 @@ void HttpServer::Run(uint16_t _port) {
     SocketEpoll::Instance().SetListenFd(listenfd_);
     
     while (running_) {
-        
         int nfds = SocketEpoll::Instance().EpollWait();
         LogI("[HttpServer::Run] nfds: %d", nfds)
         
         for (int i = 0; i < nfds; i++) {
-            SOCKET fd;
             if (SocketEpoll::Instance().IsNewConnect(i)) {
                 LogI("IsNewConnect")
                 __HandleConnect();
                 
-            } else if ((fd = SocketEpoll::Instance().IsReadSet(i)) > 0) {
+            } else if (SOCKET fd = SocketEpoll::Instance().IsReadSet(i)) {
                 LogI("IsReadSet, fd: %d", fd)
 //                __HandleReadTest(fd);
                 ThreadPool::Instance().Execute(fd, [=] { return __HandleRead(fd); });
-                
-            } else if ((fd = SocketEpoll::Instance().IsWriteSet(i)) > 0) {
-                LogI("IsWriteSet, fd: %d", fd)
-                ThreadPool::Instance().Execute(fd, [=] { return __HandleSend(fd); });
-                
-            } else if ((fd = SocketEpoll::Instance().IsErrSet(i)) > 0) {
+    
+            } else if (void *ptr = SocketEpoll::Instance().IsWriteSet(i)) {
+                NetSceneBase *net_scene = (NetSceneBase *) ptr;
+                ThreadPool::Instance().Execute(net_scene->GetSocket(), [=] {
+                    return __HandleWrite(net_scene, false);
+                });
+    
+            } else if (SOCKET fd = SocketEpoll::Instance().IsErrSet(i)) {
                 LogE("[HttpServer::Run] IsErrSet, fd:%d, i:%d", fd, i)
                 ThreadPool::Instance().Execute(fd, [=] { return __HandleErr(fd); });
             }
@@ -93,18 +93,23 @@ int HttpServer::__HandleRead(SOCKET _fd) {
         parser->DoParse();
 
         if (parser->IsEnd() || parser->IsErr()) {
-            ParserManager::Instance().DeleteParser(_fd);
-            SocketEpoll::Instance().DelSocket(_fd);
+            ParserManager::Instance().DelParser(_fd);
             if (parser->IsErr()) {
                 LogE("[HttpServer::__HandleRead] parser error")
+                SocketEpoll::Instance().DelSocket(_fd);
+                ::close(_fd);
                 return -1;
             }
-            break;
+            
+            NetSceneBase* net_scene =
+                    NetSceneDispatcher::Instance().Dispatch(_fd, parser->GetBody());
+            if (!net_scene) {
+                ::close(_fd);
+                return -1;
+            }
+            return __HandleWrite(net_scene, false);
         }
     }
-    int ret = NetSceneDispatcher::Instance().Dispatch(_fd, parser->GetBody());
-    ::close(_fd);
-    return ret;
 }
 
 int HttpServer::__HandleReadTest(SOCKET _fd) {
@@ -136,9 +141,31 @@ int HttpServer::__HandleReadTest(SOCKET _fd) {
     return 0;
 }
 
-int HttpServer::__HandleSend(int _fd) {
+int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
+    AutoBuffer *resp = _net_scene->GetHttpResp();
+    size_t pos = resp->Pos();
+    size_t ntotal = resp->Length() - pos;
+    SOCKET fd = _net_scene->GetSocket();
     
-    return 0;
+    ssize_t nsend = ::write(fd, resp->Ptr(pos), ntotal);
+    
+    if (nsend > 0 || nsend < 0 && errno == EAGAIN) {
+        nsend = nsend > 0 ? nsend : 0;
+        LogI("[HttpServer::__HandleWrite] fd(%d): send %zd/%zu bytes", fd, nsend, ntotal)
+        _net_scene->GetHttpResp()->Seek(pos + nsend);
+        if (_mod_write) {
+            SocketEpoll::Instance().ModSocketWrite(fd, _net_scene);
+        }
+        return 0;
+    }
+    if (nsend < 0) {
+        LogE("[HttpServer::__TryWrite] nsend(%zu), errno(%d): %s",
+             nsend, errno, strerror(errno));
+    }
+    SocketEpoll::Instance().DelSocket(fd);
+    delete _net_scene;
+    ::close(fd);
+    return nsend < 0 ? -1 : 0;
 }
 
 int HttpServer::__HandleConnect() {
@@ -169,7 +196,7 @@ int HttpServer::__CreateListenFd() {
              " error: %s, errno: %d", strerror(errno), errno);
         return -1;
     }
-    // TODO
+    // FIXME
     struct linger ling;
     ling.l_linger = 0;
     ling.l_onoff = 1;
@@ -186,7 +213,7 @@ int HttpServer::__Bind(uint16_t _port) {
     sock_addr.sin_port = htons(_port);
     
     int ret = ::bind(listenfd_, (struct sockaddr *) &sock_addr,
-                        sizeof(sock_addr)); // create a special socket file
+                        sizeof(sock_addr));
     if (ret < 0) {
         LogE("[HttpServer::__Bind] errno(%d): %s", errno, strerror(errno));
         return -1;
