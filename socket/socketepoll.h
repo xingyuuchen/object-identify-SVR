@@ -43,7 +43,7 @@ class SocketEpoll {
      * @param _idx: varies from 0 to the val as specifies by
      *              return val of EpollWait().
      * @param _flag: EPOLLIN, EPOLLOUT, EPOLLERR, etc.
-     * @return: -1 if not, the fd if it's ready.
+     * @return: -1 if not ready, else the fd.
      */
     int __IsFlagSet(int _idx, int _flag);
     

@@ -20,7 +20,7 @@ HttpServer::HttpServer()
 
 void HttpServer::Run(uint16_t _port) {
     if (__CreateListenFd() < 0) { return; }
-    if (__Bind(_port) < 0) { Stop(); }
+    if (__Bind(_port) < 0) { return; }
     
     // 1024 defines the maximum length for the queue of pending connections
     ::listen(listenfd_, 1024);
@@ -28,6 +28,7 @@ void HttpServer::Run(uint16_t _port) {
     SocketEpoll::Instance().SetListenFd(listenfd_);
     
     while (running_) {
+        
         int nfds = SocketEpoll::Instance().EpollWait();
         LogI("[HttpServer::Run] nfds: %d", nfds)
         
@@ -43,14 +44,15 @@ void HttpServer::Run(uint16_t _port) {
                 ThreadPool::Instance().Execute(fd, [=] { return __HandleRead(fd); });
                 
             } else if ((fd = SocketEpoll::Instance().IsWriteSet(i)) > 0) {
-                // TODO: send
+                LogI("IsWriteSet, fd: %d", fd)
+                ThreadPool::Instance().Execute(fd, [=] { return __HandleSend(fd); });
                 
             } else if ((fd = SocketEpoll::Instance().IsErrSet(i)) > 0) {
                 LogE("[HttpServer::Run] IsErrSet, fd:%d, i:%d", fd, i)
+                ThreadPool::Instance().Execute(fd, [=] { return __HandleErr(fd); });
             }
         }
     }
-    Stop();
 }
 
 int HttpServer::__HandleRead(SOCKET _fd) {
@@ -134,6 +136,11 @@ int HttpServer::__HandleReadTest(SOCKET _fd) {
     return 0;
 }
 
+int HttpServer::__HandleSend(int _fd) {
+    
+    return 0;
+}
+
 int HttpServer::__HandleConnect() {
     int fd;
     while (true) {
@@ -148,6 +155,11 @@ int HttpServer::__HandleConnect() {
         LogI("[HttpServer::__HandleConnect] new connect, fd: %d", fd);
         SocketEpoll::Instance().AddSocketRead(fd);
     }
+}
+
+int HttpServer::__HandleErr(int _fd) {
+    
+    return 0;
 }
 
 int HttpServer::__CreateListenFd() {
@@ -182,10 +194,10 @@ int HttpServer::__Bind(uint16_t _port) {
     return 0;
 }
 
-void HttpServer::Stop() {
+HttpServer::~HttpServer() {
     running_ = false;
     if (listenfd_ != -1) {
+        LogI("[~HttpServer] close listenfd")
         ::close(listenfd_);
     }
-    exit(0);
 }

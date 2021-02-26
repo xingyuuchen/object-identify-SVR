@@ -16,7 +16,7 @@ SocketEpoll::SocketEpoll(int _max_fds)
     
     epoll_events_ = new struct epoll_event[_max_fds];
     
-    int ret = epoll_create(_max_fds);
+    int ret = ::epoll_create1(0);
     if (ret < 0) {
         LogE("[SocketEpoll::SocketEpoll] epoll_create, ret = %d", ret)
         return;
@@ -43,7 +43,7 @@ int SocketEpoll::__EpollCtl(int _op, int _fd, struct epoll_event *_event/* = NUL
         LogE("[SocketEpoll::__EpollCtl] fd_ < 0")
         return -1;
     }
-    int ret = epoll_ctl(epoll_fd_, _op, _fd, _event);
+    int ret = ::epoll_ctl(epoll_fd_, _op, _fd, _event);
     if (ret < 0) {
         errno_ = errno;
         LogE("[SocketEpoll::__EpollCtl] errno(%d): %s", errno_, strerror(errno))
@@ -56,7 +56,7 @@ int SocketEpoll::EpollWait(int _max_events/* = kMaxFds_*/,
                            int _timeout_mills/* = -1*/) {
     if (_timeout_mills < -1) { _timeout_mills = -1; }
     
-    int nfds = epoll_wait(epoll_fd_, epoll_events_, _max_events, _timeout_mills);
+    int nfds = ::epoll_wait(epoll_fd_, epoll_events_, _max_events, _timeout_mills);
     if (nfds < 0) {
         errno_ = errno;
         LogE("[SocketEpoll::EpollWait] errno(%d): %s", errno_, strerror(errno))

@@ -9,14 +9,14 @@ class HttpServer {
     void operator=(const HttpServer &) = delete;
     HttpServer(const HttpServer &) = delete;
     
+    ~HttpServer();
+    
     static HttpServer &Instance() {
         static HttpServer instance;
         return instance;
     }
     
     void Run(uint16_t _port = 5002);
-    
-    void Stop();
     
 
   private:
@@ -30,6 +30,10 @@ class HttpServer {
     
     int __HandleRead(SOCKET _fd);
     int __HandleReadTest(SOCKET _fd);
+    
+    int __HandleSend(SOCKET _fd);
+    
+    int __HandleErr(SOCKET _fd);
     
   private:
     static const int    kBuffSize;
