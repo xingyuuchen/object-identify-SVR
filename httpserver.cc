@@ -84,7 +84,7 @@ int HttpServer::__HandleRead(SOCKET _fd) {
             break;
 
         } else if (n == 0) {
-            // 对方退出也会触发一次read事件
+            // A read event is raised when conn closed by peer
             LogI(TAG, "[__HandleRead] Conn closed by peer")
             break;
 
@@ -102,14 +102,18 @@ int HttpServer::__HandleRead(SOCKET _fd) {
         }
         
         if (parser->IsEnd()) {
-            ParserManager::Instance().DelParser(_fd);
+            LogI(TAG, "[__HandleRead] http parse succeed")
             NetSceneBase* net_scene =
                     NetSceneDispatcher::Instance().Dispatch(_fd, parser->GetBody());
             if (net_scene) {
+                LogI(TAG, "[__HandleRead] net_scene process done")
+                ParserManager::Instance().DelParser(_fd);
                 return __HandleWrite(net_scene, false);
             }
             break;
         }
+        
+        if (n < kBuffSize) return 0;
     }
     ParserManager::Instance().DelParser(_fd);
     SocketEpoll::Instance().DelSocket(_fd);
@@ -118,25 +122,25 @@ int HttpServer::__HandleRead(SOCKET _fd) {
 }
 
 int HttpServer::__HandleReadTest(SOCKET _fd) {
-    LogI(TAG, "sleeping...")
+    LogI(TAG, "[__HandleReadTest] sleeping...")
     sleep(4);
     char buff[kBuffSize] = {0, };
     
     while (true) {
         ssize_t n = ::read(_fd, buff, 2);
         if (n == -1 && errno == EAGAIN) {
-            LogI(TAG, "[__HandleRead] EAGAIN")
+            LogI(TAG, "[__HandleReadTest] EAGAIN")
             return 0;
         }
         if (n == 0) {
-            LogI(TAG, "[__HandleRead] Conn closed by peer")
+            LogI(TAG, "[__HandleReadTest] Conn closed by peer")
             break;
         }
         if (n < 0) {
-            LogE(TAG, "[__HandleRead] err: n=%zd", n)
+            LogE(TAG, "[__HandleReadTest] err: n=%zd", n)
             break;
         }
-        LogI(TAG, "[__HandleRead] n: %zd", n)
+        LogI(TAG, "[__HandleReadTest] n: %zd", n)
         if (n > 0) {
             LogI(TAG, "read: %s", buff)
         }
@@ -186,7 +190,7 @@ int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
 
 int HttpServer::__HandleConnect() {
     LogI(TAG, "[__HandleConnect] IsNewConnect")
-    int fd;
+    SOCKET fd;
     while (true) {
         fd = ::accept(listenfd_, (struct sockaddr *) NULL, NULL);
         if (fd < 0) {

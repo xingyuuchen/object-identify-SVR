@@ -62,6 +62,8 @@ NetSceneBase *NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_i
         req_buffer = base_req.net_scene_req_buff();
     } while (false);
     
+    LogI(TAG, "[Dispatch] dispatch to type %d", type)
+    
     NetSceneBase *net_scene = __MakeNetScene(type);
     if (net_scene) {
         net_scene->SetSocket(_conn_fd);
@@ -69,6 +71,7 @@ NetSceneBase *NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_i
     }
     return net_scene;
 }
+
 
 NetSceneDispatcher::~NetSceneDispatcher() {
     std::unique_lock<std::mutex> lock(mutex_);
