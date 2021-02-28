@@ -3,25 +3,21 @@
 #include <stdint.h>
 #include "socket/unix_socket.h"
 #include "netscene/netscenebase.h"
+#include "utils/singleton.h"
 
 
 class HttpServer {
+    
+    SINGLETON(HttpServer, )
+    
   public:
-    void operator=(const HttpServer &) = delete;
-    HttpServer(const HttpServer &) = delete;
     
     ~HttpServer();
-    
-    static HttpServer &Instance() {
-        static HttpServer instance;
-        return instance;
-    }
     
     void Run(uint16_t _port = 5002);
     
 
   private:
-    HttpServer();
     
     int __CreateListenFd();
     

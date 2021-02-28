@@ -33,11 +33,9 @@ void HttpServer::Run(uint16_t _port) {
         
         for (int i = 0; i < nfds; i++) {
             if (SocketEpoll::Instance().IsNewConnect(i)) {
-                LogI("IsNewConnect")
                 __HandleConnect();
                 
             } else if (SOCKET fd = SocketEpoll::Instance().IsReadSet(i)) {
-                LogI("IsReadSet, fd: %d", fd)
 //                __HandleReadTest(fd);
                 ThreadPool::Instance().Execute(fd, [=] { return __HandleRead(fd); });
     
@@ -48,7 +46,6 @@ void HttpServer::Run(uint16_t _port) {
                 });
     
             } else if (SOCKET fd = SocketEpoll::Instance().IsErrSet(i)) {
-                LogE("[HttpServer::Run] IsErrSet, fd:%d, i:%d", fd, i)
                 ThreadPool::Instance().Execute(fd, [=] { return __HandleErr(fd); });
             }
         }
@@ -56,6 +53,12 @@ void HttpServer::Run(uint16_t _port) {
 }
 
 int HttpServer::__HandleRead(SOCKET _fd) {
+    if (_fd <= 0) {
+        LogE("[HttpServer::__HandleRead] invalid _fd: %d", _fd)
+        return -1;
+    }
+    LogI("[HttpServer::__HandleRead] _fd: %d", _fd)
+    
     using http::request::ParserManager;
     auto parser = ParserManager::Instance().GetParser(_fd);
 
@@ -142,6 +145,10 @@ int HttpServer::__HandleReadTest(SOCKET _fd) {
 }
 
 int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
+    if (_net_scene == NULL) {
+        LogE("[HttpServer::__HandleWrite] _net_scene = NULL")
+        return -1;
+    }
     AutoBuffer *resp = _net_scene->GetHttpResp();
     size_t pos = resp->Pos();
     size_t ntotal = resp->Length() - pos;
@@ -149,7 +156,7 @@ int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
     
     ssize_t nsend = ::write(fd, resp->Ptr(pos), ntotal);
     
-    if (nsend > 0 || nsend < 0 && errno == EAGAIN) {
+    if (nsend > 0 || (nsend < 0 && errno == EAGAIN)) {
         nsend = nsend > 0 ? nsend : 0;
         LogI("[HttpServer::__HandleWrite] fd(%d): send %zd/%zu bytes", fd, nsend, ntotal)
         _net_scene->GetHttpResp()->Seek(pos + nsend);
@@ -169,6 +176,7 @@ int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
 }
 
 int HttpServer::__HandleConnect() {
+    LogI("[HttpServer::__HandleConnect] IsNewConnect")
     int fd;
     while (true) {
         fd = ::accept(listenfd_, (struct sockaddr *) NULL, NULL);
@@ -185,7 +193,7 @@ int HttpServer::__HandleConnect() {
 }
 
 int HttpServer::__HandleErr(int _fd) {
-    
+    LogE("[HttpServer::__HandleErr] fd: %d", _fd)
     return 0;
 }
 

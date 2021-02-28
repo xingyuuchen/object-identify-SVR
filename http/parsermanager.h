@@ -5,18 +5,16 @@
 #include <memory>
 #include "httprequest.h"
 #include "../socket/unix_socket.h"
+#include "../utils/singleton.h"
 
 
 namespace http { namespace request {
 
 class ParserManager {
+    
+    SINGLETON(ParserManager, )
+    
   public:
-    static ParserManager &Instance() {
-        static ParserManager instance;
-        return instance;
-    }
-    void operator=(ParserManager const &) = delete;
-    ParserManager(ParserManager const &) = delete;
     
     int DelParser(SOCKET _fd);
     
@@ -25,7 +23,6 @@ class ParserManager {
     std::shared_ptr<http::request::Parser> GetParser(SOCKET _fd);
     
   private:
-    ParserManager();
     
     std::shared_ptr<http::request::Parser> __CreateParser(SOCKET _fd);
 

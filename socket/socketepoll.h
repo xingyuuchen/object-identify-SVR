@@ -1,20 +1,27 @@
 #ifndef OI_SVR_SOCKETEPOLL_H
 #define OI_SVR_SOCKETEPOLL_H
 
+#ifdef __linux__
 #include <sys/epoll.h>
+#else
+#ifdef __APPLE__
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/time.h>
+#define epoll_event kevent
+#define epoll_data_t void
+#endif
+#endif
 #include <stddef.h>
 #include "unix_socket.h"
+#include "../utils/singleton.h"
 
 
 class SocketEpoll {
-  public:
-    void operator=(const SocketEpoll &) = delete;
-    SocketEpoll(const SocketEpoll &) = delete;
     
-    static SocketEpoll &Instance() {
-        static SocketEpoll instance;
-        return instance;
-    }
+    SINGLETON(SocketEpoll, int _max_fds = 1024)
+    
+  public:
     ~SocketEpoll();
     
     void SetListenFd(SOCKET _listen_fd);
@@ -37,7 +44,6 @@ class SocketEpoll {
     
     
   private:
-    SocketEpoll(int _max_fds = 1024);
     
     /**
      * @param _idx: varies from 0 to the val as specifies by
