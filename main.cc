@@ -3,7 +3,7 @@
 
 
 int main(int argc, char **argv) {
-    LogI("[main] Launching SVR...");
+    LogI("main", "Launching SVR...");
     
     HttpServer::Instance().Run();
     

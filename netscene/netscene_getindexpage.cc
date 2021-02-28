@@ -3,6 +3,8 @@
 #include "../http/headerfield.h"
 
 
+const char *const NetSceneGetIndexPage::TAG = "NetSceneGetIndexPage";
+
 NetSceneGetIndexPage::NetSceneGetIndexPage() : NetSceneBase() {
     http_headers_[http::HeaderField::KContentType] = http::HeaderField::KPlainText;
 }

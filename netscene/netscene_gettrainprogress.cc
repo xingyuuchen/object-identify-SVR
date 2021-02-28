@@ -7,6 +7,9 @@
 /**
  * 业务代码，获取目前训练进度。
  */
+
+const char *const NetSceneGetTrainProgress::TAG = "NetSceneGetTrainProgress";
+
 NetSceneGetTrainProgress::NetSceneGetTrainProgress()
     : NetSceneBase()
     , curr_epoch_(-1)
@@ -20,9 +23,9 @@ int NetSceneGetTrainProgress::GetType() { return kNetSceneTypeGetTrainProgress; 
 NetSceneBase *NetSceneGetTrainProgress::NewInstance() { return new NetSceneGetTrainProgress(); }
 
 int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
-    LogI("[NetSceneGetTrainProgress::DoSceneImpl] req.len: %zd", _in_buffer.size());
+    LogI(TAG, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
     if (socket_ <= 0) {
-        LogE("[NetSceneGetTrainProgress] Socket NOT open");
+        LogE(TAG, "[DoSceneImpl] Socket NOT open");
         return -1;
     }
     
@@ -41,9 +44,9 @@ int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
     } else {
         status_desc_ = "/root/cxy/trainprogress.txt-FileNotOpen";
         status_code_ = 404;
-        LogE("[NetSceneGetTrainProgress::DoSceneImpl] infile.is_open() = false")
+        LogE(TAG, "[DoSceneImpl] infile.is_open() = false")
     }
-    LogI("[NetSceneGetTrainProgress] isRunning:%d, currEpoch:%d, totalEpoch:%d",
+    LogI(TAG, "[DoSceneImpl] isRunning:%d, currEpoch:%d, totalEpoch:%d",
          is_running_, curr_epoch_, total_epoch_)
     
     resp.set_is_running(is_running_);

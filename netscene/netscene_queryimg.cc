@@ -6,6 +6,9 @@
 /**
  * 业务代码，查询图片类别。
  */
+
+const char *const NetSceneQueryImg::TAG = "NetSceneQueryImg";
+
 NetSceneQueryImg::NetSceneQueryImg() : NetSceneBase() {
 
 }
@@ -15,9 +18,9 @@ int NetSceneQueryImg::GetType() { return kNetSceneTypeQueryImg; }
 NetSceneBase *NetSceneQueryImg::NewInstance() { return new NetSceneQueryImg(); }
 
 int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
-    LogI("[NetSceneQueryImg::DoSceneImpl] req.len: %zd", _in_buffer.size());
+    LogI(TAG, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
     if (socket_ <= 0) {
-        LogE("[NetSceneQueryImg] Socket NOT open");
+        LogE(TAG, "[NetSceneQueryImg] Socket NOT open");
         return -1;
     }
     NetSceneQueryImgProto::NetSceneQueryImgReq req;

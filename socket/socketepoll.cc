@@ -5,6 +5,7 @@
 #include "../utils/log.h"
 
 
+const char *const SocketEpoll::TAG = "SocketEpoll";
 const int SocketEpoll::kMaxFds_ = 1024;
 
 SocketEpoll::SocketEpoll(int _max_fds)
@@ -20,7 +21,7 @@ SocketEpoll::SocketEpoll(int _max_fds)
     
     int ret = ::epoll_create1(0);
     if (ret < 0) {
-        LogE("[SocketEpoll::SocketEpoll] epoll_create, ret = %d", ret)
+        LogE(TAG, "[SocketEpoll] epoll_create, ret = %d", ret)
         return;
     }
     epoll_fd_ = ret;
@@ -61,13 +62,13 @@ int SocketEpoll::DelSocket(int _fd) {
 int SocketEpoll::__EpollCtl(int _op, int _fd, struct epoll_event *_event/* = NULL*/) {
 #ifdef __linux__
     if (_fd < 0) {
-        LogE("[SocketEpoll::__EpollCtl] fd_ < 0")
+        LogE(TAG, "[__EpollCtl] fd_ < 0")
         return -1;
     }
     int ret = ::epoll_ctl(epoll_fd_, _op, _fd, _event);
     if (ret < 0) {
         errno_ = errno;
-        LogE("[SocketEpoll::__EpollCtl] errno(%d): %s", errno_, strerror(errno))
+        LogE(TAG, "[__EpollCtl] errno(%d): %s", errno_, strerror(errno))
     }
     return ret;
 #else
@@ -84,7 +85,7 @@ int SocketEpoll::EpollWait(int _max_events/* = kMaxFds_*/,
     int nfds = ::epoll_wait(epoll_fd_, epoll_events_, _max_events, _timeout_mills);
     if (nfds < 0) {
         errno_ = errno;
-        LogE("[SocketEpoll::EpollWait] errno(%d): %s", errno_, strerror(errno))
+        LogE(TAG, "[EpollWait] errno(%d): %s", errno_, strerror(errno))
     }
     return nfds;
 #else
@@ -95,7 +96,7 @@ int SocketEpoll::EpollWait(int _max_events/* = kMaxFds_*/,
 bool SocketEpoll::IsNewConnect(int _idx) {
 #ifdef __linux__
     if (_idx < 0 || _idx >= kMaxFds_) {
-        LogE("[SocketEpoll::IsNewConnect] invalid _idx: %d", _idx)
+        LogE(TAG, "[IsNewConnect] invalid _idx: %d", _idx)
         return false;
     }
     return epoll_events_[_idx].data.fd == listen_fd_;
@@ -134,7 +135,7 @@ int SocketEpoll::IsErrSet(int _idx) {
 epoll_data_t *SocketEpoll::__IsFlagSet(int _idx, int _flag) {
 #ifdef __linux__
     if (_idx < 0 || _idx >= kMaxFds_) {
-        LogE("[SocketEpoll::__IsFlagSet] invalid _idx: %d", _idx)
+        LogE(TAG, "[__IsFlagSet] invalid _idx: %d", _idx)
         return NULL;
     }
     if (epoll_events_[_idx].events & _flag) {
@@ -148,7 +149,7 @@ epoll_data_t *SocketEpoll::__IsFlagSet(int _idx, int _flag) {
 void SocketEpoll::SetListenFd(int _listen_fd) {
 #ifdef __linux__
     if (_listen_fd < 0) {
-        LogE("[SocketEpoll::SetListenFd] _listen_fd: %d", _listen_fd)
+        LogE(TAG, "[SetListenFd] _listen_fd: %d", _listen_fd)
         return;
     }
     AddSocketRead(_listen_fd);
@@ -164,7 +165,7 @@ SocketEpoll::~SocketEpoll() {
         delete[] epoll_events_;
     }
     if (epoll_fd_ != -1) {
-        LogI("[~SocketEpoll] close epfd")
+        LogI(TAG, "[~SocketEpoll] close epfd")
         ::close(epoll_fd_);
     }
 #endif

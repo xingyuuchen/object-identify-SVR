@@ -27,6 +27,7 @@ class ParserManager {
     std::shared_ptr<http::request::Parser> __CreateParser(SOCKET _fd);
 
   private:
+    static const char *const TAG;
     std::unordered_map<SOCKET, std::shared_ptr<http::request::Parser>> parsers_map_;
     
 };

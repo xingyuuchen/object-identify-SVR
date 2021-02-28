@@ -18,7 +18,8 @@ class NetSceneGetIndexPage : public NetSceneBase {
     int DoSceneImpl(const std::string &_in_buffer);
     
   private:
-  
+    static const char *const TAG;
+
 };
 
 

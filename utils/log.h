@@ -4,14 +4,14 @@
 #include "stdio.h"
 #include "timeutil.h"
 
-#define LogI(...) PrintCurrTime(); \
-    printf(" I/"); \
+#define LogI(TAG, ...) PrintCurrTime(); \
+    printf(" I/%s: ", TAG); \
     printf(__VA_ARGS__); \
     printf("\n");
 
 
-#define LogE(...) PrintCurrTime(); \
-    printf(" E/"); \
+#define LogE(TAG, ...) PrintCurrTime(); \
+    printf(" E/%s: ", TAG); \
     printf(__VA_ARGS__); \
     printf("\n");
 

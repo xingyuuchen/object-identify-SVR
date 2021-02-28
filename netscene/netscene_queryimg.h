@@ -26,6 +26,7 @@ class NetSceneQueryImg : public NetSceneBase {
   
   
   private:
+    static const char *const TAG;
     std::string item_name_;
     std::string item_desc_;
     NetSceneQueryImgProto::NetSceneQueryImgResp_ItemType item_type_;

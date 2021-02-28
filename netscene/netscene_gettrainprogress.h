@@ -22,6 +22,7 @@ class NetSceneGetTrainProgress : public NetSceneBase {
     
     
   private:
+    static const char *const TAG;
     bool        is_running_;
     int32_t     curr_epoch_;
     int32_t     total_epoch_;

@@ -6,6 +6,8 @@
 #include "../socket/socketepoll.h"
 #include <errno.h>
 
+const char *const NetSceneBase::TAG = "NetSceneBase";
+
 NetSceneBase::NetSceneBase()
         : status_code_(200)
         , status_desc_("OK")
@@ -28,7 +30,7 @@ int NetSceneBase::DoScene(const std::string &_in_buffer) {
 
 void NetSceneBase::CopyRespToSendBody(std::string &_resp, size_t _size) {
     resp_body_.Reset();
-    LogI("[type%d CopyRespToSendBody] resp body len = %zd", GetType(), _size);
+    LogI(TAG, "[CopyRespToSendBody] type%d: resp body len = %zd", GetType(), _size);
     resp_body_.Write(_resp.data(), _size);
 }
 
@@ -36,7 +38,7 @@ int NetSceneBase::PackHttpMsg() {
     resp_msg_.Reset();
     http::response::Pack(http::kHTTP_1_1, status_code_,
                          status_desc_, http_headers_, resp_msg_, resp_body_);
-    LogI("[NetSceneBase::PackHttpMsg] resp_msg_ len: %ld", resp_msg_.Length())
+    LogI(TAG, "[PackHttpMsg] resp_msg_ len: %ld", resp_msg_.Length())
 //    __ShowHttpHeader(out_buff);
     resp_body_.Reset();
     return 0;
@@ -45,9 +47,9 @@ int NetSceneBase::PackHttpMsg() {
 void NetSceneBase::__ShowHttpHeader(AutoBuffer &_out) {
     for (size_t i = 0; i < _out.Length() - resp_body_.Length(); ++i) {
         if (*_out.Ptr(i) == 0x0d || *_out.Ptr(i) == 0x0a) {
-            LogI("0x%x ", *_out.Ptr(i))
+            LogI(TAG, "0x%x ", *_out.Ptr(i))
         } else {
-            LogI("0x%x %c", *_out.Ptr(i), *_out.Ptr(i))
+            LogI(TAG, "0x%x %c", *_out.Ptr(i), *_out.Ptr(i))
         }
     }
 }

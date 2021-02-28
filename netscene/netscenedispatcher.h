@@ -23,6 +23,7 @@ class NetSceneDispatcher {
     NetSceneBase *__MakeNetScene(int _type);
     
   private:
+    static const char *const        TAG;
     std::vector<NetSceneBase *>     selectors_;
     std::mutex                      mutex_;
     
