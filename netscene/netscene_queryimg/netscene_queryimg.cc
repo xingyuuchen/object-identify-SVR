@@ -1,7 +1,9 @@
 #include "netscene_queryimg.h"
-#include "../constantsprotocol.h"
+#include "../../constantsprotocol.h"
 #include <string>
-#include "../utils/log.h"
+#include "../../utils/log.h"
+#include "../../signalhandler.h"
+#include <atomic>
 
 /**
  * 业务代码，查询图片类别。
@@ -10,7 +12,12 @@
 const char *const NetSceneQueryImg::TAG = "NetSceneQueryImg";
 
 NetSceneQueryImg::NetSceneQueryImg() : NetSceneBase() {
-
+    static std::atomic_flag has_init = ATOMIC_FLAG_INIT;
+    if (!has_init.test_and_set()) {
+        if (__MakeFIFO() == 0) {
+            SignalHandler::Instance().RegisterExitCallback(__DelFIFO);
+        }
+    }
 }
 
 int NetSceneQueryImg::GetType() { return kNetSceneTypeQueryImg; }
@@ -25,7 +32,17 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
     }
     NetSceneQueryImgProto::NetSceneQueryImgReq req;
     req.ParseFromArray(_in_buffer.data(), _in_buffer.size());
-    // TODO: recognize by _in_buffer
+    
+//    char line[100];
+//    FILE *fp;
+////    if ((fp = popen("pwd", "r")) == NULL) {
+//    if ((fp = popen("python3 ../netscene/netscene_queryimg/queryimgfrombaidu.py", "r")) == NULL) {
+//        printf("err\n");
+//        return -1;
+//    }
+//    fgets(line, sizeof(line), fp);
+//    printf("%s %ld\n", line, strlen(line));
+//    pclose(fp);
     
     item_type_ = NetSceneQueryImgProto::NetSceneQueryImgResp::PLANT;
     item_name_ = "豌豆尖";
@@ -41,6 +58,17 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
     resp.SerializeToString(&byte_string);
     CopyRespToSendBody(byte_string, size);
     return 0;
+}
+
+int NetSceneQueryImg::__MakeFIFO() {
+    LogI(TAG, "[__MakeFIFO]")
+    
+    return 0;
+}
+
+void NetSceneQueryImg::DelFIFO() {
+    LogI(TAG, "[DelFIFO]")
+    
 }
 
 NetSceneQueryImg::~NetSceneQueryImg() {

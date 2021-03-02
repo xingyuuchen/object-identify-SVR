@@ -2,9 +2,9 @@
 #define OI_SVR_NETSCENE_QUERYIMG_H
 
 #include <string>
-#include "netscenebase.h"
-#include "../utils/autobuffer.h"
-#include "../autogen/netscenequeryimg.pb.h"
+#include "../netscenebase.h"
+#include "../../utils/autobuffer.h"
+#include "../../autogen/netscenequeryimg.pb.h"
 
 /**
  * 业务代码，查询图片类别。
@@ -21,8 +21,12 @@ class NetSceneQueryImg : public NetSceneBase {
     NetSceneBase *NewInstance();
     
     int DoSceneImpl(const std::string &_in_buffer);
+    
+    static void DelFIFO();
 
-  public:
+private:
+    static int __MakeFIFO();
+    
   
   
   private:
