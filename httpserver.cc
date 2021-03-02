@@ -6,6 +6,7 @@
 #include "http/httprequest.h"
 #include "http/parsermanager.h"
 #include "utils/threadpool/threadpool.h"
+#include "signalhandler.h"
 #include <unistd.h>
 #include <iostream>
 #include <string.h>
@@ -16,8 +17,11 @@ const int HttpServer::kBuffSize = 1024;
 const char *const HttpServer::TAG = "HttpServer";
 
 HttpServer::HttpServer()
-    : listenfd_(-1)
-    , running_(true) {}
+        : listenfd_(-1)
+        , running_(true) {
+    
+    SignalHandler::Instance().Init();
+}
 
 
 void HttpServer::Run(uint16_t _port) {
@@ -32,6 +36,7 @@ void HttpServer::Run(uint16_t _port) {
     while (running_) {
         int nfds = SocketEpoll::Instance().EpollWait();
         LogI(TAG, "[Run] nfds: %d", nfds)
+        if (nfds < 0) { break; }
         
         for (int i = 0; i < nfds; i++) {
             if (SocketEpoll::Instance().IsNewConnect(i)) {

@@ -4,7 +4,7 @@ function kill_procs() {
   while [ $# != 0 ]
   do
     echo kill $1
-    kill -9 $1
+    kill -2 $1
     shift
   done
 }

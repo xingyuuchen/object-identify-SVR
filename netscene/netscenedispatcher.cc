@@ -3,7 +3,7 @@
 #include "../autogen/basenetscenereq.pb.h"
 #include "../utils/log.h"
 #include "netscene_getindexpage.h"
-#include "netscene_queryimg.h"
+#include "netscene_queryimg/netscene_queryimg.h"
 #include "netscene_gettrainprogress.h"
 
 

@@ -1,5 +1,5 @@
 #include "netscene_getindexpage.h"
-#include "../constantsprotocol.h"
+#include "constantsprotocol.h"
 #include "../http/headerfield.h"
 
 

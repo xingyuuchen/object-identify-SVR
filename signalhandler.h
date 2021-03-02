@@ -2,7 +2,13 @@
 #define OI_SVR_SIGNALHANDLER_H
 #include "utils/singleton.h"
 #include <vector>
-#include <functional>
+
+
+class IProcessExitListener {
+  public:
+    IProcessExitListener(void (*_on_process_exit)());
+    void (*OnProcessExit)();
+};
 
 class SignalHandler {
     
@@ -11,14 +17,23 @@ class SignalHandler {
   public:
     ~SignalHandler();
     
-    int RegisterExitCallback(void (*func)());
+    void Init();
     
-    void ProcessExit();
+    int RegisterExitCallback(IProcessExitListener *_listener);
+    
+    void Handle(int _sig);
+
+  private:
+    void __ProcessExitManually();
+    
+    void __ProcessCrash();
+    
+    void __InvokeCallbacks();
     
     
   private:
-    static const char *const        TAG;
-    std::vector<void (*)()>         exit_callbacks_;
+    static const char *const                TAG;
+    std::vector<IProcessExitListener *>     process_exit_listeners_;
     
 };
 
