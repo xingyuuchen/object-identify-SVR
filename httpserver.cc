@@ -2,7 +2,6 @@
 #include "utils/log.h"
 #include "netscene/netscenedispatcher.h"
 #include "socket/socketepoll.h"
-#include "socket/blocksocket.h"
 #include "http/httprequest.h"
 #include "http/parsermanager.h"
 #include "utils/threadpool/threadpool.h"
@@ -85,7 +84,7 @@ int HttpServer::__HandleRead(SOCKET _fd) {
             return 0;
         }
         if (n < 0) {
-            LogE(TAG, "[__HandleRead] err: n=%zd", n)
+            LogE(TAG, "[__HandleRead] n<0, errno(%d): %s", errno, strerror(errno))
             break;
 
         } else if (n == 0) {

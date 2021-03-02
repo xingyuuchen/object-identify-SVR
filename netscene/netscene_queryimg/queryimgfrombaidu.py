@@ -1,9 +1,10 @@
 # coding=utf-8
 import requests
 import base64
+import sys
 
 
-def getAccessToken():
+def get_access_token():
     host = 'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&' \
            'client_id=wkCVySSMMRRqhGZoKdXDBkGI&client_secret=qNhLC8UUVGbwQTlPszRSn56vbBBMEtFe'
     resp = requests.get(host)
@@ -13,12 +14,17 @@ def getAccessToken():
     return None
 
 
-def Do():
-    access_token = getAccessToken()
+def read_from_fifo():
+    with open(fifo_name, 'rb') as fifo:
+        byte_arr = fifo.read(int(data_len))
+        return byte_arr
+
+
+def do_query_img():
+    access_token = get_access_token()
 
     request_url = "https://aip.baidubce.com/api/v1/solution/direct/imagerecognition/combination"
-    f = open('/Users/cxy/Downloads/c51dfecd51b01f54399a80e05782d07a.jpeg', 'rb')
-    img = base64.b64encode(f.read())
+    img = base64.b64encode(read_from_fifo())
 
     classes = ['plant', 'animal', 'landmark']
     data = "{\"image\":\"" + str(img, 'utf-8') + "\",\"scenes\":[\"animal\",\"plant\",\"landmark\"]}"
@@ -31,7 +37,8 @@ def Do():
 
     json = response.json()['result']
     # print(json)
-    target = None
+    target_name = None
+    target_clz = 0
 
     for clz in classes:
         if clz not in json:
@@ -47,9 +54,13 @@ def Do():
                 continue
             if float(item['score']) > highest:
                 highest = float(item['score'])
-                target = item['name']
-    return target
+                target_name = item['name']
+                target_clz = classes.index(clz)
+    print("{}${}${}".format(target_clz, target_name, "物体详细资料coming soon..."))
 
 
 if __name__ == '__main__':
-    print(Do())
+    fifo_name = sys.argv[1]
+    data_len = sys.argv[2]
+
+    do_query_img()

@@ -22,15 +22,16 @@ class NetSceneQueryImg : public NetSceneBase {
     
     int DoSceneImpl(const std::string &_in_buffer);
     
-    static void DelFIFO();
-
-private:
+  private:
+    int __ForkPythonScript(char *_data_write, size_t _write_len, char *_out);
+    
     static int __MakeFIFO();
     
-  
-  
+    static void __DelFIFO();
+    
   private:
     static const char *const TAG;
+    static const char *const fifo_name_;
     std::string item_name_;
     std::string item_desc_;
     NetSceneQueryImgProto::NetSceneQueryImgResp_ItemType item_type_;
