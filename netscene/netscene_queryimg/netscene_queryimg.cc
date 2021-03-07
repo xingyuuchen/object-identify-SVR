@@ -45,7 +45,7 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
     do {
         char py_ret[200] = {0, };
         if (__ForkPythonScript((char *)req.img_bytes().c_str(),
-                               req.img_bytes().size(), py_ret) < 0) {
+                               req.img_bytes().size(), py_ret, sizeof(py_ret)) < 0) {
             LogE(TAG, "[DoSceneImpl] __ForkPythonScript() failed.")
             break;
         }
@@ -53,6 +53,11 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
         oi::split(std::string(py_ret), "$", item_info);
         if (item_info.size() != 3) {
             LogE(TAG, "[DoSceneImpl] item_info.size(): %zd", item_info.size())
+            break;
+        }
+        if (strcmp(item_info[1].c_str(), "None") == 0) {
+            item_name_ = "未识别到物体";
+            item_desc_ = "";
             break;
         }
         int type = item_info[0].c_str()[0] - 0x30;
@@ -74,15 +79,16 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
     return 0;
 }
 
-int NetSceneQueryImg::__ForkPythonScript(char *_data_write,
-                                         size_t _len_write, char *_out) {
+int NetSceneQueryImg::__ForkPythonScript(char *_data_write, size_t _size_write,
+                                         char *_ret, size_t _size_ret) {
     FILE *fp;
-    std::string cmd = "python3 ../netscene/netscene_queryimg/queryimgfrombaidu.py "
-                + std::string(fifo_name_) + " " + std::to_string(_len_write);
+    std::string cmd = "python3 ../netscene/netscene_queryimg/queryimg.py "
+                + std::string(fifo_name_) + " " + std::to_string(_size_write);
     if ((fp = popen(cmd.c_str(), "r")) == NULL) {
         printf("err\n");
         return -1;
     }
+    // FIXME: no concurrency
     int fd = open(fifo_name_, O_WRONLY);
     if (fd < 0) {
         LogE(TAG, "[__ForkPythonScript] open err(%d): %s", errno, strerror(errno))
@@ -91,13 +97,13 @@ int NetSceneQueryImg::__ForkPythonScript(char *_data_write,
     }
     LogI(TAG, "[__ForkPythonScript] open fifo success, fd: %d", fd)
     
-    ssize_t nwrite = ::write(fd, _data_write, _len_write);
-    LogI(TAG, "[__ForkPythonScript] write %zd/%zd", nwrite, _len_write)
+    ssize_t nwrite = ::write(fd, _data_write, _size_write);
+    LogI(TAG, "[__ForkPythonScript] write %zd/%zd", nwrite, _size_write)
     
     close(fd);
-    fgets(_out, 100, fp);
+    fgets(_ret, _size_ret, fp);
     pclose(fp);
-    LogI(TAG, "[__ForkPythonScript] _out: %s, len: %ld\n", _out, strlen(_out));
+    LogI(TAG, "[__ForkPythonScript] _out: %s, len: %ld\n", _ret, strlen(_ret));
     return 0;
 }
 

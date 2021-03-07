@@ -23,7 +23,8 @@ class NetSceneQueryImg : public NetSceneBase {
     int DoSceneImpl(const std::string &_in_buffer);
     
   private:
-    int __ForkPythonScript(char *_data_write, size_t _write_len, char *_out);
+    int __ForkPythonScript(char *_data_write, size_t _size_write,
+                           char *_ret, size_t _size_ret);
     
     static int __MakeFIFO();
     
