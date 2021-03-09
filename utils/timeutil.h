@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 
-uint64_t GetCurrentTimeMillis();
+uint64_t gettickcount();
 
-void PrintCurrTime();
+void printcurrtime();
 
 #endif //OI_SVR_TIMEUTIL_H

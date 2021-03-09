@@ -2,9 +2,9 @@
 #define OI_SVR_NETSCENE_QUERYIMG_H
 
 #include <string>
-#include "../netscenebase.h"
-#include "../../utils/autobuffer.h"
-#include "../../autogen/netscenequeryimg.pb.h"
+#include "netscenebase.h"
+#include "autobuffer.h"
+#include "netscenequeryimg.pb.h"
 
 /**
  * 业务代码，查询图片类别。

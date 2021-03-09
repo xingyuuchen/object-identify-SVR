@@ -1,6 +1,6 @@
 #include "netscene_getindexpage.h"
 #include "constantsprotocol.h"
-#include "../http/headerfield.h"
+#include "headerfield.h"
 
 
 const char *const NetSceneGetIndexPage::TAG = "NetSceneGetIndexPage";

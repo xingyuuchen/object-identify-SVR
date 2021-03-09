@@ -14,7 +14,7 @@
 #endif
 #include <stddef.h>
 #include "unix_socket.h"
-#include "../utils/singleton.h"
+#include "singleton.h"
 
 
 class SocketEpoll {
@@ -35,7 +35,9 @@ class SocketEpoll {
     int DelSocket(SOCKET _fd);
     
     int IsReadSet(int _idx);
+    
     void *IsWriteSet(int _idx);
+    
     int IsErrSet(int _idx);
     
     bool IsNewConnect(int _idx);

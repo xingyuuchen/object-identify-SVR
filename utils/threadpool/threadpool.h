@@ -2,6 +2,7 @@
 #define OI_SVR_THREADPOOL_H
 
 #include <vector>
+#include <list>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -97,9 +98,10 @@ class ThreadPool {
     /**
      *
      * @return:  the index of kImmediate task if exists, else the index of task with
-     *           the minimum time to wait until its (next) execution if exists, else -1.
+     *           the minimum time to wait until its (next) execution if exists, else -1,
+     *           indicating that there is no task available.
      */
-    ssize_t __SelectTask();
+    std::list<std::pair<TaskProfile*, std::function<void()>>>::iterator __SelectTask();
     
     /**
      *
@@ -137,7 +139,7 @@ class ThreadPool {
 
   private:
     std::vector<std::thread>                                        workers_;
-    std::vector<std::pair<TaskProfile*, std::function<void()>>>     tasks_;
+    std::list<std::pair<TaskProfile*, std::function<void()>>>       tasks_;
     std::unordered_set<int>                                         running_serial_tags_;
     std::mutex                                                      mutex_;
     std::condition_variable                                         cv_;

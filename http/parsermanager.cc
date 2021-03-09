@@ -1,5 +1,5 @@
 #include "parsermanager.h"
-#include "../utils/log.h"
+#include "log.h"
 
 
 namespace http { namespace request {

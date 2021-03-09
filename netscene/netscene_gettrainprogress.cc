@@ -1,7 +1,7 @@
 #include "netscene_gettrainprogress.h"
-#include "../utils/log.h"
+#include "log.h"
 #include "constantsprotocol.h"
-#include "../autogen/netscenegettrainprogress.pb.h"
+#include "netscenegettrainprogress.pb.h"
 #include <fstream>
 
 /**

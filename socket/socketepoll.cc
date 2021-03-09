@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
-#include "../utils/log.h"
+#include "log.h"
 
 
 const char *const SocketEpoll::TAG = "SocketEpoll";
@@ -163,10 +163,12 @@ SocketEpoll::~SocketEpoll() {
 #ifdef __linux__
     if (epoll_events_ != NULL) {
         delete[] epoll_events_;
+        epoll_events_ = NULL;
     }
     if (epoll_fd_ != -1) {
         LogI(TAG, "[~SocketEpoll] close epfd")
         ::close(epoll_fd_);
+        epoll_fd_ = -1;
     }
 #endif
 }

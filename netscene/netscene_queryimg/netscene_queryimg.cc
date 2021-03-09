@@ -1,8 +1,8 @@
 #include "netscene_queryimg.h"
-#include "../constantsprotocol.h"
-#include "../../utils/log.h"
-#include "../../signalhandler.h"
-#include "../../utils/strutil.h"
+#include "constantsprotocol.h"
+#include "log.h"
+#include "signalhandler.h"
+#include "strutil.h"
 #include <string>
 #include <atomic>
 #include <unistd.h>

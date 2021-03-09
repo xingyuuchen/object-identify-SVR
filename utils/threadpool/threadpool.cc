@@ -12,16 +12,17 @@ void ThreadPool::__CreateWorkerThread() {
         while (true) {
             std::function<void()> task;
             TaskProfile *profile;
-            ssize_t idx;
+            std::list<std::pair<TaskProfile*, std::function<void()>>>::iterator idx;
             {
                 ScopeLock lock(this->mutex_);
                 while (true) {
                     this->cv_.wait(lock, [&, this] {
-                        return (idx = this->__SelectTask()) >= 0 || this->stop_;
+//                        return (idx = this->__SelectTask()) >= 0 || this->stop_;
+                        return 0;
                     });
                     
-                    if (idx >= 0) {
-                        profile = this->tasks_[idx].first;
+                    if (idx != tasks_.end()) {
+//                        profile = this->tasks_[idx].first;
 
                         uint64_t wait_time = __ComputeWaitTime(profile);
 
@@ -39,14 +40,14 @@ void ThreadPool::__CreateWorkerThread() {
                     return;
                 }
     
-                this->running_serial_tags_.insert(profile->serial_tag);
-                task = this->tasks_[idx].second;
-                if (profile->type == TaskProfile::kPeriodic) {
-                    profile->record = ::gettickcount();
-                    profile->seq = TaskProfile::__MakeSeq();
-                } else {
-                    tasks_.erase(tasks_.begin() + idx);
-                }
+//                this->running_serial_tags_.insert(profile->serial_tag);
+//                task = this->tasks_[idx].second;
+//                if (profile->type == TaskProfile::kPeriodic) {
+//                    profile->record = ::gettickcount();
+//                    profile->seq = TaskProfile::__MakeSeq();
+//                } else {
+//                    tasks_.erase(idx);
+//                }
             }
             task();
             {
@@ -58,49 +59,15 @@ void ThreadPool::__CreateWorkerThread() {
     });
 }
 
-ssize_t ThreadPool::__SelectTask() {
+
+std::list<std::pair<TaskProfile*, std::function<void()>>>::iterator
+ThreadPool::__SelectTask() {
     static uint64_t last_selected_seq = TaskProfile::kInvalidSeq;
     
     uint64_t now = ::gettickcount();
     uint64_t min_wait_time = 0xffffffffffffffff;
     ssize_t min_wait_time_task_idx = -1;
-    
-    for (size_t idx = 0; idx < tasks_.size(); ++idx) {
-        TaskProfile *profile = tasks_[idx].first;
-
-        if (profile->type == TaskProfile::kImmediate) {
-            int serial_tag = profile->serial_tag;
-            if (serial_tag < 0 || running_serial_tags_.find(serial_tag)
-                      == running_serial_tags_.end()) {
-                if (profile->seq != last_selected_seq) {
-                    last_selected_seq = profile->seq;
-                    return idx;
-                }
-            }
-
-        } else {
-            uint64_t wait_time = __ComputeWaitTime(profile, now);
-    
-            if (wait_time == 0) {
-                if (last_selected_seq != idx) {
-                    last_selected_seq = idx;
-                    return idx;
-                }
-                continue;
-            }
-            if (wait_time < min_wait_time) {
-                min_wait_time = wait_time;
-                min_wait_time_task_idx = idx;
-            }
-        }
-    }
-    if (min_wait_time_task_idx != -1) {
-        if (last_selected_seq == tasks_[min_wait_time_task_idx].first->seq) {
-            return -1;
-        }
-        last_selected_seq = tasks_[min_wait_time_task_idx].first->seq;
-    }
-    return min_wait_time_task_idx;
+    return tasks_.begin();
 }
 
 bool ThreadPool::__IsHigherPriorityTaskAddWhenWaiting(TaskProfile *_lhs, size_t _old_n_tasks) {

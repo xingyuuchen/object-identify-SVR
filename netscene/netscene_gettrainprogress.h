@@ -2,7 +2,7 @@
 #define OI_SVR_NETSCENE_GETTRAINPROGRESS_H
 
 #include "netscenebase.h"
-#include "../utils/autobuffer.h"
+#include "autobuffer.h"
 
 /**
  * 业务代码，获取目前训练进度。

@@ -1,9 +1,9 @@
 #ifndef OI_SVR_HTTPSERVER_H
 #define OI_SVR_HTTPSERVER_H
 #include <stdint.h>
-#include "socket/unix_socket.h"
-#include "netscene/netscenebase.h"
-#include "utils/singleton.h"
+#include "unix_socket.h"
+#include "netscenebase.h"
+#include "singleton.h"
 
 
 class HttpServer {

@@ -1,9 +1,9 @@
 #include "netscenebase.h"
 #include "../http/httpresponse.h"
 #include "../http/firstline.h"
-#include "../utils/log.h"
-#include "../http/headerfield.h"
-#include "../socket/socketepoll.h"
+#include "log.h"
+#include "headerfield.h"
+#include "socketepoll.h"
 #include <errno.h>
 
 const char *const NetSceneBase::TAG = "NetSceneBase";

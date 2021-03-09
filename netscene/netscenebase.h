@@ -3,18 +3,18 @@
 #include <string>
 #include <string.h>
 #include <map>
-#include "../socket/unix_socket.h"
-#include "../utils/autobuffer.h"
+#include "unix_socket.h"
+#include "autobuffer.h"
 
 /**
  * Base class for all NetScenes.
  *
  * Responsible for:
- *      1. Managing the net scene type;
- *      2. Packing htp body into http message;
- *      3. Implementing the business logic by subclasses themselves.
+ *      1. Specifying the net scene type;
+ *      2. Packing http body into http message;
  * Note:
- *      1. NOT responsible for any network operation(recv, send, etc.).
+ *      1. NOT responsible for any network operation(recv, send, etc.);
+ *      2. Business logic is Implemented the by subclasses by override DoSceneImpl.
  */
 class NetSceneBase {
 

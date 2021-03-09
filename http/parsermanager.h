@@ -4,8 +4,8 @@
 #include <unordered_map>
 #include <memory>
 #include "httprequest.h"
-#include "../socket/unix_socket.h"
-#include "../utils/singleton.h"
+#include "unix_socket.h"
+#include "singleton.h"
 
 
 namespace http { namespace request {

@@ -1,7 +1,7 @@
 #include "netscenedispatcher.h"
 #include <stdio.h>
-#include "../autogen/basenetscenereq.pb.h"
-#include "../utils/log.h"
+#include "basenetscenereq.pb.h"
+#include "log.h"
 #include "netscene_getindexpage.h"
 #include "netscene_queryimg/netscene_queryimg.h"
 #include "netscene_gettrainprogress.h"

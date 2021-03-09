@@ -1,7 +1,7 @@
 #ifndef OI_SVR_NETSCENEDISPATCHER_H
 #define OI_SVR_NETSCENEDISPATCHER_H
 #include "netscenebase.h"
-#include "../utils/singleton.h"
+#include "singleton.h"
 #include <vector>
 #include <mutex>
 
