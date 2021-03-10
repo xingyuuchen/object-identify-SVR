@@ -1,5 +1,7 @@
 #include "threadpool.h"
 
+const uint64_t ThreadPool::kUInt64MaxValue = 0xffffffffffffffff;
+
 ThreadPool::ThreadPool(size_t _n_threads)
         : stop_(false) {
     while (_n_threads--) {
@@ -10,28 +12,38 @@ ThreadPool::ThreadPool(size_t _n_threads)
 void ThreadPool::__CreateWorkerThread() {
     workers_.emplace_back([this] {
         while (true) {
+            TaskPairPtr task_pair = NULL;
+            TaskProfile *profile = NULL;
             std::function<void()> task;
-            TaskProfile *profile;
-            std::list<std::pair<TaskProfile*, std::function<void()>>>::iterator idx;
             {
                 ScopeLock lock(this->mutex_);
+                uint64_t wait_time = 10000;
+                bool is_waiting_timed_task = false;
                 while (true) {
-                    this->cv_.wait(lock, [&, this] {
-//                        return (idx = this->__SelectTask()) >= 0 || this->stop_;
-                        return 0;
+                    bool pred = this->cv_.wait_for(lock,
+                                                   std::chrono::milliseconds(wait_time),
+                                                [&, this] {
+                            /*
+                             * If task_pair is NULL, indicating it has not been chosen, then choose the fastest task.
+                             * If task_pair has already been chosen(not NULL), see if there is any faster task added
+                             * while waiting for the expiration of current timed task.
+                             */
+                            TaskPairPtr faster = __PickOutTaskFasterThan(task_pair);
+                            if (faster) {
+                                task_pair = faster;
+                                return true;
+                            }
+                            return this->stop_ && task_pair == NULL;
                     });
                     
-                    if (idx != tasks_.end()) {
-//                        profile = this->tasks_[idx].first;
-
-                        uint64_t wait_time = __ComputeWaitTime(profile);
-
-                        if (wait_time == 0) { break; }
-
-                        size_t curr_size = tasks_.size();
-                        bool is_new = this->cv_.wait_for(lock, std::chrono::milliseconds(wait_time),
-                                [&, this] { return this->__IsHigherPriorityTaskAddWhenWaiting(profile, curr_size); });
-                        if (is_new) {  // Comes a task that needs to be done earlier
+                    if (!pred && !is_waiting_timed_task) { continue; }
+                    
+                    if (task_pair) {
+                        profile = &task_pair->first;
+                        uint64_t wait = __ComputeWaitTime(profile);
+                        if (wait > 0) {
+                            wait_time = wait;
+                            is_waiting_timed_task = true;
                             continue;
                         }
                         break;
@@ -40,47 +52,67 @@ void ThreadPool::__CreateWorkerThread() {
                     return;
                 }
     
-//                this->running_serial_tags_.insert(profile->serial_tag);
-//                task = this->tasks_[idx].second;
-//                if (profile->type == TaskProfile::kPeriodic) {
-//                    profile->record = ::gettickcount();
-//                    profile->seq = TaskProfile::__MakeSeq();
-//                } else {
-//                    tasks_.erase(idx);
-//                }
+                this->running_serial_tags_.insert(profile->serial_tag);
+                task = task_pair->second;
+                if (profile->type == TaskProfile::kPeriodic) {
+                    profile->record = ::gettickcount();
+                    tasks_.push_back(task_pair);
+                }
             }
             task();
             {
                 ScopeLock lock(this->mutex_);
                 this->running_serial_tags_.erase(profile->serial_tag);
-                if (profile->type != TaskProfile::kPeriodic) { delete profile; }
+                if (profile->type != TaskProfile::kPeriodic) { delete task_pair; }
             }
         }
     });
 }
 
 
-std::list<std::pair<TaskProfile*, std::function<void()>>>::iterator
-ThreadPool::__SelectTask() {
-    static uint64_t last_selected_seq = TaskProfile::kInvalidSeq;
+ThreadPool::TaskPairPtr ThreadPool::__PickOutTaskFasterThan(TaskPairPtr _old/* = NULL*/) {
+    uint64_t now = ::gettickcount();
     
-    uint64_t now = ::gettickcount();
-    uint64_t min_wait_time = 0xffffffffffffffff;
-    ssize_t min_wait_time_task_idx = -1;
-    return tasks_.begin();
-}
-
-bool ThreadPool::__IsHigherPriorityTaskAddWhenWaiting(TaskProfile *_lhs, size_t _old_n_tasks) {
-    // FIXME
-    if (tasks_.size() == _old_n_tasks) {
-        return false;
+    uint64_t old_wait = kUInt64MaxValue;
+    if (_old) {
+        old_wait = __ComputeWaitTime(&_old->first, now);
+        if (old_wait <= 0) {
+            return NULL;
+        }
     }
-    TaskProfile *rhs = tasks_.back().first;
-    if (rhs->type == TaskProfile::kImmediate) {
-        return true;
+    
+    auto it = tasks_.begin();
+    auto last = tasks_.end();
+    auto min_wait_time_iter = last;
+    uint64_t min_wait_time = old_wait;
+    
+    while (it != last) {
+        TaskProfile *profile = &(*it)->first;
+        uint64_t wait = __ComputeWaitTime(profile, now);
+        if (wait == 0) {
+            int serial_tag = profile->serial_tag;
+            if (serial_tag == -1 || running_serial_tags_.find(serial_tag)
+                        == running_serial_tags_.end()) {
+                min_wait_time_iter = it;
+                break;
+            }
+            ++it;
+            continue;
+        }
+        if (wait < min_wait_time) {
+            min_wait_time = wait;
+            min_wait_time_iter = it;
+        }
+        ++it;
     }
-    uint64_t now = ::gettickcount();
-    return __ComputeWaitTime(rhs, now) < __ComputeWaitTime(_lhs, now);
+    if (min_wait_time_iter != last) {
+        tasks_.erase(min_wait_time_iter);
+        if (_old) {
+            tasks_.push_back(_old);
+        }
+        return *min_wait_time_iter;
+    }
+    return NULL;
 }
 
 uint64_t ThreadPool::__ComputeWaitTime(TaskProfile *_profile, uint64_t _now) {
@@ -108,12 +140,8 @@ ThreadPool::~ThreadPool() {
     }
     {
         ScopeLock lock(mutex_);
-        for (auto & task : tasks_) {
-            TaskProfile *profile = task.first;
-            if (profile) {
-                delete profile;
-                task.first = NULL;
-            }
+        for (TaskPairPtr task_pair : tasks_) {
+            delete task_pair;
         }
     }
 }
