@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.4.1)
-project(oi_svr)
+project(oi-svr)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lprotobuf")
 if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -39,7 +39,12 @@ list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} utils/threadpool/*.cc)
 list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 
-#message(SELF_SRC_FILES: ${SELF_SRC_FILES})
+file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} utils/messagequeue/*.cc)
+list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
+
+if (${DAEMON})
+    add_definitions("-DDAEMON")
+endif()
 
 link_directories(/usr/local/lib)
 

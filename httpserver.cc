@@ -19,7 +19,7 @@ HttpServer::HttpServer()
         : listenfd_(-1)
         , running_(true) {
     
-    SignalHandler::Instance().Init();
+    ThreadPool::Instance().Init();
 }
 
 
@@ -46,12 +46,12 @@ void HttpServer::Run(uint16_t _port) {
                 ThreadPool::Instance().Execute(fd, [=] { return __HandleRead(fd); });
     
             } else if (void *ptr = SocketEpoll::Instance().IsWriteSet(i)) {
-                NetSceneBase *net_scene = (NetSceneBase *) ptr;
+                auto *net_scene = (NetSceneBase *) ptr;
                 ThreadPool::Instance().Execute(net_scene->GetSocket(), [=] {
                     return __HandleWrite(net_scene, false);
                 });
     
-            } else if (SOCKET fd = SocketEpoll::Instance().IsErrSet(i)) {
+            } else if ((fd = SocketEpoll::Instance().IsErrSet(i))) {
                 ThreadPool::Instance().Execute(fd, [=] { return __HandleErr(fd); });
             }
         }
@@ -79,7 +79,7 @@ int HttpServer::__HandleRead(SOCKET _fd) {
         ssize_t n = ::read(_fd, recv_buff->Ptr(
                 recv_buff->Length()), kBuffSize);
 
-        if (n == -1 && errno == EAGAIN) {
+        if (n == -1 && IS_EAGAIN(errno)) {
             LogI(TAG, "[__HandleRead] EAGAIN")
             return 0;
         }
@@ -121,7 +121,7 @@ int HttpServer::__HandleRead(SOCKET _fd) {
     }
     ParserManager::Instance().DelParser(_fd);
     SocketEpoll::Instance().DelSocket(_fd);
-    ::close(_fd);
+    ::shutdown(_fd, SHUT_RDWR);
     return -1;
 }
 
@@ -132,7 +132,7 @@ int HttpServer::__HandleReadTest(SOCKET _fd) {
     
     while (true) {
         ssize_t n = ::read(_fd, buff, 2);
-        if (n == -1 && errno == EAGAIN) {
+        if (n == -1 && IS_EAGAIN(errno)) {
             LogI(TAG, "[__HandleReadTest] EAGAIN")
             return 0;
         }
@@ -155,7 +155,7 @@ int HttpServer::__HandleReadTest(SOCKET _fd) {
 }
 
 int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
-    if (_net_scene == NULL) {
+    if (!_net_scene) {
         LogE(TAG, "[__HandleWrite] _net_scene = NULL")
         return -1;
     }
@@ -171,7 +171,7 @@ int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
             LogI(TAG, "[__HandleWrite] send %zd/%zu bytes without epoll", nsend, ntotal)
             break;
         }
-        if (nsend >= 0 || (nsend < 0 && errno == EAGAIN)) {
+        if (nsend >= 0 || (nsend < 0 && IS_EAGAIN(errno))) {
             nsend = nsend > 0 ? nsend : 0;
             LogI(TAG, "[__HandleWrite] fd(%d): send %zd/%zu bytes", fd, nsend, ntotal)
             _net_scene->GetHttpResp()->Seek(pos + nsend);
@@ -198,7 +198,7 @@ int HttpServer::__HandleConnect() {
     while (true) {
         fd = ::accept(listenfd_, (struct sockaddr *) NULL, NULL);
         if (fd < 0) {
-            if (errno == EAGAIN) { return 0; }
+            if (IS_EAGAIN(errno)) { return 0; }
             LogE(TAG, "[__HandleConnect] errno(%d): %s",
                  errno, strerror(errno));
             return -1;
@@ -217,8 +217,8 @@ int HttpServer::__HandleErr(int _fd) {
 int HttpServer::__CreateListenFd() {
     listenfd_ = ::socket(AF_INET, SOCK_STREAM, 0);
     if (listenfd_ < 0) {
-        LogE(TAG, "[__CreateListenFd] create socket"
-             " error: %s, errno: %d", strerror(errno), errno);
+        LogE(TAG, "[__CreateListenFd] create socket error: %s, errno: %d",
+             strerror(errno), errno);
         return -1;
     }
     // FIXME

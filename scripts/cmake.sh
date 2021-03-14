@@ -5,7 +5,7 @@ if [ `uname` != "Darwin" ]; then
 fi
 
 isRun=false
-isNohup=false
+isDaemon=false
 
 cd ..
 
@@ -13,8 +13,8 @@ while [ $# != 0 ]
 do
   if [ "$1" == "-r" ]; then
     isRun=true
-  elif [ "$1" == "-n" ]; then
-    isNohup=true
+  elif [ "$1" == "-d" ]; then
+    isDaemon=true
   fi
   shift
 done
@@ -26,16 +26,17 @@ fi
 
 cd build
 if ${isRun}; then
-  if ${isNohup}; then
-    cmake .. && make
+  if ${isDaemon}; then
+    cmake -DDAEMON=On .. && make
     if [ $? -eq 0 ]; then
-      nohup ./oi_svr > ../logs/log.txt 2>&1 &
+#      nohup ./oi-svr > ../logs/log.txt 2>&1 &    # nohup is deprecated, replaced by daemon.
+      ./oi-svr
     fi
     echo
-    echo "oi_svr running..."
+    echo "starting an oi-svr daemon."
     echo
   else
-    cmake .. && make && ./oi_svr
+    cmake -DDAEMON=Off .. && make && ./oi-svr
   fi
 else
   cmake .. && make

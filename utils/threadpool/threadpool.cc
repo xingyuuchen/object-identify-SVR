@@ -1,6 +1,24 @@
 #include "threadpool.h"
 
-const uint64_t ThreadPool::kUInt64MaxValue = 0xffffffffffffffff;
+
+static uint64_t gettickcount() {
+    using namespace std::chrono;
+    time_point<std::chrono::system_clock, milliseconds> tp =
+            time_point_cast<milliseconds>(system_clock::now());
+    return tp.time_since_epoch().count();
+}
+
+TaskProfile::TaskProfile(TTiming _timing, int _serial_tag, int _after, int _period)
+        : type(_timing), serial_tag(_serial_tag), after(_after)
+        , period(_period), seq(__MakeSeq()) {
+    if (type != kImmediate) {
+        record = ::gettickcount();
+    }
+}
+
+uint64_t const ThreadPool::kUInt64MaxValue = 0xffffffffffffffff;
+
+void ThreadPool::Init() {}
 
 ThreadPool::ThreadPool(size_t _n_threads)
         : stop_(false) {
@@ -14,9 +32,8 @@ void ThreadPool::__CreateWorkerThread() {
         while (true) {
             TaskPairPtr task_pair = NULL;
             TaskProfile *profile = NULL;
-            std::function<void()> task;
             {
-                ScopeLock lock(this->mutex_);
+                ScopedLock lock(this->mutex_);
                 uint64_t wait_time = 10000;
                 bool is_waiting_timed_task = false;
                 while (true) {
@@ -25,8 +42,8 @@ void ThreadPool::__CreateWorkerThread() {
                                                 [&, this] {
                             /*
                              * If task_pair is NULL, indicating it has not been chosen, then choose the fastest task.
-                             * If task_pair has already been chosen(not NULL), see if there is any faster task added
-                             * while waiting for the expiration of current timed task.
+                             * If task_pair is not NULL, indicating it has already been chosen,
+                             * see if there is any faster task added while waiting for the expiration of current timed task.
                              */
                             TaskPairPtr faster = __PickOutTaskFasterThan(task_pair);
                             if (faster) {
@@ -53,15 +70,14 @@ void ThreadPool::__CreateWorkerThread() {
                 }
     
                 this->running_serial_tags_.insert(profile->serial_tag);
-                task = task_pair->second;
                 if (profile->type == TaskProfile::kPeriodic) {
                     profile->record = ::gettickcount();
                     tasks_.push_back(task_pair);
                 }
             }
-            task();
+            task_pair->second();
             {
-                ScopeLock lock(this->mutex_);
+                ScopedLock lock(this->mutex_);
                 this->running_serial_tags_.erase(profile->serial_tag);
                 if (profile->type != TaskProfile::kPeriodic) { delete task_pair; }
             }
@@ -96,10 +112,7 @@ ThreadPool::TaskPairPtr ThreadPool::__PickOutTaskFasterThan(TaskPairPtr _old/* =
                 min_wait_time_iter = it;
                 break;
             }
-            ++it;
-            continue;
-        }
-        if (wait < min_wait_time) {
+        } else if (wait < min_wait_time) {
             min_wait_time = wait;
             min_wait_time_iter = it;
         }
@@ -131,7 +144,7 @@ uint64_t ThreadPool::__ComputeWaitTime(TaskProfile *_profile, uint64_t _now) {
 
 ThreadPool::~ThreadPool() {
     {
-        ScopeLock lock(mutex_);
+        ScopedLock lock(mutex_);
         stop_ = true;
     }
     cv_.notify_all();
@@ -139,7 +152,7 @@ ThreadPool::~ThreadPool() {
         thread.join();
     }
     {
-        ScopeLock lock(mutex_);
+        ScopedLock lock(mutex_);
         for (TaskPairPtr task_pair : tasks_) {
             delete task_pair;
         }
