@@ -4,7 +4,7 @@
 
 namespace Daemon {
 
-void Daemonize();
+int Daemonize();
 
 }
 

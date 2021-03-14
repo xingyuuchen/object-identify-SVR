@@ -17,7 +17,7 @@ namespace Logger {
  * See /etc/rsyslog.conf for detail.
  *
  */
-    void OpenLog(const char *_ident);
+void OpenLog(const char *_ident);
     
 }
 

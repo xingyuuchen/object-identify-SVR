@@ -14,7 +14,7 @@
  *      2. Packing http body into http message;
  * Note:
  *      1. NOT responsible for any network operation(recv, send, etc.);
- *      2. Business logic is Implemented the by subclasses by override DoSceneImpl.
+ *      2. Business logic is Implemented the by subclasses by overriding DoSceneImpl.
  */
 class NetSceneBase {
 

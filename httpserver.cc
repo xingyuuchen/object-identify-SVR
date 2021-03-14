@@ -96,8 +96,6 @@ int HttpServer::__HandleRead(SOCKET _fd) {
             recv_buff->AddLength(n);
         }
 
-        LogI(TAG, "[__HandleRead] n: %zd", n)
-        
         parser->DoParse();
         
         if (parser->IsErr()) {
@@ -150,7 +148,7 @@ int HttpServer::__HandleReadTest(SOCKET _fd) {
         }
     }
     SocketEpoll::Instance().DelSocket(_fd);
-    ::close(_fd);
+    ::shutdown(_fd, SHUT_RDWR);
     return 0;
 }
 
@@ -188,7 +186,7 @@ int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
     
     SocketEpoll::Instance().DelSocket(fd);
     delete _net_scene;
-    ::close(fd);
+    ::shutdown(fd, SHUT_RDWR);
     return nsend < 0 ? -1 : 0;
 }
 

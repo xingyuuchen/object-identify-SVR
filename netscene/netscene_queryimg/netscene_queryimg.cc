@@ -85,7 +85,7 @@ int NetSceneQueryImg::__ForkPythonScript(char *_data_write, size_t _size_write,
     std::string cmd = "python3 ../netscene/netscene_queryimg/queryimg.py "
                 + std::string(fifo_name_) + " " + std::to_string(_size_write);
     if ((fp = popen(cmd.c_str(), "r")) == NULL) {
-        printf("err\n");
+        LogE(TAG, "[__ForkPythonScript] popen err")
         return -1;
     }
     // FIXME: no concurrency

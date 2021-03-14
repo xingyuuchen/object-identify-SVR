@@ -7,9 +7,9 @@
 
 namespace Logger {
     
-    void OpenLog(const char *_ident) {
+void OpenLog(const char *_ident) {
 #ifdef DAEMON
-        #ifdef __linux__
+#ifdef __linux__
     openlog(_ident, LOG_PID, LOG_USER);
     SignalHandler::Instance().RegisterExitCallback(
             new IProcessExitListener([] {
@@ -17,7 +17,7 @@ namespace Logger {
     }));
 #endif
 #endif
-    }
+}
     
 }
 

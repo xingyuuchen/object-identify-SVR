@@ -9,5 +9,5 @@ function kill_procs() {
   done
 }
 
-kill_procs `ps -A | grep 'oi_svr$' | awk '{print $1}'`
+kill_procs `ps -A | grep 'oi-svr$' | awk '{print $1}'`
 #kill_procs `netstat -anp | grep 5002`
