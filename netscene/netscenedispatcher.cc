@@ -76,6 +76,6 @@ NetSceneBase *NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_i
 NetSceneDispatcher::~NetSceneDispatcher() {
     std::unique_lock<std::mutex> lock(mutex_);
     for (auto iter = selectors_.begin(); iter != selectors_.end(); iter++) {
-        delete *iter;
+        delete *iter, *iter = NULL;
     }
 }

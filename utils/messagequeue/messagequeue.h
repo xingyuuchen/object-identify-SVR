@@ -1,6 +1,4 @@
-#ifndef MESSAGEQUEUE_H
-#define MESSAGEQUEUE_H
-
+#pragma once
 
 // TODO: 将线程池中的任务队列作为消息队列的一列
 namespace MessageQueue {
@@ -8,4 +6,3 @@ namespace MessageQueue {
 }
 
 
-#endif //MESSAGEQUEUE_H

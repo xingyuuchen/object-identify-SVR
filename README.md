@@ -4,21 +4,21 @@
 
 ## 编译方法
 ### UNIX
-```
-git clone https://github.com/xingyuuchen/object-identify-SVR.git
+```bash
+git clone --recursive https://github.com/xingyuuchen/object-identify-SVR.git
 cd object-identify-SVR/scripts
 bash autogen.sh
 ```
 仅编译
-```
+```bash
 bash cmake.sh
 ```
 编译运行
-```
+```bash
 bash cmake.sh -r
 ```
 以守护进程形式运行
-```
+```bash
 bash cmake.sh -r -d   # -d: run as a daemon.
 ```
 

@@ -185,7 +185,7 @@ int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
     } while (false);
     
     SocketEpoll::Instance().DelSocket(fd);
-    delete _net_scene;
+    delete _net_scene, _net_scene = NULL;
     ::shutdown(fd, SHUT_RDWR);
     return nsend < 0 ? -1 : 0;
 }

@@ -162,8 +162,7 @@ int SocketEpoll::GetErrNo() const { return errno_; }
 SocketEpoll::~SocketEpoll() {
 #ifdef __linux__
     if (epoll_events_ != NULL) {
-        delete[] epoll_events_;
-        epoll_events_ = NULL;
+        delete[] epoll_events_, epoll_events_ = NULL;
     }
     if (epoll_fd_ != -1) {
         LogI(TAG, "[~SocketEpoll] close epfd")

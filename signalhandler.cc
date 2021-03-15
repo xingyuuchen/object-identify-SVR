@@ -82,6 +82,6 @@ SignalHandler::~SignalHandler() {
     LogI(TAG, "[~SignalHandler]")
     __InvokeCallbacks();
     for (IProcessExitListener *p : process_exit_listeners_) {
-        delete p;
+        delete p, p = NULL;
     }
 }
