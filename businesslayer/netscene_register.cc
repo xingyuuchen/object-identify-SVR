@@ -2,10 +2,11 @@
 #include "constantsprotocol.h"
 #include "log.h"
 #include "netsceneregister.pb.h"
+#include "dao/connection.h"
 
 
 NetSceneRegister::NetSceneRegister() : NetSceneBase() {
-
+    Dao::Connection::Instance().Connect("dji", "xxx");
 }
 
 int NetSceneRegister::GetType() { return kNetSceneTypeRegister; }
@@ -14,7 +15,7 @@ NetSceneBase *NetSceneRegister::NewInstance() { return new NetSceneRegister(); }
 
 
 int NetSceneRegister::DoSceneImpl(const std::string &_in_buffer) {
-    static std::mutex   mutex_;
+    static std::mutex mutex_;
     static uint32_t usr_id = 0;
     uint32_t id;
     {

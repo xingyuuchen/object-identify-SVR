@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 project(oi-svr)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lprotobuf")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
@@ -15,6 +15,9 @@ include_directories(socket)
 include_directories(utils)
 include_directories(utils/threadpool)
 include_directories(/usr/local/include)
+
+# Before compiling this subproject, make sure mysql++ installed.
+add_subdirectory(dao)
 
 file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} *.cc)
 list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
@@ -53,3 +56,6 @@ endif()
 link_directories(/usr/local/lib)
 
 add_executable(${PROJECT_NAME} ${SELF_SRC_FILES})
+
+target_link_libraries(${PROJECT_NAME} protobuf)
+target_link_libraries(${PROJECT_NAME} oi-svr-dao)
