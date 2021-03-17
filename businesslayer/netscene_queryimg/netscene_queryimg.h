@@ -14,13 +14,13 @@ class NetSceneQueryImg : public NetSceneBase {
     
     NetSceneQueryImg();
     
-    ~NetSceneQueryImg();
+    ~NetSceneQueryImg() override;
     
-    int GetType();
+    int GetType() override;
     
-    NetSceneBase *NewInstance();
+    NetSceneBase *NewInstance() override;
     
-    int DoSceneImpl(const std::string &_in_buffer);
+    int DoSceneImpl(const std::string &_in_buffer) override;
     
   private:
     int __ForkPythonScript(char *_data_write, size_t _size_write,
@@ -31,7 +31,6 @@ class NetSceneQueryImg : public NetSceneBase {
     static void __DelFIFO();
     
   private:
-    static const char *const TAG;
     static const char *const fifo_name_;
     std::string item_name_;
     std::string item_desc_;

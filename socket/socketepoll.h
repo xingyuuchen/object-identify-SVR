@@ -58,7 +58,6 @@ class SocketEpoll {
     int __EpollCtl(int _op, SOCKET _fd, struct epoll_event *_event = NULL);
     
   private:
-    static const char *const    TAG;
     int                         epoll_fd_;
     int                         listen_fd_;
     struct epoll_event*         epoll_events_;

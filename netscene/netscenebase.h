@@ -45,7 +45,6 @@ class NetSceneBase {
     void __ShowHttpHeader(AutoBuffer &_out);
     
   protected:
-    static const char *const            TAG;
     SOCKET                              socket_;
     AutoBuffer                          resp_body_;
     AutoBuffer                          resp_msg_;

@@ -8,6 +8,7 @@ endif()
 
 include_directories(.)
 include_directories(autogen)
+include_directories(businesslayer)
 include_directories(http)
 include_directories(netscene)
 include_directories(socket)
@@ -21,13 +22,16 @@ list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} autogen/*.cc)
 list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 
+file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} businesslayer/*.cc)
+list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
+
+file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} businesslayer/netscene_queryimg/*.cc)
+list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
+
 file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} http/*.cc)
 list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 
 file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} netscene/*.cc)
-list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
-
-file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} netscene/netscene_queryimg/*.cc)
 list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 
 file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} socket/*.cc)

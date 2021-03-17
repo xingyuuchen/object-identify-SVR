@@ -33,7 +33,6 @@ class HttpServer {
     int __HandleErr(SOCKET _fd);
     
   private:
-    static const char *const    TAG;
     static const int            kBuffSize;
     bool                        running_;
     int                         listenfd_;

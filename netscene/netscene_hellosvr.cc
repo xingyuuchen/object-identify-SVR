@@ -1,19 +1,17 @@
-#include "netscene_getindexpage.h"
+#include "netscene_hellosvr.h"
 #include "constantsprotocol.h"
 #include "headerfield.h"
 
 
-const char *const NetSceneGetIndexPage::TAG = "NetSceneGetIndexPage";
-
-NetSceneGetIndexPage::NetSceneGetIndexPage() : NetSceneBase() {
+NetSceneHelloSvr::NetSceneHelloSvr() : NetSceneBase() {
     http_headers_[http::HeaderField::KContentType] = http::HeaderField::KPlainText;
 }
 
-int NetSceneGetIndexPage::GetType() { return kIndexPage; }
+int NetSceneHelloSvr::GetType() { return kNetSceneTypeHelloSvr; }
 
-NetSceneBase *NetSceneGetIndexPage::NewInstance() { return new NetSceneGetIndexPage(); }
+NetSceneBase *NetSceneHelloSvr::NewInstance() { return new NetSceneHelloSvr(); }
 
-int NetSceneGetIndexPage::DoSceneImpl(const std::string &_in_buffer) {
+int NetSceneHelloSvr::DoSceneImpl(const std::string &_in_buffer) {
     static int visit_times_since_last_boot_ = 0;
     std::string resp = "If you see this, the server is running normally, "
                    + std::to_string(++visit_times_since_last_boot_) + " visits since last boot.";

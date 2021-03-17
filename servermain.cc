@@ -14,7 +14,7 @@ int main(int ac, char **argv) {
     
     Logger::OpenLog(argv[0]);
 
-    LogI("main", "Launching SVR...")
+    LogI(__FILE__, "Launching SVR...")
     
     HttpServer::Instance().Run();
     

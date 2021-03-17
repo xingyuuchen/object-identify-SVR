@@ -4,7 +4,6 @@
 
 namespace http { namespace request {
 
-const char *const ParserManager::TAG = "ParserManager";
 
 ParserManager::ParserManager() { }
 
@@ -19,15 +18,15 @@ std::shared_ptr<http::request::Parser> ParserManager::GetParser(SOCKET _fd) {
 std::shared_ptr<http::request::Parser> ParserManager::__CreateParser(SOCKET _fd) {
     auto new_parser = std::make_shared<http::request::Parser>();
     if (!parsers_map_.emplace(_fd, new_parser).second) {
-        LogE(TAG, "[__CreateParser] insert failed")
+        LogE(__FILE__, "[__CreateParser] insert failed")
     }
-    LogI(TAG, "[__CreateParser] map size: %lu", parsers_map_.size())
+    LogI(__FILE__, "[__CreateParser] map size: %lu", parsers_map_.size())
     return new_parser;
 }
 
 int ParserManager::DelParser(SOCKET _fd) {
     int ret = parsers_map_.erase(_fd);
-    LogI(TAG, "[DelParser] map size: %lu, ret: %d", parsers_map_.size(), ret)
+    LogI(__FILE__, "[DelParser] map size: %lu, ret: %d", parsers_map_.size(), ret)
     return ret;
 }
 

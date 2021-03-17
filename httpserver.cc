@@ -13,8 +13,6 @@
 
 const int HttpServer::kBuffSize = 1024;
 
-const char *const HttpServer::TAG = "HttpServer";
-
 HttpServer::HttpServer()
         : listenfd_(-1)
         , running_(true) {
@@ -34,7 +32,7 @@ void HttpServer::Run(uint16_t _port) {
     
     while (running_) {
         int nfds = SocketEpoll::Instance().EpollWait();
-        LogI(TAG, "[Run] nfds: %d", nfds)
+        LogI(__FILE__, "[Run] nfds: %d", nfds)
         if (nfds < 0) { break; }
         
         for (int i = 0; i < nfds; i++) {
@@ -60,10 +58,10 @@ void HttpServer::Run(uint16_t _port) {
 
 int HttpServer::__HandleRead(SOCKET _fd) {
     if (_fd <= 0) {
-        LogE(TAG, "[__HandleRead] invalid _fd: %d", _fd)
+        LogE(__FILE__, "[__HandleRead] invalid _fd: %d", _fd)
         return -1;
     }
-    LogI(TAG, "[__HandleRead] _fd: %d", _fd)
+    LogI(__FILE__, "[__HandleRead] _fd: %d", _fd)
     
     using http::request::ParserManager;
     auto parser = ParserManager::Instance().GetParser(_fd);
@@ -80,16 +78,16 @@ int HttpServer::__HandleRead(SOCKET _fd) {
                 recv_buff->Length()), kBuffSize);
 
         if (n == -1 && IS_EAGAIN(errno)) {
-            LogI(TAG, "[__HandleRead] EAGAIN")
+            LogI(__FILE__, "[__HandleRead] EAGAIN")
             return 0;
         }
         if (n < 0) {
-            LogE(TAG, "[__HandleRead] n<0, errno(%d): %s", errno, strerror(errno))
+            LogE(__FILE__, "[__HandleRead] n<0, errno(%d): %s", errno, strerror(errno))
             break;
 
         } else if (n == 0) {
             // A read event is raised when conn closed by peer
-            LogI(TAG, "[__HandleRead] Conn closed by peer")
+            LogI(__FILE__, "[__HandleRead] Conn closed by peer")
             break;
 
         } else if (n > 0) {
@@ -99,16 +97,16 @@ int HttpServer::__HandleRead(SOCKET _fd) {
         parser->DoParse();
         
         if (parser->IsErr()) {
-            LogE(TAG, "[__HandleRead] parser error")
+            LogE(__FILE__, "[__HandleRead] parser error")
             break;
         }
         
         if (parser->IsEnd()) {
-            LogI(TAG, "[__HandleRead] http parse succeed")
+            LogI(__FILE__, "[__HandleRead] http parse succeed")
             NetSceneBase* net_scene =
                     NetSceneDispatcher::Instance().Dispatch(_fd, parser->GetBody());
             if (net_scene) {
-                LogI(TAG, "[__HandleRead] net_scene process done")
+                LogI(__FILE__, "[__HandleRead] net_scene process done")
                 ParserManager::Instance().DelParser(_fd);
                 return __HandleWrite(net_scene, false);
             }
@@ -124,27 +122,27 @@ int HttpServer::__HandleRead(SOCKET _fd) {
 }
 
 int HttpServer::__HandleReadTest(SOCKET _fd) {
-    LogI(TAG, "[__HandleReadTest] sleeping...")
+    LogI(__FILE__, "[__HandleReadTest] sleeping...")
     sleep(4);
     char buff[kBuffSize] = {0, };
     
     while (true) {
         ssize_t n = ::read(_fd, buff, 2);
         if (n == -1 && IS_EAGAIN(errno)) {
-            LogI(TAG, "[__HandleReadTest] EAGAIN")
+            LogI(__FILE__, "[__HandleReadTest] EAGAIN")
             return 0;
         }
         if (n == 0) {
-            LogI(TAG, "[__HandleReadTest] Conn closed by peer")
+            LogI(__FILE__, "[__HandleReadTest] Conn closed by peer")
             break;
         }
         if (n < 0) {
-            LogE(TAG, "[__HandleReadTest] err: n=%zd", n)
+            LogE(__FILE__, "[__HandleReadTest] err: n=%zd", n)
             break;
         }
-        LogI(TAG, "[__HandleReadTest] n: %zd", n)
+        LogI(__FILE__, "[__HandleReadTest] n: %zd", n)
         if (n > 0) {
-            LogI(TAG, "read: %s", buff)
+            LogI(__FILE__, "read: %s", buff)
         }
     }
     SocketEpoll::Instance().DelSocket(_fd);
@@ -154,7 +152,7 @@ int HttpServer::__HandleReadTest(SOCKET _fd) {
 
 int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
     if (!_net_scene) {
-        LogE(TAG, "[__HandleWrite] _net_scene = NULL")
+        LogE(__FILE__, "[__HandleWrite] _net_scene = NULL")
         return -1;
     }
     AutoBuffer *resp = _net_scene->GetHttpResp();
@@ -166,12 +164,12 @@ int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
     
     do {
         if (nsend == ntotal) {
-            LogI(TAG, "[__HandleWrite] send %zd/%zu bytes without epoll", nsend, ntotal)
+            LogI(__FILE__, "[__HandleWrite] send %zd/%zu bytes without epoll", nsend, ntotal)
             break;
         }
         if (nsend >= 0 || (nsend < 0 && IS_EAGAIN(errno))) {
             nsend = nsend > 0 ? nsend : 0;
-            LogI(TAG, "[__HandleWrite] fd(%d): send %zd/%zu bytes", fd, nsend, ntotal)
+            LogI(__FILE__, "[__HandleWrite] fd(%d): send %zd/%zu bytes", fd, nsend, ntotal)
             _net_scene->GetHttpResp()->Seek(pos + nsend);
             if (_mod_write) {
                 SocketEpoll::Instance().ModSocketWrite(fd, (void *)_net_scene);
@@ -179,7 +177,7 @@ int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
             return 0;
         }
         if (nsend < 0) {
-            LogE(TAG, "[__TryWrite] nsend(%zu), errno(%d): %s",
+            LogE(__FILE__, "[__TryWrite] nsend(%zu), errno(%d): %s",
                  nsend, errno, strerror(errno));
         }
     } while (false);
@@ -191,31 +189,31 @@ int HttpServer::__HandleWrite(NetSceneBase *_net_scene, bool _mod_write) {
 }
 
 int HttpServer::__HandleConnect() {
-    LogI(TAG, "[__HandleConnect] IsNewConnect")
+    LogI(__FILE__, "[__HandleConnect] IsNewConnect")
     SOCKET fd;
     while (true) {
         fd = ::accept(listenfd_, (struct sockaddr *) NULL, NULL);
         if (fd < 0) {
             if (IS_EAGAIN(errno)) { return 0; }
-            LogE(TAG, "[__HandleConnect] errno(%d): %s",
+            LogE(__FILE__, "[__HandleConnect] errno(%d): %s",
                  errno, strerror(errno));
             return -1;
         }
         SetNonblocking(fd);
-        LogI(TAG, "[__HandleConnect] new connect, fd: %d", fd);
+        LogI(__FILE__, "[__HandleConnect] new connect, fd: %d", fd);
         SocketEpoll::Instance().AddSocketRead(fd);
     }
 }
 
 int HttpServer::__HandleErr(int _fd) {
-    LogE(TAG, "[__HandleErr] fd: %d", _fd)
+    LogE(__FILE__, "[__HandleErr] fd: %d", _fd)
     return 0;
 }
 
 int HttpServer::__CreateListenFd() {
     listenfd_ = ::socket(AF_INET, SOCK_STREAM, 0);
     if (listenfd_ < 0) {
-        LogE(TAG, "[__CreateListenFd] create socket error: %s, errno: %d",
+        LogE(__FILE__, "[__CreateListenFd] create socket error: %s, errno: %d",
              strerror(errno), errno);
         return -1;
     }
@@ -238,7 +236,7 @@ int HttpServer::__Bind(uint16_t _port) {
     int ret = ::bind(listenfd_, (struct sockaddr *) &sock_addr,
                         sizeof(sock_addr));
     if (ret < 0) {
-        LogE(TAG, "[__Bind] errno(%d): %s", errno, strerror(errno));
+        LogE(__FILE__, "[__Bind] errno(%d): %s", errno, strerror(errno));
         return -1;
     }
     return 0;
@@ -247,7 +245,7 @@ int HttpServer::__Bind(uint16_t _port) {
 HttpServer::~HttpServer() {
     running_ = false;
     if (listenfd_ != -1) {
-        LogI(TAG, "[~HttpServer] close listenfd")
+        LogI(__FILE__, "[~HttpServer] close listenfd")
         ::close(listenfd_);
     }
 }

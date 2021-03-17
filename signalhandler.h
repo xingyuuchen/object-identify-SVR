@@ -32,7 +32,6 @@ class SignalHandler {
     
     
   private:
-    static const char *const                TAG;
     std::vector<IProcessExitListener *>     process_exit_listeners_;
     
 };

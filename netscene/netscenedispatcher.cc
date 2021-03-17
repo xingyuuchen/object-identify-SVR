@@ -2,18 +2,24 @@
 #include <stdio.h>
 #include "basenetscenereq.pb.h"
 #include "log.h"
-#include "netscene_getindexpage.h"
-#include "netscene_queryimg/netscene_queryimg.h"
-#include "netscene_gettrainprogress.h"
+#include "netscene_hellosvr.h"
+#include "businesslayer/netscene_queryimg/netscene_queryimg.h"
+#include "businesslayer/netscene_gettrainprogress.h"
+#include "businesslayer/netscene_getrecentquery.h"
+#include "businesslayer/netscene_gethotsearch.h"
+#include "businesslayer/netscene_register.h"
+#include "businesslayer/netscene_uploadavatar.h"
 
-
-const char *const NetSceneDispatcher::TAG = "NetSceneDispatcher";
 
 NetSceneDispatcher::NetSceneDispatcher() {
     std::unique_lock<std::mutex> lock(mutex_);
-    selectors_.push_back(new NetSceneGetIndexPage());
+    selectors_.push_back(new NetSceneHelloSvr());
     selectors_.push_back(new NetSceneQueryImg());
     selectors_.push_back(new NetSceneGetTrainProgress());
+    selectors_.push_back(new NetSceneRegister());
+    selectors_.push_back(new NetSceneUploadAvatar());
+    selectors_.push_back(new NetSceneGetHotSearch());
+    selectors_.push_back(new NetSceneGetRecentQuery());
     
 }
 
@@ -22,7 +28,7 @@ NetSceneBase *NetSceneDispatcher::__MakeNetScene(int _type) {
     auto iter = std::find_if(selectors_.begin(), selectors_.end(),
                         [=] (NetSceneBase *find) { return find->GetType() == _type; });
     if (iter == selectors_.end()) {
-        LogE(TAG, "[__MakeNetScene] NO such NetScene:"
+        LogE(__FILE__, "[__MakeNetScene] NO such NetScene:"
              " type=%d, give up processing this request.", _type)
         return NULL;
     }
@@ -41,28 +47,28 @@ NetSceneBase *NetSceneDispatcher::Dispatch(SOCKET _conn_fd, const AutoBuffer *_i
     std::string req_buffer;
     do {
         if (_in_buffer == NULL || _in_buffer->Ptr() == NULL) {
-            LogI(TAG, "[Dispatch] return index page.")
+            LogI(__FILE__, "[Dispatch] return index page.")
             type = 0;
             break;
         }
-        LogI(TAG, "[Dispatch] _in_buffer.len: %zd", _in_buffer->Length());
+        LogI(__FILE__, "[Dispatch] _in_buffer.len: %zd", _in_buffer->Length());
     
         BaseNetSceneReq::BaseNetSceneReq base_req;
         base_req.ParseFromArray(_in_buffer->Ptr(), _in_buffer->Length());
     
         if (!base_req.has_net_scene_type()) {
-            LogI(TAG, "[Dispatch] base_req.has_net_scene_type(): false")
+            LogI(__FILE__, "[Dispatch] base_req.has_net_scene_type(): false")
             return NULL;
         }
         type = base_req.net_scene_type();
         if (!base_req.has_net_scene_req_buff()) {
-            LogI(TAG, "[Dispatch] type(%d), base_req.has_net_scene_req_buff(): false", type)
+            LogI(__FILE__, "[Dispatch] type(%d), base_req.has_net_scene_req_buff(): false", type)
             return NULL;
         }
         req_buffer = base_req.net_scene_req_buff();
     } while (false);
     
-    LogI(TAG, "[Dispatch] dispatch to type %d", type)
+    LogI(__FILE__, "[Dispatch] dispatch to type %d", type)
     
     NetSceneBase *net_scene = __MakeNetScene(type);
     if (net_scene) {

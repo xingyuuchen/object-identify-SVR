@@ -8,7 +8,6 @@
  * 业务代码，获取目前训练进度。
  */
 
-const char *const NetSceneGetTrainProgress::TAG = "NetSceneGetTrainProgress";
 
 NetSceneGetTrainProgress::NetSceneGetTrainProgress()
     : NetSceneBase()
@@ -16,16 +15,16 @@ NetSceneGetTrainProgress::NetSceneGetTrainProgress()
     , total_epoch_(-1)
     , is_running_(false) {}
 
-NetSceneGetTrainProgress::~NetSceneGetTrainProgress() { }
+NetSceneGetTrainProgress::~NetSceneGetTrainProgress() = default;
 
 int NetSceneGetTrainProgress::GetType() { return kNetSceneTypeGetTrainProgress; }
 
 NetSceneBase *NetSceneGetTrainProgress::NewInstance() { return new NetSceneGetTrainProgress(); }
 
 int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
-    LogI(TAG, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
+    LogI(__FILE__, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
     if (socket_ <= 0) {
-        LogE(TAG, "[DoSceneImpl] Socket NOT open");
+        LogE(__FILE__, "[DoSceneImpl] Socket NOT open");
         return -1;
     }
     
@@ -44,9 +43,9 @@ int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
     } else {
         status_desc_ = "/root/cxy/trainprogress.txt-FileNotOpen";
         status_code_ = 404;
-        LogE(TAG, "[DoSceneImpl] infile.is_open() = false")
+        LogE(__FILE__, "[DoSceneImpl] infile.is_open() = false")
     }
-    LogI(TAG, "[DoSceneImpl] isRunning:%d, currEpoch:%d, totalEpoch:%d",
+    LogI(__FILE__, "[DoSceneImpl] isRunning:%d, currEpoch:%d, totalEpoch:%d",
          is_running_, curr_epoch_, total_epoch_)
     
     resp.set_is_running(is_running_);

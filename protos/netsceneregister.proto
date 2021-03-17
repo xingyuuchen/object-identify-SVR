@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package NetSceneRegisterProto;
+
+message NetSceneRegisterReq {
+  optional bool nop = 1;  // no req body, this is for padding.
+
+}
+
+message NetSceneRegisterResp {
+  optional uint32 usr_id = 1;
+
+}
