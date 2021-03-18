@@ -1,6 +1,6 @@
 #ifndef OI_SVR_SIGNALHANDLER_H
 #define OI_SVR_SIGNALHANDLER_H
-#include "utils/singleton.h"
+#include "singleton.h"
 #include <vector>
 
 

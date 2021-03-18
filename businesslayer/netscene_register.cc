@@ -6,7 +6,7 @@
 
 
 NetSceneRegister::NetSceneRegister() : NetSceneBase() {
-    Dao::Connection::Instance().Connect("dji", "xxx");
+//    Dao::Connection::Instance().Connect("dji", "xxx");
 }
 
 int NetSceneRegister::GetType() { return kNetSceneTypeRegister; }

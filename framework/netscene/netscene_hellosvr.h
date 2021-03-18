@@ -11,11 +11,11 @@ class NetSceneHelloSvr : public NetSceneBase {
   public:
     NetSceneHelloSvr();
     
-    int GetType();
+    int GetType() override;
     
-    NetSceneBase *NewInstance();
+    NetSceneBase *NewInstance() override;
     
-    int DoSceneImpl(const std::string &_in_buffer);
+    int DoSceneImpl(const std::string &_in_buffer) override;
     
   private:
 

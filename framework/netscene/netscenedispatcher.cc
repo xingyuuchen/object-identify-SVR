@@ -1,27 +1,22 @@
 #include "netscenedispatcher.h"
 #include <stdio.h>
 #include "basenetscenereq.pb.h"
-#include "log.h"
 #include "netscene_hellosvr.h"
-#include "businesslayer/netscene_queryimg/netscene_queryimg.h"
-#include "businesslayer/netscene_gettrainprogress.h"
-#include "businesslayer/netscene_getrecentquery.h"
-#include "businesslayer/netscene_gethotsearch.h"
-#include "businesslayer/netscene_register.h"
-#include "businesslayer/netscene_uploadavatar.h"
+#include "log.h"
 
 
 NetSceneDispatcher::NetSceneDispatcher() {
     std::unique_lock<std::mutex> lock(mutex_);
     selectors_.push_back(new NetSceneHelloSvr());
-    selectors_.push_back(new NetSceneQueryImg());
-    selectors_.push_back(new NetSceneGetTrainProgress());
-    selectors_.push_back(new NetSceneRegister());
-    selectors_.push_back(new NetSceneUploadAvatar());
-    selectors_.push_back(new NetSceneGetHotSearch());
-    selectors_.push_back(new NetSceneGetRecentQuery());
     
 }
+
+void NetSceneDispatcher::RegisterNetScene(NetSceneBase *_net_scene) {
+    if (_net_scene) {
+        selectors_.push_back(_net_scene);
+    }
+}
+
 
 NetSceneBase *NetSceneDispatcher::__MakeNetScene(int _type) {
     std::unique_lock<std::mutex> lock(mutex_);

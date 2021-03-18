@@ -1,7 +1,6 @@
 #ifndef OI_SVR_HTTPSERVER_H
 #define OI_SVR_HTTPSERVER_H
 #include <stdint.h>
-#include "unix_socket.h"
 #include "netscenebase.h"
 #include "singleton.h"
 

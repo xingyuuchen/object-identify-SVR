@@ -7,11 +7,11 @@ include_directories(.)
 include_directories(/usr/include/mysql)
 include_directories(/usr/local/include/mysql++)
 
-file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} *.cc)
+file(GLOB SELF_TEMP_SRC_FILES RELATIVE ../.. *.cc)
 list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 
-link_directories(/usr/local/lib)
-
-add_library(${PROJECT_NAME} SHARED ${SELF_SRC_FILES})
-
-target_link_libraries(${PROJECT_NAME} mysqlpp)
+#link_directories(/usr/local/lib)
+#
+#add_library(${PROJECT_NAME} SHARED ${SELF_SRC_FILES})
+#
+#target_link_libraries(${PROJECT_NAME} mysqlpp)

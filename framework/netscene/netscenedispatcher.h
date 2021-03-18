@@ -18,6 +18,8 @@ class NetSceneDispatcher {
     
     NetSceneBase *Dispatch(SOCKET _conn_fd, const AutoBuffer *_buffer);
     
+    void RegisterNetScene(NetSceneBase* _net_scene);
+    
   private:
     
     NetSceneBase *__MakeNetScene(int _type);

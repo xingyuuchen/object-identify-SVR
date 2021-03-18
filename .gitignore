@@ -1,6 +1,5 @@
-.idea/
-testclient.cc
-build/
-cmake-build-debug/
-autogen/
-logs/
+.idea
+build
+cmake-build-debug
+autogen
+logs
