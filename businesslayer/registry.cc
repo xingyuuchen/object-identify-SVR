@@ -18,6 +18,7 @@ void RegisterNetScenes() {
     NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneUploadAvatar());
     NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneGetHotSearch());
     NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneGetRecentQuery());
+    
 }
 
 

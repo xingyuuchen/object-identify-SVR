@@ -6,7 +6,6 @@
 
 
 NetSceneRegister::NetSceneRegister() : NetSceneBase() {
-//    Dao::Connection::Instance().Connect("dji", "xxx");
 }
 
 int NetSceneRegister::GetType() { return kNetSceneTypeRegister; }
@@ -22,6 +21,8 @@ int NetSceneRegister::DoSceneImpl(const std::string &_in_buffer) {
         std::unique_lock<std::mutex> lock(mutex_);
         id = ++usr_id;
     }
+    Dao::Insert("insert into users(null, null);");
+    
     LogI(__FILE__, "[DoSceneImpl] alloc id: %d", id)
     NetSceneRegisterProto::NetSceneRegisterResp resp;
     

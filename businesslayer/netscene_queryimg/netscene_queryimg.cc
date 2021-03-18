@@ -1,5 +1,5 @@
 #include "netscene_queryimg.h"
-#include "constantsprotocol.h"
+#include "../constantsprotocol.h"
 #include "log.h"
 #include "signalhandler.h"
 #include "strutil.h"
