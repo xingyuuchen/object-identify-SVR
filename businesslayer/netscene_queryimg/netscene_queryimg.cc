@@ -1,5 +1,5 @@
 #include "netscene_queryimg.h"
-#include "../constantsprotocol.h"
+#include "../netscenetypes.h"
 #include "log.h"
 #include "signalhandler.h"
 #include "strutil.h"
@@ -74,7 +74,7 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
     size_t size = resp.ByteSizeLong();
     std::string byte_string;
     resp.SerializeToString(&byte_string);
-    CopyRespToSendBody(byte_string, size);
+    Write2BaseResp(byte_string, size);
     return 0;
 }
 

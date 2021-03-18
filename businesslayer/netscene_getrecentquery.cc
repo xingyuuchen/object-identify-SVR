@@ -1,5 +1,5 @@
 #include "netscene_getrecentquery.h"
-#include "constantsprotocol.h"
+#include "netscenetypes.h"
 
 
 NetSceneGetRecentQuery::NetSceneGetRecentQuery() : NetSceneBase() {

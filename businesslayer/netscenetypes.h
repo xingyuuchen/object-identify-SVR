@@ -1,5 +1,5 @@
-#ifndef OI_SVR_CONSTANTSPROTOCOL_H
-#define OI_SVR_CONSTANTSPROTOCOL_H
+#ifndef OI_SVR_NETSCENETYPES_H
+#define OI_SVR_NETSCENETYPES_H
 
 /**
  * All NetScene types are declared here.
@@ -13,4 +13,4 @@ const int kNetSceneTypeGetHotSearch         = 5;
 const int kNetSceneTypeGetRecentQuery       = 6;
 
 
-#endif //OI_SVR_CONSTANTSPROTOCOL_H
+#endif //OI_SVR_NETSCENETYPES_H

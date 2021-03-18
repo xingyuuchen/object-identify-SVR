@@ -1,6 +1,6 @@
 #include "netscene_gettrainprogress.h"
 #include "log.h"
-#include "constantsprotocol.h"
+#include "netscenetypes.h"
 #include "netscenegettrainprogress.pb.h"
 #include <fstream>
 
@@ -56,7 +56,7 @@ int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
     std::string byte_string;
     resp.SerializeToString(&byte_string);
     
-    CopyRespToSendBody(byte_string, size);
+    Write2BaseResp(byte_string, size);
     return 0;
     
 }

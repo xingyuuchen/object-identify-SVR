@@ -1,5 +1,5 @@
 #include "netscene_uploadavatar.h"
-#include "constantsprotocol.h"
+#include "netscenetypes.h"
 #include "log.h"
 
 NetSceneUploadAvatar::NetSceneUploadAvatar() : NetSceneBase() {

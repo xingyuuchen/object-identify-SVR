@@ -1,5 +1,5 @@
 #include "netscene_gethotsearch.h"
-#include "constantsprotocol.h"
+#include "netscenetypes.h"
 
 
 NetSceneGetHotSearch::NetSceneGetHotSearch() : NetSceneBase() {
