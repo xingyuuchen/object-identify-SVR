@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package NetSceneChangeNicknameProto;
+
+
+message NetSceneChangeNicknameReq {
+  optional uint32 usr_id = 1;
+  optional string nickname = 2;
+
+}
+
+message NetSceneChangeNicknameResp {
+  optional bool nop = 1;  // no req body, this is for padding.
+
+}
+

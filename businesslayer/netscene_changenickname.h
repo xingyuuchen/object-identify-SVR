@@ -1,12 +1,12 @@
-#ifndef OI_SVR_NETSCENE_REGISTER_H
-#define OI_SVR_NETSCENE_REGISTER_H
+#pragma once
 #include "netscenebase.h"
 #include "db/userinfo.h"
 
 
-class NetSceneRegister : public NetSceneBase {
+class NetSceneChangeNickname : public NetSceneBase {
   public:
-    NetSceneRegister();
+    
+    NetSceneChangeNickname();
     
     int GetType() override;
     
@@ -18,5 +18,3 @@ class NetSceneRegister : public NetSceneBase {
   
 };
 
-
-#endif //OI_SVR_NETSCENE_REGISTER_H

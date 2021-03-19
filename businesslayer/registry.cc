@@ -7,6 +7,7 @@
 #include "netscene_gethotsearch.h"
 #include "netscene_register.h"
 #include "netscene_uploadavatar.h"
+#include "netscene_changenickname.h"
 
 
 namespace Registry {
@@ -18,6 +19,7 @@ void RegisterNetScenes() {
     NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneUploadAvatar());
     NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneGetHotSearch());
     NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneGetRecentQuery());
+    NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneChangeNickname());
     
 }
 
