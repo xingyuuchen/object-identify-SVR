@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package NetSceneUploadAvatarProto;
+
+
+message NetSceneUploadAvatarReq {
+  optional uint32 usr_id = 1;
+  optional bytes avatar_img_bytes = 2;
+
+}
+
+message NetSceneUploadAvatarResp {
+  optional bool nop = 1;    // padding
+
+}

@@ -38,6 +38,8 @@ int NetSceneChangeNickname::DoSceneImpl(const std::string &_in_buffer) {
         base_resp_.set_errcode(kErrDatabase);
         base_resp_.set_errmsg("db err.");
     }
+    LogI(__FILE__, "[DoSceneImpl] update succeed, usrid: %d, nickname: %s",
+         usr_id, nickname.c_str())
     NetSceneChangeNicknameProto::NetSceneChangeNicknameResp resp;
     resp.set_nop(true);
     

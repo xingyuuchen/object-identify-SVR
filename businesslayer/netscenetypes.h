@@ -4,7 +4,7 @@
 /**
  * All NetScene types are declared here.
  */
-extern int kNetSceneTypeHelloSvr;       /* Reserved type. */
+extern int kNetSceneTypeHelloSvr;       /* Framework Reserved type. */
 const int kNetSceneTypeQueryImg             = 1;
 const int kNetSceneTypeGetTrainProgress     = 2;
 const int kNetSceneTypeRegister             = 3;
