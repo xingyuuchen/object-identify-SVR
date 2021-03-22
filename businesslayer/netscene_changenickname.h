@@ -1,6 +1,6 @@
 #pragma once
 #include "netscenebase.h"
-#include "db/userinfo.h"
+#include "dbitem/dbitem_userinfo.h"
 
 
 class NetSceneChangeNickname : public NetSceneBase {

@@ -4,10 +4,10 @@
 #include "signalhandler.h"
 #include "strutil.h"
 #include <string>
-#include <atomic>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <sys/types.h>
+#include "dbitem_recognition.h"
+#include "connection.h"
 
 /**
  * 业务代码，查询图片类别。
@@ -16,13 +16,13 @@
 const char *const NetSceneQueryImg::fifo_name_ = "/tmp/fifo_queryimg";
 
 NetSceneQueryImg::NetSceneQueryImg() : NetSceneBase() {
-    static std::atomic_flag has_init = ATOMIC_FLAG_INIT;
-    if (!has_init.test_and_set()) {
+    NETSCENE_INIT_START
         if (__MakeFIFO() == 0) {
             SignalHandler::Instance().RegisterExitCallback(
                     new IProcessExitListener([] { __DelFIFO(); }));
         }
-    }
+    NETSCENE_INIT_END
+    
     item_type_ = NetSceneQueryImgProto::NetSceneQueryImgResp::PLANT;
     item_name_ = "查询有误";
     item_desc_ = "请稍后再试。";
@@ -64,6 +64,17 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
         item_type_ = (NetSceneQueryImgProto::NetSceneQueryImgResp_ItemType) type;
         item_name_ = item_info[1];
         item_desc_ = item_info[2];
+        
+        DBItem_Recognition new_row;
+        new_row.SetItemName(std::string(item_name_));
+        new_row.SetItemType(type);
+        new_row.SetItemDesc(std::string(item_desc_));
+        int db_ret = Dao::Insert(new_row);
+        
+        if (db_ret < 0) {
+            LogE(__FILE__, "[DoSceneImpl] db insert failed: %s", item_name_.c_str())
+        }
+        
     } while (false);
     
     NetSceneQueryImgProto::NetSceneQueryImgResp resp;

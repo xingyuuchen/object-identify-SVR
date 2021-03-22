@@ -13,6 +13,8 @@ include_directories(framework/dao)
 include_directories(framework/netscene)
 include_directories(framework/utils)
 
+include_directories(businesslayer/dbitem)
+
 file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} *.cc)
 list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 
@@ -22,7 +24,7 @@ list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} businesslayer/*.cc)
 list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 
-file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} businesslayer/db/*.cc)
+file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} businesslayer/dbitem/*.cc)
 list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 
 file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} businesslayer/netscene_queryimg/*.cc)

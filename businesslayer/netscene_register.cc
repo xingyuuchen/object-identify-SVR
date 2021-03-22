@@ -19,7 +19,7 @@ int NetSceneRegister::DoSceneImpl(const std::string &_in_buffer) {
     static std::mutex mutex_;
     int32_t id = -1;
     
-    UserInfo new_usr;
+    DBItem_UserInfo new_usr;
     new_usr.SetNickname("NULL");
     new_usr.SetAvatarPath("NULL");
     int ret = Dao::Insert(new_usr);

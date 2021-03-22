@@ -4,9 +4,8 @@
 #include "netsceneuploadavatar.pb.h"
 #include "constantsprotocol.h"
 #include "fileutil.h"
-#include "db/userinfo.h"
+#include "dbitem/dbitem_userinfo.h"
 #include "connection.h"
-#include <atomic>
 
 
 int NetSceneUploadAvatar::last_file_seq_when_boot_ = 0;
@@ -15,12 +14,14 @@ const char *const NetSceneUploadAvatar::avatar_saved_file_name_ = "/root/cxy/ava
 
 const char *const NetSceneUploadAvatar::cmd_find_last_seq_ = "ls -t /root/cxy/avatars | head -1";
 
+std::mutex NetSceneUploadAvatar::mutex_;
+
 NetSceneUploadAvatar::NetSceneUploadAvatar()
         : NetSceneBase() {
-    static std::atomic_flag has_init = ATOMIC_FLAG_INIT;
-    if (!has_init.test_and_set()) {
+    
+    NETSCENE_INIT_START
         __LoadFileSeqNum();
-    }
+    NETSCENE_INIT_END
 }
 
 int NetSceneUploadAvatar::GetType() { return kNetSceneTypeUploadAvatar; }
@@ -50,7 +51,7 @@ int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
         int seq = __MakeFileSeq();
         char file_path[32] = {0, };
         {
-//            std::unique_lock<std::mutex> lock(mutex_);
+            std::unique_lock<std::mutex> lock(mutex_);
             snprintf(file_path, sizeof(file_path), avatar_saved_file_name_, seq);
         }
     
@@ -64,9 +65,9 @@ int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
         }
         LogI(__FILE__, "[DoSceneImpl] write file succeed")
     
-        UserInfo old;
+        DBItem_UserInfo old;
         old.SetUsrId(usr_id);
-        UserInfo neo;
+        DBItem_UserInfo neo;
         neo.SetAvatarPath(std::string(file_path));
         Dao::Update(old, neo);
         int db_ret = Dao::Update(old, neo);
@@ -88,7 +89,7 @@ int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
 
 int NetSceneUploadAvatar::__MakeFileSeq() {
     // do synchronization
-//    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock<std::mutex> lock(mutex_);
     return ++last_file_seq_when_boot_;
 }
 

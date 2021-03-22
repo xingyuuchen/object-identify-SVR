@@ -2,10 +2,10 @@
 #include "dbitem.h"
 
 
-class UserInfo : public DBItem {
+class DBItem_UserInfo : public DBItem {
   public:
     
-    UserInfo();
+    DBItem_UserInfo();
     
     const char *table() const final;
     
@@ -21,17 +21,17 @@ class UserInfo : public DBItem {
     
     void SetAvatarPath(std::string _avatar_path);
     
-    void PopulateFieldList(std::vector<std::string> &_filed_list) const override;
+    void PopulateFieldList(std::vector<std::string> &_field_list) const override;
     
     void PopulateValueList(std::vector<std::string> &_value_list) const override;
     
     void PopulateEqualList(std::map<std::string, std::string> &_equal_list) const override;
 
-  protected:
-    static const char * table_;
-    static const char * field_name_usrid_;
-    static const char * field_name_nickname_;
-    static const char * field_name_avatarpath_;
+  public:
+    static const char * const table_;
+    static const char * const field_name_usrid_;
+    static const char * const field_name_nickname_;
+    static const char * const field_name_avatarpath_;
     
   private:
     uint32_t            usr_id_;

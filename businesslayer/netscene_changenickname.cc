@@ -26,9 +26,9 @@ int NetSceneChangeNickname::DoSceneImpl(const std::string &_in_buffer) {
     uint32_t usr_id = req.usr_id();
     std::string nickname = req.nickname();
     
-    UserInfo old;
+    DBItem_UserInfo old;
     old.SetUsrId(usr_id);
-    UserInfo neo;
+    DBItem_UserInfo neo;
     neo.SetNickname(nickname);
     
     int db_ret = Dao::Update(old, neo);
