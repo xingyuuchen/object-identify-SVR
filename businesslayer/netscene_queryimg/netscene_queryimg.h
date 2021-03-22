@@ -18,6 +18,8 @@ class NetSceneQueryImg : public NetSceneBase {
     
     int GetType() override;
     
+    RespMessage *GetRespMessage() override;
+    
     NetSceneBase *NewInstance() override;
     
     int DoSceneImpl(const std::string &_in_buffer) override;
@@ -34,6 +36,7 @@ class NetSceneQueryImg : public NetSceneBase {
     static const char *const fifo_name_;
     std::string item_name_;
     std::string item_desc_;
+    NetSceneQueryImgProto::NetSceneQueryImgResp resp_;
     NetSceneQueryImgProto::NetSceneQueryImgResp_ItemType item_type_;
     
 };

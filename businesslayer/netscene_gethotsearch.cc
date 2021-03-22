@@ -9,8 +9,8 @@
 
 
 
-/* recompute hot-search every 2min */
-const int NetSceneGetHotSearch::hot_search_refresh_period_ = 2 * 60 * 1000;
+/* recompute hot-search every minute */
+const int NetSceneGetHotSearch::hot_search_refresh_period_ = 1 * 60 * 1000;
 //const int NetSceneGetHotSearch::hot_search_refresh_period_ = 10 * 1000;
 
 const int NetSceneGetHotSearch::hot_search_max_cnt_ = 9;
@@ -44,15 +44,8 @@ int NetSceneGetHotSearch::DoSceneImpl(const std::string &_in_buffer) {
     uint32_t usr_id = req.usr_id();
     LogI(__FILE__, "[DoSceneImpl] usr_id: %d", usr_id)
     
+    __PopulateHotSearchResp();
     
-    NetSceneGetHotSearchProto::NetSceneGetHotSearchResp resp;
-    
-    __PopulateHotSearchResp(resp);
-    
-    size_t size = resp.ByteSizeLong();
-    std::string byte_string;
-    resp.SerializeToString(&byte_string);
-    Write2BaseResp(byte_string, size);
     return 0;
 }
 
@@ -137,8 +130,7 @@ void NetSceneGetHotSearch::__ComputeHotSearch() {
     LogI(__FILE__, "[__ComputeHotSearch] done, cost time: %llu ms", cost)
 }
 
-void NetSceneGetHotSearch::__PopulateHotSearchResp(
-        NetSceneGetHotSearchProto::NetSceneGetHotSearchResp &_resp) {
+void NetSceneGetHotSearch::__PopulateHotSearchResp() {
     HotSearchItem *hot_search_item;
     
     std::unique_lock<std::mutex> lock(hot_search_mutex_);
@@ -147,7 +139,7 @@ void NetSceneGetHotSearch::__PopulateHotSearchResp(
         return;
     }
     for (auto &it : hot_searches_) {
-        hot_search_item = _resp.add_hot_search_items();
+        hot_search_item = resp_.add_hot_search_items();
         hot_search_item->CopyFrom(it);
     }
     LogI(__FILE__, "[__PopulateHotSearch] copied %ld items", hot_searches_.size())
@@ -177,9 +169,10 @@ int NetSceneGetHotSearch::GetType() { return kNetSceneTypeGetHotSearch; }
 
 NetSceneBase *NetSceneGetHotSearch::NewInstance() { return new NetSceneGetHotSearch(); }
 
+NetSceneBase::RespMessage *NetSceneGetHotSearch::GetRespMessage() { return &resp_; }
 
 bool NetSceneGetHotSearch::HotSearchItemComparator::operator()(
         const NetSceneGetHotSearch::HotSearchItem &_lhs,
         const NetSceneGetHotSearch::HotSearchItem &_rhs) {
-    return _lhs.heat() > _rhs.heat();
+    return _lhs.heat() < _rhs.heat();
 }

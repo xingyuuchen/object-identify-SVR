@@ -1,13 +1,13 @@
 #include "netscene_gettrainprogress.h"
 #include "log.h"
 #include "netscenetypes.h"
-#include "netscenegettrainprogress.pb.h"
+#include "constantsprotocol.h"
 #include <fstream>
+
 
 /**
  * 业务代码，获取目前训练进度。
  */
-
 
 NetSceneGetTrainProgress::NetSceneGetTrainProgress()
     : NetSceneBase()
@@ -21,6 +21,8 @@ int NetSceneGetTrainProgress::GetType() { return kNetSceneTypeGetTrainProgress; 
 
 NetSceneBase *NetSceneGetTrainProgress::NewInstance() { return new NetSceneGetTrainProgress(); }
 
+NetSceneBase::RespMessage *NetSceneGetTrainProgress::GetRespMessage() { return &resp_; }
+
 int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
     LogI(__FILE__, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
     if (socket_ <= 0) {
@@ -28,7 +30,6 @@ int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
         return -1;
     }
     
-    NetSceneGetTrainProgressProto::NetSceneGetTrainProgressResp resp;
     std::ifstream infile("/root/cxy/trainprogress.txt");
     if (infile) {
         infile >> total_epoch_;
@@ -36,27 +37,22 @@ int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
         float hit_rate;
         while (infile >> hit_rate) {
             curr_epoch_++;
-            resp.add_hit_rates(hit_rate);
+            resp_.add_hit_rates(hit_rate);
         }
         is_running_ = true;
         infile.close();
     } else {
-        status_desc_ = "/root/cxy/trainprogress.txt-FileNotOpen";
-        status_code_ = 404;
+        errcode_ = kErrFileBroken;
+        errmsg_ = "/root/cxy/trainprogress.txt-FileNotOpen";
         LogE(__FILE__, "[DoSceneImpl] infile.is_open() = false")
     }
     LogI(__FILE__, "[DoSceneImpl] isRunning:%d, currEpoch:%d, totalEpoch:%d",
          is_running_, curr_epoch_, total_epoch_)
     
-    resp.set_is_running(is_running_);
-    resp.set_curr_epoch(curr_epoch_);
-    resp.set_total_epoch(total_epoch_);
+    resp_.set_is_running(is_running_);
+    resp_.set_curr_epoch(curr_epoch_);
+    resp_.set_total_epoch(total_epoch_);
     
-    size_t size = resp.ByteSizeLong();
-    std::string byte_string;
-    resp.SerializeToString(&byte_string);
-    
-    Write2BaseResp(byte_string, size);
     return 0;
     
 }

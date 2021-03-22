@@ -2,6 +2,7 @@
 #define OI_SVR_NETSCENE_REGISTER_H
 #include "netscenebase.h"
 #include "dbitem/dbitem_userinfo.h"
+#include "netsceneregister.pb.h"
 
 
 class NetSceneRegister : public NetSceneBase {
@@ -14,8 +15,11 @@ class NetSceneRegister : public NetSceneBase {
     
     int DoSceneImpl(const std::string &_in_buffer) override;
 
+    RespMessage *GetRespMessage() override;
+
   private:
-  
+    NetSceneRegisterProto::NetSceneRegisterResp resp_;
+    
 };
 
 

@@ -32,6 +32,8 @@ int NetSceneQueryImg::GetType() { return kNetSceneTypeQueryImg; }
 
 NetSceneBase *NetSceneQueryImg::NewInstance() { return new NetSceneQueryImg(); }
 
+NetSceneBase::RespMessage *NetSceneQueryImg::GetRespMessage() { return &resp_; }
+
 int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
     LogI(__FILE__, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
     if (socket_ <= 0) {
@@ -68,7 +70,8 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
         DBItem_Recognition new_row;
         new_row.SetItemName(std::string(item_name_));
         new_row.SetItemType(type);
-        new_row.SetItemDesc(std::string(item_desc_));
+        new_row.SetItemDesc(std::string(item_desc_.substr(0,
+                                              item_desc_.size() - 1)));
         int db_ret = Dao::Insert(new_row);
         
         if (db_ret < 0) {
@@ -77,15 +80,10 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
         
     } while (false);
     
-    NetSceneQueryImgProto::NetSceneQueryImgResp resp;
-    resp.set_item_name(item_name_);
-    resp.set_item_type(item_type_);
-    resp.set_item_desc(item_desc_);
+    resp_.set_item_name(item_name_);
+    resp_.set_item_type(item_type_);
+    resp_.set_item_desc(item_desc_);
     
-    size_t size = resp.ByteSizeLong();
-    std::string byte_string;
-    resp.SerializeToString(&byte_string);
-    Write2BaseResp(byte_string, size);
     return 0;
 }
 

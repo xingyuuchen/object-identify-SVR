@@ -1,7 +1,6 @@
 #include "netscene_uploadavatar.h"
 #include "netscenetypes.h"
 #include "log.h"
-#include "netsceneuploadavatar.pb.h"
 #include "constantsprotocol.h"
 #include "fileutil.h"
 #include "dbitem/dbitem_userinfo.h"
@@ -28,6 +27,8 @@ int NetSceneUploadAvatar::GetType() { return kNetSceneTypeUploadAvatar; }
 
 NetSceneBase *NetSceneUploadAvatar::NewInstance() { return new NetSceneUploadAvatar(); }
 
+NetSceneBase::RespMessage *NetSceneUploadAvatar::GetRespMessage() { return &resp_; }
+
 int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
     LogI(__FILE__, "[DoSceneImpl] req.size: %zd", _in_buffer.size());
     if (socket_ <= 0) {
@@ -44,8 +45,8 @@ int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
         if (usr_id <= 0 || avatar_img_bytes.empty()) {
             LogI(__FILE__, "[DoSceneImpl] usr_id: %d, avatar_bytes empty: %d",
                  usr_id, avatar_img_bytes.empty())
-            base_resp_.set_errmsg("usr_id or avatar is illegal.");
-            base_resp_.set_errcode(kErrIllegalReq);
+            errcode_ = kErrIllegalReq;
+            errmsg_ = "usr_id or avatar is illegal.";
             break;
         }
         int seq = __MakeFileSeq();
@@ -59,8 +60,8 @@ int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
         
         if (size < avatar_bytes_len) {
             LogE(__FILE__, "[DoSceneImpl] write: %ld, total: %ld", size, avatar_bytes_len)
-            base_resp_.set_errmsg("fwrite your avatar failed.");
-            base_resp_.set_errcode(kErrFileBroken);
+            errmsg_ = "fwrite your avatar failed.";
+            errcode_ = kErrFileBroken;
             break;
         }
         LogI(__FILE__, "[DoSceneImpl] write file succeed")
@@ -74,15 +75,14 @@ int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
         if (db_ret < 0) {
             LogI(__FILE__, "[DoSceneImpl] db err, usrid: %d, file_path: %s",
                  usr_id, file_path)
-            base_resp_.set_errcode(kErrDatabase);
-            base_resp_.set_errmsg("db err.");
+            errcode_ = kErrDatabase;
+            errmsg_ = "db err.";
         }
         LogI(__FILE__, "[DoSceneImpl] update db succeed")
         
     } while (false);
     
-    NetSceneUploadAvatarProto::NetSceneUploadAvatarResp resp;
-    resp.set_nop(true);
+    resp_.set_nop(true);
     
     return 0;
 }

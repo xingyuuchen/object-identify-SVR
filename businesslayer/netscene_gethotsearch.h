@@ -15,6 +15,8 @@ class NetSceneGetHotSearch : public NetSceneBase {
     
     NetSceneBase *NewInstance() override;
     
+    RespMessage *GetRespMessage() override;
+    
     int DoSceneImpl(const std::string &_in_buffer) override;
 
   private:
@@ -24,8 +26,7 @@ class NetSceneGetHotSearch : public NetSceneBase {
     
     static void __ComputeHotSearch();
     
-    static void __PopulateHotSearchResp(NetSceneGetHotSearchProto::
-                            NetSceneGetHotSearchResp &_resp);
+    void __PopulateHotSearchResp();
     
     static int __GetFrequency(std::string &_item_name);
     
@@ -42,6 +43,7 @@ class NetSceneGetHotSearch : public NetSceneBase {
     
     
   private:
+    NetSceneGetHotSearchProto::NetSceneGetHotSearchResp resp_;
     static const int                        hot_search_refresh_period_;
     static const int                        hot_search_max_cnt_;
     static std::map<std::string, int>       item_frequency_map_;

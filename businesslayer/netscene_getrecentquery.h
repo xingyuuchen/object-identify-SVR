@@ -15,6 +15,8 @@ class NetSceneGetRecentQuery : public NetSceneBase {
     NetSceneBase *NewInstance() override;
     
     int DoSceneImpl(const std::string &_in_buffer) override;
+    
+    RespMessage *GetRespMessage() override;
 
   private:
   

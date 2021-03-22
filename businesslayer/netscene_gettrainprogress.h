@@ -3,6 +3,8 @@
 
 #include "netscenebase.h"
 #include "autobuffer.h"
+#include "netscenegettrainprogress.pb.h"
+
 
 /**
  * 业务代码，获取目前训练进度。
@@ -20,8 +22,10 @@ class NetSceneGetTrainProgress : public NetSceneBase {
     
     int DoSceneImpl(const std::string &_in_buffer) override;
     
+    RespMessage *GetRespMessage() override;
     
   private:
+    NetSceneGetTrainProgressProto::NetSceneGetTrainProgressResp resp_;
     bool        is_running_;
     int32_t     curr_epoch_;
     int32_t     total_epoch_;
