@@ -2,6 +2,11 @@
 import requests
 import base64
 import sys
+import urllib.request
+from lxml import etree
+
+
+ITEM_DESC_MAX_LEN = 200
 
 
 def get_access_token():
@@ -56,7 +61,33 @@ def do_query_img():
                 highest = float(item['score'])
                 target_name = item['name']
                 target_clz = classes.index(clz)
-    print("{}${}${}".format(target_clz, target_name, "物体详细资料coming soon..."))
+    desc = 'ops'
+    if target_name is not None:
+        desc = get_desc(target_name)
+        if desc is None or len(desc) == 0:
+            desc = '暂时无法查询到' + target_name + '的详细资料'
+    print("{}${}${}".format(target_clz, target_name, desc))
+
+
+def get_desc(item):
+    url = 'https://baike.baidu.com/item/' + urllib.parse.quote(item)
+    req = urllib.request.Request(url=url, method='GET')
+    response = urllib.request.urlopen(req)
+    text = response.read().decode('utf-8')
+    html = etree.HTML(text)
+    sen_list = html.xpath('//div[contains(@class,"lemma-summary") or contains(@class,"lemmaWgt-lemmaSummary")]//text()')
+    sen_list = [item.strip('\n') for item in sen_list]
+    sen_list = ''.join(sen_list)
+
+    if len(sen_list) > ITEM_DESC_MAX_LEN:
+        last = sen_list.rfind('。', 0, ITEM_DESC_MAX_LEN)
+        if last < 0:
+            last = ITEM_DESC_MAX_LEN
+    else:
+        last = sen_list.rfind('。', 0, len(sen_list))
+        if last < 0:
+            last = len(sen_list) - 1
+    return sen_list[0: last + 1]
 
 
 if __name__ == '__main__':
@@ -64,3 +95,4 @@ if __name__ == '__main__':
     data_len = sys.argv[2]
 
     do_query_img()
+    # print(get_desc('海棠'))

@@ -44,7 +44,7 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
     req.ParseFromArray(_in_buffer.data(), _in_buffer.size());
     
     do {
-        char py_ret[200] = {0, };
+        char py_ret[1024] = {0, };
         if (__ForkPythonScript((char *)req.img_bytes().c_str(),
                                req.img_bytes().size(), py_ret, sizeof(py_ret)) < 0) {
             LogE(__FILE__, "[DoSceneImpl] __ForkPythonScript() failed.")
@@ -57,7 +57,7 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
             break;
         }
         if (strcmp(item_info[1].c_str(), "None") == 0) {
-            item_name_ = "未识别到物体";
+            item_name_ = "未识别到植物/动物/地标";
             item_desc_ = "";
             break;
         }
@@ -111,7 +111,7 @@ int NetSceneQueryImg::__ForkPythonScript(char *_data_write, size_t _size_write,
     close(fd);
     fgets(_ret, _size_ret, fp);
     pclose(fp);
-    LogI(__FILE__, "[__ForkPythonScript] _out: %s, len: %ld\n", _ret, strlen(_ret));
+    LogI(__FILE__, "[__ForkPythonScript] _out: '%s', len: %ld\n", _ret, strlen(_ret));
     return 0;
 }
 
