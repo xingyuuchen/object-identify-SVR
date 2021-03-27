@@ -1,5 +1,6 @@
 #include "log.h"
-#include "httpserver.h"
+#include "server.h"
+#include "netscenedispatcher.h"
 #include "businesslayer/registry.h"
 #ifdef DAEMON
 #include "daemon.h"
@@ -20,7 +21,9 @@ int main(int ac, char **argv) {
     
     Registry::RegisterNetScenes();
     
-    HttpServer::Instance().Run();
+    Server::Instance().SetWorker<NetSceneDispatcher::NetSceneWorker>();
+
+    Server::Instance().Serve();
     
     return 0;
 }
