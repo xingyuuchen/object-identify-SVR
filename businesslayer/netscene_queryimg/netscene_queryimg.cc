@@ -18,8 +18,8 @@ const char *const NetSceneQueryImg::fifo_name_ = "/tmp/fifo_queryimg";
 NetSceneQueryImg::NetSceneQueryImg() : NetSceneBase() {
     NETSCENE_INIT_START
         if (__MakeFIFO() == 0) {
-            SignalHandler::Instance().RegisterExitCallback(
-                    new IProcessExitListener([] { __DelFIFO(); }));
+            SignalHandler::Instance().RegisterCallback(SIGINT,
+                    [] { __DelFIFO(); });
         }
     NETSCENE_INIT_END
     
@@ -36,10 +36,7 @@ NetSceneBase::RespMessage *NetSceneQueryImg::GetRespMessage() { return &resp_; }
 
 int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
     LogI(__FILE__, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
-    if (socket_ <= 0) {
-        LogE(__FILE__, "[NetSceneQueryImg] Socket NOT open");
-        return -1;
-    }
+    
     NetSceneQueryImgProto::NetSceneQueryImgReq req;
     req.ParseFromArray(_in_buffer.data(), _in_buffer.size());
     

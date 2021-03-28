@@ -25,10 +25,6 @@ NetSceneBase::RespMessage *NetSceneGetTrainProgress::GetRespMessage() { return &
 
 int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
     LogI(__FILE__, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
-    if (socket_ <= 0) {
-        LogE(__FILE__, "[DoSceneImpl] Socket NOT open");
-        return -1;
-    }
     
     std::ifstream infile("/root/cxy/trainprogress.txt");
     if (infile) {

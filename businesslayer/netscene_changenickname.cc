@@ -18,10 +18,7 @@ NetSceneBase::RespMessage *NetSceneChangeNickname::GetRespMessage() { return &re
 
 int NetSceneChangeNickname::DoSceneImpl(const std::string &_in_buffer) {
     LogI(__FILE__, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
-    if (socket_ <= 0) {
-        LogE(__FILE__, "[NetSceneQueryImg] Socket NOT open");
-        return -1;
-    }
+    
     NetSceneChangeNicknameProto::NetSceneChangeNicknameReq req;
     req.ParseFromArray(_in_buffer.data(), _in_buffer.size());
     uint32_t usr_id = req.usr_id();

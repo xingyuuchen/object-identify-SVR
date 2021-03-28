@@ -35,10 +35,7 @@ NetSceneGetHotSearch::NetSceneGetHotSearch()
 
 int NetSceneGetHotSearch::DoSceneImpl(const std::string &_in_buffer) {
     LogI(__FILE__, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
-    if (socket_ <= 0) {
-        LogE(__FILE__, "[DoSceneImpl] Socket NOT open");
-        return -1;
-    }
+    
     NetSceneGetHotSearchProto::NetSceneGetHotSearchReq req;
     req.ParseFromArray(_in_buffer.data(), _in_buffer.size());
     uint32_t usr_id = req.usr_id();
