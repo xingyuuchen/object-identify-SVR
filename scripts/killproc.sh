@@ -1,10 +1,16 @@
 #!/bin/sh
 
+signal="-2"
+
+if [ $# == 1 ]; then
+  signal="$1"
+fi
+
 function kill_procs() {
   while [ $# != 0 ]
   do
-    echo kill $1
-    kill -2 $1
+    echo kill ${signal} $1
+    kill ${signal} $1
     shift
   done
 }
