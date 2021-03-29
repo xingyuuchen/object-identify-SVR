@@ -6,6 +6,7 @@
 #include "connection.h"
 #include "dbitem_recognition.h"
 #include <queue>
+#include <stdlib.h>
 
 
 
@@ -81,7 +82,8 @@ void NetSceneGetHotSearch::__ComputeHotSearch() {
     
     for (auto &it : item_frequency_map_) {
         HotSearchItem item;
-        item.set_heat(it.second * 18);
+        int heat_factor = rand() % 30 + 20;
+        item.set_heat(it.second * heat_factor);
     
         query_res.clear();
         snprintf(sql, sizeof(sql), "select %s, %s from %s where %s='%s' limit 1",
