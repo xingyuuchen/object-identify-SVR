@@ -1,4 +1,5 @@
 #include "netscene_gethotsearch.h"
+#include "netscene_queryimg/netscene_queryimg.h"
 #include "netscenetypes.h"
 #include "log.h"
 #include "timeutil.h"
@@ -49,6 +50,9 @@ int NetSceneGetHotSearch::DoSceneImpl(const std::string &_in_buffer) {
 
 void NetSceneGetHotSearch::__ComputeHotSearch() {
     uint64_t start = ::gettickcount();
+    if (start - NetSceneQueryImg::GetLastQueryTs() > 2 * hot_search_refresh_period_) {
+        return;
+    }
     
     item_frequency_map_.clear();
     hot_searches_.clear();

@@ -15,8 +15,15 @@
 
 const char *const NetSceneQueryImg::fifo_name_ = "/tmp/fifo_queryimg";
 
+uint64_t NetSceneQueryImg::last_query_ts_ = 0;
+std::mutex NetSceneQueryImg::last_query_ts_mtx_;
+
 NetSceneQueryImg::NetSceneQueryImg() : NetSceneBase() {
     NETSCENE_INIT_START
+        {
+            std::lock_guard<std::mutex> lock(last_query_ts_mtx_);
+            last_query_ts_ = ::gettickcount();
+        }
         if (__MakeFIFO() == 0) {
             SignalHandler::Instance().RegisterCallback(SIGINT,
                     [] { __DelFIFO(); });
@@ -73,7 +80,11 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
         
         if (db_ret < 0) {
             LogE(__FILE__, "[DoSceneImpl] db insert failed: %s", item_name_.c_str())
+            break;
         }
+        
+        std::lock_guard<std::mutex> lock(last_query_ts_mtx_);
+        last_query_ts_ = ::gettickcount();
         
     } while (false);
     
@@ -127,6 +138,11 @@ void NetSceneQueryImg::__DelFIFO() {
         return;
     }
     LogI(__FILE__, "[__DelFIFO] success")
+}
+
+uint64_t NetSceneQueryImg::GetLastQueryTs() {
+    std::lock_guard<std::mutex> lock(last_query_ts_mtx_);
+    return last_query_ts_;
 }
 
 NetSceneQueryImg::~NetSceneQueryImg() {
