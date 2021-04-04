@@ -31,7 +31,7 @@ int NetSceneRegister::DoSceneImpl(const std::string &_in_buffer) {
         errmsg_ = "insert database failed";
     }
     
-    LogI(__FILE__, "[DoSceneImpl] alloc id: %d", id)
+    LogI("alloc id: %d", id)
     
     resp_.set_usr_id(id);
     

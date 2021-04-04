@@ -36,12 +36,12 @@ NetSceneGetHotSearch::NetSceneGetHotSearch()
 }
 
 int NetSceneGetHotSearch::DoSceneImpl(const std::string &_in_buffer) {
-    LogI(__FILE__, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
+    LogI("req.len: %zd", _in_buffer.size());
     
     NetSceneGetHotSearchProto::NetSceneGetHotSearchReq req;
     req.ParseFromArray(_in_buffer.data(), _in_buffer.size());
     uint32_t usr_id = req.usr_id();
-    LogI(__FILE__, "[DoSceneImpl] usr_id: %d", usr_id)
+    LogI("usr_id: %d", usr_id)
     
     __PopulateHotSearchResp();
     
@@ -64,17 +64,17 @@ void NetSceneGetHotSearch::__ComputeHotSearch() {
              DBItem_Recognition::table_);
     int db_ret = Dao::Query(sql, query_res, 1);
     if (db_ret < 0) {
-        LogE(__FILE__, "db query failed.")
+        LogE("db query failed.")
         return;
     }
     
-    LogI(__FILE__, "[__ComputeHotSearch] db query succeed, cnt: %lu", query_res.size())
+    LogI("db query succeed, cnt: %lu", query_res.size())
     
     for (const auto& item_name : query_res) {
         ++item_frequency_map_[item_name];
     }
     
-    LogI(__FILE__, "[__ComputeHotSearch] frequency computed, %lu different search",
+    LogI("frequency computed, %lu different search",
             item_frequency_map_.size())
     
     using ItemType = NetSceneGetHotSearchProto::
@@ -98,17 +98,17 @@ void NetSceneGetHotSearch::__ComputeHotSearch() {
                  it.first.c_str());
         db_ret = Dao::Query(sql, query_res, 2);
         if (db_ret < 0) {
-            LogE(__FILE__, "[__ComputeHotSearch] query desc failed")
+            LogE("query desc failed")
             return;
         }
         if (query_res.size() != 2) {
-            LogE(__FILE__, "[__ComputeHotSearch] wtf??, %lu", query_res.size())
+            LogE("wtf??, %lu", query_res.size())
             continue;
         }
         
         int type = query_res[0].c_str()[0] - 0x30;
         if (type < 0 || type > 2) {
-            LogE(__FILE__, "[__ComputeHotSearch] type err: name: %s, type: %d",
+            LogE("type err: name: %s, type: %d",
                  it.first.c_str(), type)
             type = 0;
         }
@@ -132,7 +132,7 @@ void NetSceneGetHotSearch::__ComputeHotSearch() {
     }
     
     uint64_t cost = ::gettickcount() - start;
-    LogI(__FILE__, "[__ComputeHotSearch] done, cost time: %llu ms", cost)
+    LogI("done, cost time: %llu ms", cost)
 }
 
 void NetSceneGetHotSearch::__PopulateHotSearchResp() {
@@ -140,14 +140,14 @@ void NetSceneGetHotSearch::__PopulateHotSearchResp() {
     
     std::unique_lock<std::mutex> lock(hot_search_mutex_);
     if (hot_searches_.empty()) {
-        LogI(__FILE__, "[__PopulateHotSearch] hot_search is empty.")
+        LogI("hot_search is empty.")
         return;
     }
     for (auto &it : hot_searches_) {
         hot_search_item = resp_.add_hot_search_items();
         hot_search_item->CopyFrom(it);
     }
-    LogI(__FILE__, "[__PopulateHotSearch] copied %ld items", hot_searches_.size())
+    LogI("copied %ld items", hot_searches_.size())
 }
 
 int NetSceneGetHotSearch::__GetFrequency(std::string &_item_name) {
@@ -162,10 +162,10 @@ int NetSceneGetHotSearch::__GetFrequency(std::string &_item_name) {
  * debug only
  */
 void NetSceneGetHotSearch::__ShowFrequencyMap() {
-    LogI(__FILE__, "[__ShowFrequencyMap] map size: %lu",
+    LogI("map size: %lu",
          item_frequency_map_.size())
     for (auto &it : item_frequency_map_) {
-        LogI(__FILE__, "[__ShowFrequencyMap] %s : %d",
+        LogI("%s : %d",
              it.first.c_str(), it.second)
     }
 }

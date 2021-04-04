@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include "dbitem_recognition.h"
 #include "connection.h"
+#include "timeutil.h"
 
 /**
  * 业务代码，查询图片类别。
@@ -42,7 +43,7 @@ NetSceneBase *NetSceneQueryImg::NewInstance() { return new NetSceneQueryImg(); }
 NetSceneBase::RespMessage *NetSceneQueryImg::GetRespMessage() { return &resp_; }
 
 int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
-    LogI(__FILE__, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
+    LogI("req.len: %zd", _in_buffer.size());
     
     NetSceneQueryImgProto::NetSceneQueryImgReq req;
     req.ParseFromArray(_in_buffer.data(), _in_buffer.size());
@@ -51,13 +52,13 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
         char py_ret[1024] = {0, };
         if (__ForkPythonScript((char *)req.img_bytes().c_str(),
                                req.img_bytes().size(), py_ret, sizeof(py_ret)) < 0) {
-            LogE(__FILE__, "[DoSceneImpl] __ForkPythonScript() failed.")
+            LogE("__ForkPythonScript() failed.")
             break;
         }
         std::vector<std::string> item_info;
         oi::split(std::string(py_ret), "$", item_info);
         if (item_info.size() != 3) {
-            LogE(__FILE__, "[DoSceneImpl] item_info.size(): %zd", item_info.size())
+            LogE("item_info.size(): %zd", item_info.size())
             break;
         }
         if (strcmp(item_info[1].c_str(), "None") == 0) {
@@ -79,7 +80,7 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
         int db_ret = Dao::Insert(new_row);
         
         if (db_ret < 0) {
-            LogE(__FILE__, "[DoSceneImpl] db insert failed: %s", item_name_.c_str())
+            LogE("db insert failed: %s", item_name_.c_str())
             break;
         }
         
@@ -100,44 +101,44 @@ int NetSceneQueryImg::__ForkPythonScript(char *_data_write, size_t _size_write,
     FILE *fp;
     std::string cmd = "python3 ../businesslayer/netscene_queryimg/queryimg.py "
                 + std::string(fifo_name_) + " " + std::to_string(_size_write);
-    if ((fp = popen(cmd.c_str(), "r")) == NULL) {
-        LogE(__FILE__, "[__ForkPythonScript] popen err")
+    if (!(fp = popen(cmd.c_str(), "r"))) {
+        LogE("popen err")
         return -1;
     }
     // FIXME: no concurrency
     int fd = open(fifo_name_, O_WRONLY);
     if (fd < 0) {
-        LogE(__FILE__, "[__ForkPythonScript] open err(%d): %s", errno, strerror(errno))
+        LogE("open err(%d): %s", errno, strerror(errno))
         pclose(fp);
         return -1;
     }
-    LogI(__FILE__, "[__ForkPythonScript] open fifo success, fd: %d", fd)
+    LogI("open fifo success, fd: %d", fd)
     
     ssize_t nwrite = ::write(fd, _data_write, _size_write);
-    LogI(__FILE__, "[__ForkPythonScript] write %zd/%zd", nwrite, _size_write)
+    LogI("write %zd/%zd", nwrite, _size_write)
     
     close(fd);
     fgets(_ret, _size_ret, fp);
     pclose(fp);
-    LogI(__FILE__, "[__ForkPythonScript] _out: '%s', len: %ld\n", _ret, strlen(_ret));
+    LogI("_out: '%s', len: %ld\n", _ret, strlen(_ret));
     return 0;
 }
 
 int NetSceneQueryImg::__MakeFIFO() {
     if (mkfifo(fifo_name_, 0777) < 0) {
-        LogE(__FILE__, "[__MakeFIFO] mkfifo err(%d): %s", errno, strerror(errno))
+        LogE("mkfifo err(%d): %s", errno, strerror(errno))
         return -1;
     }
-    LogI(__FILE__, "[__MakeFIFO] success")
+    LogI("success")
     return 0;
 }
 
 void NetSceneQueryImg::__DelFIFO() {
     if (unlink(fifo_name_) < 0) {
-        LogE(__FILE__, "[__DelFIFO] unlink err(%d): %s", errno, strerror(errno))
+        LogE("unlink err(%d): %s", errno, strerror(errno))
         return;
     }
-    LogI(__FILE__, "[__DelFIFO] success")
+    LogI("success")
 }
 
 uint64_t NetSceneQueryImg::GetLastQueryTs() {
@@ -145,6 +146,4 @@ uint64_t NetSceneQueryImg::GetLastQueryTs() {
     return last_query_ts_;
 }
 
-NetSceneQueryImg::~NetSceneQueryImg() {
-
-}
+NetSceneQueryImg::~NetSceneQueryImg() = default;

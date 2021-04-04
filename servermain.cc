@@ -17,7 +17,7 @@ int main(int ac, char **argv) {
     
     Logger::OpenLog(argv[0]);
 
-    LogI(__FILE__, "Launching Server...")
+    LogI("Launching Server...")
     
     Registry::RegisterNetScenes();
     
@@ -25,7 +25,7 @@ int main(int ac, char **argv) {
 
     Server::Instance().Serve();
     
-    LogI(__FILE__, "Server Down")
+    LogI("Server Down")
     return 0;
 }
 

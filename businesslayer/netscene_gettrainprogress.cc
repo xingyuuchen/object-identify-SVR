@@ -24,7 +24,7 @@ NetSceneBase *NetSceneGetTrainProgress::NewInstance() { return new NetSceneGetTr
 NetSceneBase::RespMessage *NetSceneGetTrainProgress::GetRespMessage() { return &resp_; }
 
 int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
-    LogI(__FILE__, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
+    LogI("req.len: %zd", _in_buffer.size());
     
     std::ifstream infile("/root/cxy/trainprogress.txt");
     if (infile) {
@@ -40,9 +40,9 @@ int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
     } else {
         errcode_ = kErrFileBroken;
         errmsg_ = "/root/cxy/trainprogress.txt-FileNotOpen";
-        LogE(__FILE__, "[DoSceneImpl] infile.is_open() = false")
+        LogE("infile.is_open() = false")
     }
-    LogI(__FILE__, "[DoSceneImpl] isRunning:%d, currEpoch:%d, totalEpoch:%d",
+    LogI("isRunning:%d, currEpoch:%d, totalEpoch:%d",
          is_running_, curr_epoch_, total_epoch_)
     
     resp_.set_is_running(is_running_);

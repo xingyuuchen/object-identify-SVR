@@ -30,7 +30,7 @@ NetSceneBase *NetSceneUploadAvatar::NewInstance() { return new NetSceneUploadAva
 NetSceneBase::RespMessage *NetSceneUploadAvatar::GetRespMessage() { return &resp_; }
 
 int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
-    LogI(__FILE__, "[DoSceneImpl] req.size: %zd", _in_buffer.size());
+    LogI("req.size: %zd", _in_buffer.size());
     
     NetSceneUploadAvatarProto::NetSceneUploadAvatarReq req;
     req.ParseFromArray(_in_buffer.data(), _in_buffer.size());
@@ -40,7 +40,7 @@ int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
     
     do {
         if (usr_id <= 0 || avatar_img_bytes.empty()) {
-            LogI(__FILE__, "[DoSceneImpl] usr_id: %d, avatar_bytes empty: %d",
+            LogI("usr_id: %d, avatar_bytes empty: %d",
                  usr_id, avatar_img_bytes.empty())
             errcode_ = kErrIllegalReq;
             errmsg_ = "usr_id or avatar is illegal.";
@@ -56,12 +56,12 @@ int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
         size_t size = File::WriteFileBin(file_path, avatar_img_bytes.data(), avatar_bytes_len);
         
         if (size < avatar_bytes_len) {
-            LogE(__FILE__, "[DoSceneImpl] write: %ld, total: %ld", size, avatar_bytes_len)
+            LogE("write: %ld, total: %ld", size, avatar_bytes_len)
             errmsg_ = "fwrite your avatar failed.";
             errcode_ = kErrFileBroken;
             break;
         }
-        LogI(__FILE__, "[DoSceneImpl] write file succeed")
+        LogI("write file succeed")
     
         DBItem_UserInfo old;
         old.SetUsrId(usr_id);
@@ -70,12 +70,12 @@ int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
         Dao::Update(old, neo);
         int db_ret = Dao::Update(old, neo);
         if (db_ret < 0) {
-            LogI(__FILE__, "[DoSceneImpl] db err, usrid: %d, file_path: %s",
+            LogI("db err, usrid: %d, file_path: %s",
                  usr_id, file_path)
             errcode_ = kErrDatabase;
             errmsg_ = "db err.";
         }
-        LogI(__FILE__, "[DoSceneImpl] update db succeed")
+        LogI("update db succeed")
         
     } while (false);
     
@@ -97,12 +97,12 @@ void NetSceneUploadAvatar::__LoadFileSeqNum() {
     fgets(ret, sizeof(ret), fp);
     pclose(fp);
     
-    LogI(__FILE__, "[__LoadFileSeqNum] ret: %s", ret)
+    LogI("ret: %s", ret)
     for (size_t i = 0; ret[i]; ++i) {
         if (ret[i] == '.') {
             ret[i] = 0;
             last_file_seq_when_boot_ = (int) strtol(ret, 0, 10);
-            LogI(__FILE__, "[__LoadFileSeqNum] last_file_seq_when_boot_: %d",
+            LogI("last_file_seq_when_boot_: %d",
                     last_file_seq_when_boot_)
             return;
         }

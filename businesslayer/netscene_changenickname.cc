@@ -17,7 +17,7 @@ NetSceneBase *NetSceneChangeNickname::NewInstance() { return new NetSceneChangeN
 NetSceneBase::RespMessage *NetSceneChangeNickname::GetRespMessage() { return &resp_; }
 
 int NetSceneChangeNickname::DoSceneImpl(const std::string &_in_buffer) {
-    LogI(__FILE__, "[DoSceneImpl] req.len: %zd", _in_buffer.size());
+    LogI("req.len: %zd", _in_buffer.size());
     
     NetSceneChangeNicknameProto::NetSceneChangeNicknameReq req;
     req.ParseFromArray(_in_buffer.data(), _in_buffer.size());
@@ -31,12 +31,12 @@ int NetSceneChangeNickname::DoSceneImpl(const std::string &_in_buffer) {
     
     int db_ret = Dao::Update(old, neo);
     if (db_ret < 0) {
-        LogI(__FILE__, "[DoSceneImpl] db err, usrid: %d, nickname: %s",
+        LogI("db err, usrid: %d, nickname: %s",
              usr_id, nickname.c_str())
         errcode_ = kErrDatabase;
         errmsg_ = "db err.";
     }
-    LogI(__FILE__, "[DoSceneImpl] update succeed, usrid: %d, nickname: %s",
+    LogI("update succeed, usrid: %d, nickname: %s",
          usr_id, nickname.c_str())
     resp_.set_nop(true);
     
