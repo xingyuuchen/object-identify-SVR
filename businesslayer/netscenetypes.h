@@ -17,6 +17,7 @@ const int kNetSceneTypeUploadAvatar         = 5;
 const int kNetSceneTypeGetHotSearch         = 6;
 const int kNetSceneTypeGetRecentQuery       = 7;
 const int kNetSceneTypeChangeNickname       = 8;
+const int kNetSceneTypeGetCovid19Infected   = 9;
 
 
 #endif //OI_SVR_NETSCENETYPES_H
