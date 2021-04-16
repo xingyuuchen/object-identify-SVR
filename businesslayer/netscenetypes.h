@@ -18,6 +18,9 @@ const int kNetSceneTypeGetHotSearch         = 6;
 const int kNetSceneTypeGetRecentQuery       = 7;
 const int kNetSceneTypeChangeNickname       = 8;
 const int kNetSceneTypeGetCovid19Infected   = 9;
+const int kNetSceneTypeGetFile              = 10;
+const int kNetSceneTypeBearShopRegister     = 11;
+const int kNetSceneTypeBearShopLogin        = 12;
 
 
 #endif //OI_SVR_NETSCENETYPES_H

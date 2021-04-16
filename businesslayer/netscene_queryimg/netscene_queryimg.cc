@@ -56,7 +56,7 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
             break;
         }
         std::vector<std::string> item_info;
-        oi::split(std::string(py_ret), "$", item_info);
+        str::split(std::string(py_ret), "$", item_info);
         if (item_info.size() != 3) {
             LogE("item_info.size(): %zd", item_info.size())
             break;

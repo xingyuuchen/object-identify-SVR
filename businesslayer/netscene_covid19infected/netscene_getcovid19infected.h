@@ -1,12 +1,11 @@
 #pragma once
 #include "netscenebase.h"
-#include "autobuffer.h"
+#include <string>
 #include <mutex>
 
 
 class NetSceneGetCovid19Infected : public NetSceneBase {
   public:
-    
     NetSceneGetCovid19Infected();
     
     void *Data() override;
@@ -32,6 +31,6 @@ class NetSceneGetCovid19Infected : public NetSceneBase {
     static const char * const   kUrlRoute;
     static const char * const   kHtmlPath;
     static std::mutex           html_mtx_;
-    AutoBuffer                  resp_;
+    std::string                 resp_;
 };
 

@@ -33,6 +33,9 @@ list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} businesslayer/netscene_covid19infected/*.cc)
 list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
 
+file(GLOB SELF_TEMP_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR} businesslayer/bear_shop/*.cc)
+list(APPEND SELF_SRC_FILES ${SELF_TEMP_SRC_FILES})
+
 link_directories(/usr/local/lib)
 
 if (${DAEMON})

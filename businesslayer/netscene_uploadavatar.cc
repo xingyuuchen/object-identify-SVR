@@ -53,7 +53,7 @@ int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
             snprintf(file_path, sizeof(file_path), avatar_saved_file_name_, seq);
         }
     
-        size_t size = File::WriteFileBin(file_path, avatar_img_bytes.data(), avatar_bytes_len);
+        size_t size = file::WriteFile(file_path, avatar_img_bytes.data(), avatar_bytes_len);
         
         if (size < avatar_bytes_len) {
             LogE("write: %ld, total: %ld", size, avatar_bytes_len)
