@@ -27,7 +27,5 @@ class NetSceneBearShopLogin : public NetSceneBase {
     static const char *const    kUrlRoute;
     static const char *const    kLoginErrResp;
     static const char *const    kWrongPwdResp;
-    NetSceneGetFile             net_scene_get_bear_shop_;
-    bool                        is_login_ok_;
-    bool                        is_pwd_wrong_;
+    char *                      resp_;
 };

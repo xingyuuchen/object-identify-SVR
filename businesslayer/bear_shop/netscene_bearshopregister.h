@@ -1,6 +1,5 @@
 #pragma once
 #include "netscenebase.h"
-#include "../netscene_getfile.h"
 #include <mutex>
 #include <string>
 
@@ -23,14 +22,13 @@ class NetSceneBearShopRegister : public NetSceneBase {
     
     int DoSceneImpl(const std::string &_in_buffer) override;
     
-    static std::string &GetBearShopHtmlPath();
+    static const char *GetBearShopRedirectResp();
 
   private:
     static const char *const    kUrlRoute;
     static const char *const    kRegisterFailedResp;
-    static std::string          kBearShopHtmlPath;
-    bool                        register_success_;
-    NetSceneGetFile             net_scene_get_file_;
-//    static const char *const    kLoginHtmlPath;
+    static const char *const    kUsernameAlreadyUsedResp;
+    static const char *const    kRedirectToBearShopResp;
+    char *                      resp_;
 
 };

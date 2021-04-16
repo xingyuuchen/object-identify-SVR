@@ -8,9 +8,12 @@
 
 
 
-std::string NetSceneBearShopRegister::kBearShopHtmlPath =
-        "/file/xjx/bear_shop.html";
 const char *const NetSceneBearShopRegister::kUrlRoute = "/bear-shop-register";
+
+const char *const NetSceneBearShopRegister::kRedirectToBearShopResp =
+        R"(<head><meta http-equiv="refresh" content="0; URL=http://49.235.29.121:5002/file/xjx/bear_shop.html" /></head>)";
+
+const char *const NetSceneBearShopRegister::kUsernameAlreadyUsedResp = "Your username already been used!!";
 
 const char *const NetSceneBearShopRegister::kRegisterFailedResp =
         "Register Failed! Contact Stacy Xu for help.";
@@ -18,23 +21,18 @@ const char *const NetSceneBearShopRegister::kRegisterFailedResp =
 
 NetSceneBearShopRegister::NetSceneBearShopRegister()
         : NetSceneBase()
-        , register_success_(false) {
+        , resp_(nullptr) {
+    resp_ = (char *) kRegisterFailedResp;
 }
 
 bool NetSceneBearShopRegister::IsUseProtobuf() { return false; }
 
 void *NetSceneBearShopRegister::Data() {
-    if (register_success_) {
-        return (void *) net_scene_get_file_.Data();
-    }
-    return (void *) kRegisterFailedResp;
+    return resp_;
 }
 
 size_t NetSceneBearShopRegister::Length() {
-    if (register_success_) {
-        return net_scene_get_file_.Length();
-    }
-    return strlen(kRegisterFailedResp);
+    return strlen(resp_);
 }
 
 int NetSceneBearShopRegister::GetType() { return kNetSceneTypeBearShopRegister; }
@@ -43,7 +41,7 @@ char *NetSceneBearShopRegister::Route() { return const_cast<char *>(kUrlRoute); 
 
 NetSceneBase *NetSceneBearShopRegister::NewInstance() { return new NetSceneBearShopRegister(); }
 
-std::string &NetSceneBearShopRegister::GetBearShopHtmlPath() { return kBearShopHtmlPath; }
+const char *NetSceneBearShopRegister::GetBearShopRedirectResp() { return kRedirectToBearShopResp; }
 
 int NetSceneBearShopRegister::DoSceneImpl(const std::string &_in_buffer) {
     std::string::size_type params_start = _in_buffer.find('?');
@@ -80,14 +78,29 @@ int NetSceneBearShopRegister::DoSceneImpl(const std::string &_in_buffer) {
     DBItem_BearUser user;
     user.SetUserName(user_name);
     user.SetUserPwd(user_pwd);
-    int db_ret = Dao::Insert(user);
-    if (db_ret < 0) {
-        LogE("db insert failed, ")
+    
+    std::vector<std::string> vec;
+    char sql[256] = {0, };
+    snprintf(sql, sizeof(sql), "select * from %s where %s='%s'",
+             DBItem_BearUser::table_,
+             DBItem_BearUser::field_name_usr_name_,
+             user_name.c_str());
+    if (Dao::Query(sql, vec, 1) < 0) {
+        LogE("db query failed")
+        return -1;
+    }
+    if (!vec.empty()) {
+        resp_ = (char *) kUsernameAlreadyUsedResp;
         return -1;
     }
     
-    net_scene_get_file_.DoScene(kBearShopHtmlPath);
-    register_success_ = true;
+    int db_ret = Dao::Insert(user);
+    if (db_ret < 0) {
+        LogE("db insert failed")
+        return -1;
+    }
+    
+    resp_ = (char *) kRedirectToBearShopResp;
     return 0;
 }
 

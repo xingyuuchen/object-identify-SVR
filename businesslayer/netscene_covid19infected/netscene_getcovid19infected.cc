@@ -16,7 +16,7 @@ std::mutex NetSceneGetCovid19Infected::html_mtx_;
 NetSceneGetCovid19Infected::NetSceneGetCovid19Infected()
         : NetSceneBase() {
     NETSCENE_INIT_START
-        ThreadPool::Instance().ExecutePeriodic(60 * 1000,
+        ThreadPool::Instance().ExecutePeriodic(2 * 60 * 60 * 1000,
                    [] { NetSceneGetCovid19Infected::__GenerateCovid19InfectedHtml(); });
     NETSCENE_INIT_END
 }

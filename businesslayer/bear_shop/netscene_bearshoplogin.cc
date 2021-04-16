@@ -17,30 +17,18 @@ const char *const NetSceneBearShopLogin::kWrongPwdResp =
 
 NetSceneBearShopLogin::NetSceneBearShopLogin()
         : NetSceneBase()
-        , is_login_ok_(false)
-        , is_pwd_wrong_(true) {
+        , resp_(nullptr) {
+    resp_ = (char *) kLoginErrResp;
 }
 
 bool NetSceneBearShopLogin::IsUseProtobuf() { return false; }
 
 void *NetSceneBearShopLogin::Data() {
-    if (is_login_ok_) {
-        return (void *) net_scene_get_bear_shop_.Data();
-    }
-    if (is_pwd_wrong_) {
-        return (void *) kWrongPwdResp;
-    }
-    return (void *) kLoginErrResp;
+    return resp_;
 }
 
 size_t NetSceneBearShopLogin::Length() {
-    if (is_login_ok_) {
-        return net_scene_get_bear_shop_.Length();
-    }
-    if (is_pwd_wrong_) {
-        return strlen(kWrongPwdResp);
-    }
-    return strlen(kLoginErrResp);
+    return strlen(resp_);
 }
 
 int NetSceneBearShopLogin::GetType() { return kNetSceneTypeBearShopLogin; }
@@ -94,11 +82,10 @@ int NetSceneBearShopLogin::DoSceneImpl(const std::string &_in_buffer) {
     }
     if (db_res.empty()) {
         LogI("wrong user_name or pwd")
-        is_pwd_wrong_ = true;
+        resp_ = (char *) kWrongPwdResp;
         return -1;
     }
     
-    net_scene_get_bear_shop_.DoScene(NetSceneBearShopRegister::GetBearShopHtmlPath());
-    is_login_ok_ = true;
+    resp_ = (char *) NetSceneBearShopRegister::GetBearShopRedirectResp();
     return 0;
 }
