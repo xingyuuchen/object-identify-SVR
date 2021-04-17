@@ -1,10 +1,10 @@
 #pragma once
-#include "netscenebase.h"
+#include "netscenecustom.h"
 #include <string>
 #include <mutex>
 
 
-class NetSceneGetCovid19Infected : public NetSceneBase {
+class NetSceneGetCovid19Infected : public NetSceneCustom {
   public:
     NetSceneGetCovid19Infected();
     
@@ -17,8 +17,6 @@ class NetSceneGetCovid19Infected : public NetSceneBase {
     int GetType() override;
     
     NetSceneBase *NewInstance() override;
-    
-    bool IsUseProtobuf() override;
     
     char *Route() override;
     

@@ -26,7 +26,7 @@ std::mutex NetSceneGetHotSearch::hot_search_mutex_;
 
 
 NetSceneGetHotSearch::NetSceneGetHotSearch()
-        : NetSceneBase() {
+        : NetSceneProtobuf() {
     
     NETSCENE_INIT_START
         ThreadPool::Instance().ExecutePeriodic(
@@ -174,7 +174,7 @@ int NetSceneGetHotSearch::GetType() { return kNetSceneTypeGetHotSearch; }
 
 NetSceneBase *NetSceneGetHotSearch::NewInstance() { return new NetSceneGetHotSearch(); }
 
-NetSceneBase::RespMessage *NetSceneGetHotSearch::GetRespMessage() { return &resp_; }
+NetSceneProtobuf::RespMessage *NetSceneGetHotSearch::GetRespMessage() { return &resp_; }
 
 bool NetSceneGetHotSearch::HotSearchItemComparator::operator()(
         const NetSceneGetHotSearch::HotSearchItem &_lhs,

@@ -1,14 +1,12 @@
 #pragma once
-#include "netscenebase.h"
+#include "netscenecustom.h"
 #include <mutex>
 #include <string>
 
 
-class NetSceneBearShopRegister : public NetSceneBase {
+class NetSceneBearShopRegister : public NetSceneCustom {
   public:
     NetSceneBearShopRegister();
-    
-    bool IsUseProtobuf() override;
     
     void *Data() override;
     

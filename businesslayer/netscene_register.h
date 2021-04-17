@@ -1,11 +1,11 @@
 #ifndef OI_SVR_NETSCENE_REGISTER_H
 #define OI_SVR_NETSCENE_REGISTER_H
-#include "netscenebase.h"
+#include <netsceneprotobuf.h>
 #include "dbitem/dbitem_userinfo.h"
 #include "netsceneregister.pb.h"
 
 
-class NetSceneRegister : public NetSceneBase {
+class NetSceneRegister : public NetSceneProtobuf {
   public:
     NetSceneRegister();
     

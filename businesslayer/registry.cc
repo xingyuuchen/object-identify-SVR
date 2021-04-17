@@ -17,17 +17,17 @@
 namespace Registry {
 
 void RegisterNetScenes() {
-    NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneQueryImg());
-    NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneGetTrainProgress());
-    NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneRegister());
-    NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneUploadAvatar());
-    NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneGetHotSearch());
-    NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneGetRecentQuery());
-    NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneChangeNickname());
-    NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneGetCovid19Infected());
-    NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneGetFile());
-    NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneBearShopRegister());
-    NetSceneDispatcher::Instance().RegisterNetScene(new NetSceneBearShopLogin());
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneQueryImg>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneGetTrainProgress>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneRegister>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneUploadAvatar>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneGetHotSearch>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneGetRecentQuery>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneChangeNickname>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneGetCovid19Infected>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneGetFile>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneBearShopRegister>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneBearShopLogin>();
     
 }
 

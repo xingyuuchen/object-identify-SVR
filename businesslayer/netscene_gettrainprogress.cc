@@ -10,7 +10,7 @@
  */
 
 NetSceneGetTrainProgress::NetSceneGetTrainProgress()
-    : NetSceneBase()
+    : NetSceneProtobuf()
     , curr_epoch_(-1)
     , total_epoch_(-1)
     , is_running_(false) {}
@@ -21,7 +21,7 @@ int NetSceneGetTrainProgress::GetType() { return kNetSceneTypeGetTrainProgress; 
 
 NetSceneBase *NetSceneGetTrainProgress::NewInstance() { return new NetSceneGetTrainProgress(); }
 
-NetSceneBase::RespMessage *NetSceneGetTrainProgress::GetRespMessage() { return &resp_; }
+NetSceneProtobuf::RespMessage *NetSceneGetTrainProgress::GetRespMessage() { return &resp_; }
 
 int NetSceneGetTrainProgress::DoSceneImpl(const std::string &_in_buffer) {
     LogI("req.len: %zd", _in_buffer.size());

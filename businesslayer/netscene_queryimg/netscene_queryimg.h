@@ -3,14 +3,14 @@
 
 #include <string>
 #include <mutex>
-#include "netscenebase.h"
+#include "netsceneprotobuf.h"
 #include "autobuffer.h"
 #include "netscenequeryimg.pb.h"
 
 /**
  * 业务代码，查询图片类别。
  */
-class NetSceneQueryImg : public NetSceneBase {
+class NetSceneQueryImg : public NetSceneProtobuf {
   public:
     
     NetSceneQueryImg();

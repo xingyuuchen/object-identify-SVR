@@ -20,12 +20,10 @@ const char *const NetSceneBearShopRegister::kRegisterFailedResp =
 
 
 NetSceneBearShopRegister::NetSceneBearShopRegister()
-        : NetSceneBase()
+        : NetSceneCustom()
         , resp_(nullptr) {
     resp_ = (char *) kRegisterFailedResp;
 }
-
-bool NetSceneBearShopRegister::IsUseProtobuf() { return false; }
 
 void *NetSceneBearShopRegister::Data() {
     return resp_;

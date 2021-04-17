@@ -1,5 +1,6 @@
 #include "netscene_getfile.h"
 #include "netscenetypes.h"
+#include "netscene_404notfound.h"
 #include "fileutil.h"
 #include "log.h"
 #include <string>
@@ -10,10 +11,8 @@ const char *const NetSceneGetFile::kBaseDirPath = "/root/cxy/staticfiles/";
 const char *const NetSceneGetFile::kUrlRoute = "/file/*";
 
 NetSceneGetFile::NetSceneGetFile()
-        : NetSceneBase() {
+        : NetSceneCustom() {
 }
-
-bool NetSceneGetFile::IsUseProtobuf() { return false; }
 
 void *NetSceneGetFile::Data() { return (void *) resp_.data(); }
 
@@ -32,7 +31,8 @@ int NetSceneGetFile::DoSceneImpl(const std::string &_in_buffer) {
     LogI("file_path: %s", file_path.c_str())
     
     if (!file::IsFileExist(file_path.c_str())) {
-        resp_ = "404. Resource Not Found";
+        NetScene404NotFound _404;
+        resp_ = std::string((char *) _404.Data());
         return -1;
     }
     if (!file::ReadFile(file_path.c_str(), resp_)) {

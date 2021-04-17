@@ -7,14 +7,14 @@
 
 
 NetSceneChangeNickname::NetSceneChangeNickname()
-        : NetSceneBase() {
+        : NetSceneProtobuf() {
 }
 
 int NetSceneChangeNickname::GetType() { return kNetSceneTypeChangeNickname; }
 
 NetSceneBase *NetSceneChangeNickname::NewInstance() { return new NetSceneChangeNickname(); }
 
-NetSceneBase::RespMessage *NetSceneChangeNickname::GetRespMessage() { return &resp_; }
+NetSceneProtobuf::RespMessage *NetSceneChangeNickname::GetRespMessage() { return &resp_; }
 
 int NetSceneChangeNickname::DoSceneImpl(const std::string &_in_buffer) {
     LogI("req.len: %zd", _in_buffer.size());

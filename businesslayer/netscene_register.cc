@@ -6,14 +6,14 @@
 #include "constantsprotocol.h"
 
 
-NetSceneRegister::NetSceneRegister() : NetSceneBase() {
+NetSceneRegister::NetSceneRegister() : NetSceneProtobuf() {
 }
 
 int NetSceneRegister::GetType() { return kNetSceneTypeRegister; }
 
 NetSceneBase *NetSceneRegister::NewInstance() { return new NetSceneRegister(); }
 
-NetSceneBase::RespMessage *NetSceneRegister::GetRespMessage() { return &resp_; }
+NetSceneProtobuf::RespMessage *NetSceneRegister::GetRespMessage() { return &resp_; }
 
 int NetSceneRegister::DoSceneImpl(const std::string &_in_buffer) {
     static std::mutex mutex_;

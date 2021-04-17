@@ -1,14 +1,12 @@
 #pragma once
-#include "netscenebase.h"
+#include "netscenecustom.h"
 #include <mutex>
 #include <string>
 
 
-class NetSceneGetFile : public NetSceneBase {
+class NetSceneGetFile : public NetSceneCustom {
   public:
     NetSceneGetFile();
-    
-    bool IsUseProtobuf() override;
     
     void *Data() override;
     

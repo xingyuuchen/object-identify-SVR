@@ -16,7 +16,7 @@ const char *const NetSceneUploadAvatar::cmd_find_last_seq_ = "ls -t /root/cxy/av
 std::mutex NetSceneUploadAvatar::mutex_;
 
 NetSceneUploadAvatar::NetSceneUploadAvatar()
-        : NetSceneBase() {
+        : NetSceneProtobuf() {
     
     NETSCENE_INIT_START
         __LoadFileSeqNum();
@@ -27,7 +27,7 @@ int NetSceneUploadAvatar::GetType() { return kNetSceneTypeUploadAvatar; }
 
 NetSceneBase *NetSceneUploadAvatar::NewInstance() { return new NetSceneUploadAvatar(); }
 
-NetSceneBase::RespMessage *NetSceneUploadAvatar::GetRespMessage() { return &resp_; }
+NetSceneProtobuf::RespMessage *NetSceneUploadAvatar::GetRespMessage() { return &resp_; }
 
 int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
     LogI("req.size: %zd", _in_buffer.size());

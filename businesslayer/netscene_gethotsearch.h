@@ -1,12 +1,12 @@
 #pragma once
-#include "netscenebase.h"
+#include "netsceneprotobuf.h"
 #include <map>
 #include <vector>
 #include <mutex>
 #include "netscenegethotsearch.pb.h"
 
 
-class NetSceneGetHotSearch : public NetSceneBase {
+class NetSceneGetHotSearch : public NetSceneProtobuf {
   public:
     
     NetSceneGetHotSearch();

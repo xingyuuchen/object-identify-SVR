@@ -19,7 +19,7 @@ const char *const NetSceneQueryImg::fifo_name_ = "/tmp/fifo_queryimg";
 uint64_t NetSceneQueryImg::last_query_ts_ = 0;
 std::mutex NetSceneQueryImg::last_query_ts_mtx_;
 
-NetSceneQueryImg::NetSceneQueryImg() : NetSceneBase() {
+NetSceneQueryImg::NetSceneQueryImg() : NetSceneProtobuf() {
     NETSCENE_INIT_START
         {
             std::lock_guard<std::mutex> lock(last_query_ts_mtx_);
@@ -40,7 +40,7 @@ int NetSceneQueryImg::GetType() { return kNetSceneTypeQueryImg; }
 
 NetSceneBase *NetSceneQueryImg::NewInstance() { return new NetSceneQueryImg(); }
 
-NetSceneBase::RespMessage *NetSceneQueryImg::GetRespMessage() { return &resp_; }
+NetSceneProtobuf::RespMessage *NetSceneQueryImg::GetRespMessage() { return &resp_; }
 
 int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
     LogI("req.len: %zd", _in_buffer.size());

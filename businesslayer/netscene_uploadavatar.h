@@ -1,11 +1,11 @@
 #ifndef OI_SVR_NETSCENE_UPLOADAVATAR_H
 #define OI_SVR_NETSCENE_UPLOADAVATAR_H
-#include "netscenebase.h"
+#include <netsceneprotobuf.h>
 #include "netsceneuploadavatar.pb.h"
 #include <mutex>
 
 
-class NetSceneUploadAvatar : public NetSceneBase {
+class NetSceneUploadAvatar : public NetSceneProtobuf {
   public:
     NetSceneUploadAvatar();
     

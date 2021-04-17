@@ -1,10 +1,10 @@
 #pragma once
-#include "netscenebase.h"
+#include "netsceneprotobuf.h"
 #include "dbitem/dbitem_userinfo.h"
 #include "netscenechangenickname.pb.h"
 
 
-class NetSceneChangeNickname : public NetSceneBase {
+class NetSceneChangeNickname : public NetSceneProtobuf {
   public:
     
     NetSceneChangeNickname();

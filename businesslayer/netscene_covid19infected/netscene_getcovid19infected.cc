@@ -14,7 +14,7 @@ const char *const NetSceneGetCovid19Infected::kHtmlPath =
 std::mutex NetSceneGetCovid19Infected::html_mtx_;
 
 NetSceneGetCovid19Infected::NetSceneGetCovid19Infected()
-        : NetSceneBase() {
+        : NetSceneCustom() {
     NETSCENE_INIT_START
         ThreadPool::Instance().ExecutePeriodic(2 * 60 * 60 * 1000,
                    [] { NetSceneGetCovid19Infected::__GenerateCovid19InfectedHtml(); });
@@ -42,8 +42,6 @@ int NetSceneGetCovid19Infected::DoSceneImpl(const std::string &_in_buffer) {
     }
     return 0;
 }
-
-bool NetSceneGetCovid19Infected::IsUseProtobuf() { return false; }
 
 char *NetSceneGetCovid19Infected::Route() { return const_cast<char *>(kUrlRoute); }
 

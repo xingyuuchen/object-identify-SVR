@@ -5,11 +5,9 @@
 #include <string>
 
 
-class NetSceneBearShopLogin : public NetSceneBase {
+class NetSceneBearShopLogin : public NetSceneCustom {
   public:
     NetSceneBearShopLogin();
-    
-    bool IsUseProtobuf() override;
     
     void *Data() override;
     

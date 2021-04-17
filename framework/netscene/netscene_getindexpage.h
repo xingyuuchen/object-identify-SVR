@@ -1,10 +1,11 @@
 #pragma once
-#include "netscenebase.h"
+#include "netscenecustom.h"
 #include <mutex>
 
 
-class NetSceneGetIndexPage : public NetSceneBase {
+class NetSceneGetIndexPage : public NetSceneCustom {
   public:
+    
     NetSceneGetIndexPage();
     
     int GetType() override;
@@ -17,11 +18,9 @@ class NetSceneGetIndexPage : public NetSceneBase {
     
     size_t Length() override;
     
-    bool IsUseProtobuf() override;
-    
     char *Route() override;
 
-private:
+  private:
     char                        resp_[128] {0, };
     
     static const char *const    kUrlRoute;

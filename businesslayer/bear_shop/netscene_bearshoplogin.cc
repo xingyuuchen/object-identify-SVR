@@ -16,12 +16,10 @@ const char *const NetSceneBearShopLogin::kWrongPwdResp =
         "Wrong user name or password!";
 
 NetSceneBearShopLogin::NetSceneBearShopLogin()
-        : NetSceneBase()
+        : NetSceneCustom()
         , resp_(nullptr) {
     resp_ = (char *) kLoginErrResp;
 }
-
-bool NetSceneBearShopLogin::IsUseProtobuf() { return false; }
 
 void *NetSceneBearShopLogin::Data() {
     return resp_;
