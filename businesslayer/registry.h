@@ -2,7 +2,7 @@
 #define OI_SVR_REGISTRY_H
 
 
-namespace Registry {
+namespace registry {
 
 void RegisterNetScenes();
 

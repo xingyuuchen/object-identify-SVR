@@ -14,7 +14,7 @@
 #include "netscene_getfile.h"
 
 
-namespace Registry {
+namespace registry {
 
 void RegisterNetScenes() {
     NetSceneDispatcher::Instance().RegisterNetScene<NetSceneQueryImg>();

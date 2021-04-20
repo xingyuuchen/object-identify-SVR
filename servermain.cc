@@ -15,11 +15,11 @@ int main(int ac, char **argv) {
     }
 #endif
     
-    Logger::OpenLog(argv[0]);
+    logger::OpenLog(argv[0]);
 
     LogI("Launching Server...")
     
-    Registry::RegisterNetScenes();
+    registry::RegisterNetScenes();
     
     Server::Instance().SetWorker<NetSceneDispatcher::NetSceneWorker>();
 
