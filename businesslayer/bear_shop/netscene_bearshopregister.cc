@@ -35,7 +35,7 @@ size_t NetSceneBearShopRegister::Length() {
 
 int NetSceneBearShopRegister::GetType() { return kNetSceneTypeBearShopRegister; }
 
-char *NetSceneBearShopRegister::Route() { return const_cast<char *>(kUrlRoute); }
+const char *NetSceneBearShopRegister::Route() { return kUrlRoute; }
 
 NetSceneBase *NetSceneBearShopRegister::NewInstance() { return new NetSceneBearShopRegister(); }
 

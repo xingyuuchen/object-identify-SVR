@@ -18,7 +18,7 @@ class NetSceneGetCovid19Infected : public NetSceneCustom {
     
     NetSceneBase *NewInstance() override;
     
-    char *Route() override;
+    const char *Route() override;
     
     int DoSceneImpl(const std::string &_in_buffer) override;
     

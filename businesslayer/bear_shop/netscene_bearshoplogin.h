@@ -15,7 +15,7 @@ class NetSceneBearShopLogin : public NetSceneCustom {
     
     int GetType() override;
     
-    char *Route() override;
+    const char *Route() override;
     
     NetSceneBase *NewInstance() override;
     

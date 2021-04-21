@@ -14,14 +14,17 @@ class NetSceneGetFile : public NetSceneCustom {
     
     int GetType() override;
     
-    char *Route() override;
+    const char *Route() override;
     
     NetSceneBase *NewInstance() override;
     
     int DoSceneImpl(const std::string &_in_buffer) override;
+    
+    const char *ContentType() override;
 
   private:
     static const char *const    kUrlRoute;
     static const char *const    kBaseDirPath;
+    char *                      content_type_;
     std::string                 resp_;
 };

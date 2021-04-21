@@ -43,7 +43,7 @@ int NetSceneGetCovid19Infected::DoSceneImpl(const std::string &_in_buffer) {
     return 0;
 }
 
-char *NetSceneGetCovid19Infected::Route() { return const_cast<char *>(kUrlRoute); }
+const char *NetSceneGetCovid19Infected::Route() { return kUrlRoute; }
 
 int NetSceneGetCovid19Infected::__GenerateCovid19InfectedHtml() {
     uint64_t start = ::gettickcount();

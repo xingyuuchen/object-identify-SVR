@@ -31,7 +31,7 @@ size_t NetSceneBearShopLogin::Length() {
 
 int NetSceneBearShopLogin::GetType() { return kNetSceneTypeBearShopLogin; }
 
-char *NetSceneBearShopLogin::Route() { return const_cast<char *>(kUrlRoute); }
+const char *NetSceneBearShopLogin::Route() { return kUrlRoute; }
 
 NetSceneBase *NetSceneBearShopLogin::NewInstance() { return new NetSceneBearShopLogin(); }
 

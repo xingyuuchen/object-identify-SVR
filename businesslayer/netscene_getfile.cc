@@ -4,6 +4,7 @@
 #include "fileutil.h"
 #include "log.h"
 #include <string>
+#include "http/headerfield.h"
 
 
 const char *const NetSceneGetFile::kBaseDirPath = "/root/cxy/staticfiles/";
@@ -11,7 +12,8 @@ const char *const NetSceneGetFile::kBaseDirPath = "/root/cxy/staticfiles/";
 const char *const NetSceneGetFile::kUrlRoute = "/file/*";
 
 NetSceneGetFile::NetSceneGetFile()
-        : NetSceneCustom() {
+        : NetSceneCustom()
+        , content_type_(nullptr) {
 }
 
 void *NetSceneGetFile::Data() { return (void *) resp_.data(); }
@@ -20,7 +22,11 @@ size_t NetSceneGetFile::Length() { return resp_.size(); }
 
 int NetSceneGetFile::GetType() { return kNetSceneTypeGetFile; }
 
-char *NetSceneGetFile::Route() { return const_cast<char *>(kUrlRoute); }
+const char *NetSceneGetFile::Route() { return kUrlRoute; }
+
+const char *NetSceneGetFile::ContentType() {
+    return content_type_ ? content_type_ : NetSceneCustom::ContentType();
+}
 
 NetSceneBase *NetSceneGetFile::NewInstance() { return new NetSceneGetFile(); }
 
@@ -39,6 +45,17 @@ int NetSceneGetFile::DoSceneImpl(const std::string &_in_buffer) {
         LogE("read login_html failed")
         resp_ = "Internal Server Error, Contact xingyuuchen for help.";
         return -1;
+    }
+    std::string suffix = file_path.substr(file_path.rfind('.') + 1);
+    if (suffix == "html" || suffix == "HTML" ||
+            suffix == "htm" || suffix == "HTM") {
+        content_type_ = (char *) http::HeaderField::kTextHtml;
+    } else if (suffix == "css" || suffix == "CSS") {
+        content_type_ = (char *) http::HeaderField::kTextCss;
+    } else if (suffix == "jpg" || suffix == "JPG" ||
+                suffix == "jpeg" || suffix == "JPEG" ||
+                suffix == "png" || suffix == "PNG") {
+        content_type_ = (char *) http::HeaderField::kOctetStream;
     }
     return 0;
 }
