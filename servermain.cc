@@ -1,5 +1,5 @@
 #include "log.h"
-#include "server.h"
+#include "webserver.h"
 #include "netscenedispatcher.h"
 #include "businesslayer/registry.h"
 #ifdef DAEMON
@@ -21,9 +21,9 @@ int main(int ac, char **argv) {
     
     registry::RegisterNetScenes();
     
-    Server::Instance().SetWorker<NetSceneDispatcher::NetSceneWorker>();
+    WebServer::Instance().SetWorker<NetSceneDispatcher::NetSceneWorker>();
 
-    Server::Instance().Serve();
+    WebServer::Instance().Serve();
     
     LogI("Server Down")
     return 0;
