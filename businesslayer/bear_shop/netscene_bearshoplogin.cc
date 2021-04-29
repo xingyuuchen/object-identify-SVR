@@ -35,6 +35,10 @@ const char *NetSceneBearShopLogin::Route() { return kUrlRoute; }
 
 NetSceneBase *NetSceneBearShopLogin::NewInstance() { return new NetSceneBearShopLogin(); }
 
+const char *NetSceneBearShopLogin::ContentType() {
+    return http::HeaderField::kTextHtml;
+}
+
 int NetSceneBearShopLogin::DoSceneImpl(const std::string &_in_buffer) {
     std::string::size_type params_start = _in_buffer.find('?');
     if (params_start == std::string::npos) {
@@ -65,20 +69,15 @@ int NetSceneBearShopLogin::DoSceneImpl(const std::string &_in_buffer) {
         return -1;
     }
     
-    std::vector<std::string> db_res;
-    char sql[256] = {0, };
-    snprintf(sql, sizeof(sql), "select * from %s where %s='%s' and %s='%s'",
-             DBItem_BearUser::table_,
-             DBItem_BearUser::field_name_usr_name_,
-             user_name.c_str(),
-             DBItem_BearUser::field_name_pwd_,
-             user_pwd.c_str());
-    int db_ret = Dao::Query(sql, db_res, 1);
-    if (db_ret < 0) {
+    DBItem_BearUser user;
+    user.SetUserName(user_name);
+    user.SetUserPwd(user_pwd);
+    bool exist = false;
+    if (Dao::QueryExist(user, exist) < 0) {
         LogE("db query failed, ")
         return -1;
     }
-    if (db_res.empty()) {
+    if (!exist) {
         LogI("wrong user_name or pwd")
         resp_ = (char *) kWrongPwdResp;
         return -1;

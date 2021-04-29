@@ -53,9 +53,10 @@ int NetSceneGetFile::DoSceneImpl(const std::string &_in_buffer) {
     } else if (suffix == "css" || suffix == "CSS") {
         content_type_ = (char *) http::HeaderField::kTextCss;
     } else if (suffix == "jpg" || suffix == "JPG" ||
-                suffix == "jpeg" || suffix == "JPEG" ||
-                suffix == "png" || suffix == "PNG") {
-        content_type_ = (char *) http::HeaderField::kOctetStream;
+                suffix == "jpeg" || suffix == "JPEG") {
+        content_type_ = (char *) http::HeaderField::kImageJpg;
+    } else if (suffix == "png" || suffix == "PNG") {
+        content_type_ = (char *) http::HeaderField::kImagePng;
     }
     return 0;
 }

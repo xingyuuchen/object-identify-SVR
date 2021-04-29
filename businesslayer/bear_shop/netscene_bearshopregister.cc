@@ -41,6 +41,10 @@ NetSceneBase *NetSceneBearShopRegister::NewInstance() { return new NetSceneBearS
 
 const char *NetSceneBearShopRegister::GetBearShopRedirectResp() { return kRedirectToBearShopResp; }
 
+const char *NetSceneBearShopRegister::ContentType() {
+    return http::HeaderField::kTextHtml;
+}
+
 int NetSceneBearShopRegister::DoSceneImpl(const std::string &_in_buffer) {
     std::string::size_type params_start = _in_buffer.find('?');
     if (params_start == std::string::npos) {
@@ -75,22 +79,17 @@ int NetSceneBearShopRegister::DoSceneImpl(const std::string &_in_buffer) {
     
     DBItem_BearUser user;
     user.SetUserName(user_name);
-    user.SetUserPwd(user_pwd);
-    
-    std::vector<std::string> vec;
-    char sql[256] = {0, };
-    snprintf(sql, sizeof(sql), "select * from %s where %s='%s'",
-             DBItem_BearUser::table_,
-             DBItem_BearUser::field_name_usr_name_,
-             user_name.c_str());
-    if (Dao::Query(sql, vec, 1) < 0) {
-        LogE("db query failed")
+    bool exist = false;
+    if (Dao::QueryExist(user, exist) < 0) {
+        LogE("db query failed, ")
         return -1;
     }
-    if (!vec.empty()) {
+    if (exist) {
         resp_ = (char *) kUsernameAlreadyUsedResp;
         return -1;
     }
+    
+    user.SetUserPwd(user_pwd);
     
     int db_ret = Dao::Insert(user);
     if (db_ret < 0) {

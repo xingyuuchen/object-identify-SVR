@@ -2,7 +2,8 @@
 #include "netscenedispatcher.h"
 
 #include "netscene_queryimg/netscene_queryimg.h"
-#include "netscene_covid19infected/netscene_getcovid19infected.h"
+#include "covid19infected/netscene_getcovid19infected.h"
+#include "covid19infected/netscene_virususer.h"
 #include "bear_shop/netscene_bearshopregister.h"
 #include "bear_shop/netscene_bearshoplogin.h"
 #include "netscene_gettrainprogress.h"
@@ -28,6 +29,9 @@ void RegisterNetScenes() {
     NetSceneDispatcher::Instance().RegisterNetScene<NetSceneGetFile>();
     NetSceneDispatcher::Instance().RegisterNetScene<NetSceneBearShopRegister>();
     NetSceneDispatcher::Instance().RegisterNetScene<NetSceneBearShopLogin>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneVirusUser::NetSceneVirusLogin>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneVirusUser::NetSceneVirusRegister>();
+    NetSceneDispatcher::Instance().RegisterNetScene<NetSceneVirusUser::NetSceneVirusForgetPwd>();
     
 }
 

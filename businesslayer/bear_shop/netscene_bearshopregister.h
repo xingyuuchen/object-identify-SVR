@@ -20,6 +20,8 @@ class NetSceneBearShopRegister : public NetSceneCustom {
     
     int DoSceneImpl(const std::string &_in_buffer) override;
     
+    const char *ContentType() override;
+    
     static const char *GetBearShopRedirectResp();
 
   private:

@@ -19,6 +19,8 @@ class NetSceneBearShopLogin : public NetSceneCustom {
     
     NetSceneBase *NewInstance() override;
     
+    const char *ContentType() override;
+    
     int DoSceneImpl(const std::string &_in_buffer) override;
 
   private:

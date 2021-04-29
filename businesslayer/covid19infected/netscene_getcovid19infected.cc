@@ -45,6 +45,10 @@ int NetSceneGetCovid19Infected::DoSceneImpl(const std::string &_in_buffer) {
 
 const char *NetSceneGetCovid19Infected::Route() { return kUrlRoute; }
 
+const char *NetSceneGetCovid19Infected::ContentType() {
+    return http::HeaderField::kTextHtml;
+}
+
 int NetSceneGetCovid19Infected::__GenerateCovid19InfectedHtml() {
     uint64_t start = ::gettickcount();
     FILE *fp;

@@ -18,6 +18,9 @@ const int kNetSceneTypeGetCovid19Infected   = kReservedTypeOffset + 8;
 const int kNetSceneTypeGetFile              = kReservedTypeOffset + 9;
 const int kNetSceneTypeBearShopRegister     = kReservedTypeOffset + 10;
 const int kNetSceneTypeBearShopLogin        = kReservedTypeOffset + 11;
+const int kNetSceneTypeVirusLogin           = kReservedTypeOffset + 12;
+const int kNetSceneTypeVirusRegister        = kReservedTypeOffset + 13;
+const int kNetSceneTypeVirusForgerPwd       = kReservedTypeOffset + 14;
 
 
 #endif //OI_SVR_NETSCENETYPES_H
