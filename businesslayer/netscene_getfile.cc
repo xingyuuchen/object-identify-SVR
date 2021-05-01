@@ -37,12 +37,13 @@ int NetSceneGetFile::DoSceneImpl(const std::string &_in_buffer) {
     LogI("file_path: %s", file_path.c_str())
     
     if (!file::IsFileExist(file_path.c_str())) {
+        LogI("file(%s) NOT exist", file_path.c_str())
         NetScene404NotFound _404;
         resp_ = std::string((char *) _404.Data());
-        return -1;
+        return 0;
     }
     if (!file::ReadFile(file_path.c_str(), resp_)) {
-        LogE("read login_html failed")
+        LogE("read file(%s) failed", file_path.c_str())
         resp_ = "Internal Server Error, Contact xingyuuchen for help.";
         return -1;
     }

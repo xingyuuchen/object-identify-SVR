@@ -57,7 +57,7 @@ int NetSceneVirusUser::NetSceneVirusLogin::DoSceneImpl(const std::string &_in_bu
     if (Dao::QueryExist(user, exist) < 0) {
         LogE("db query failed")
         resp_ = (char *) kUnknownErrResp;
-        return 0;
+        return -1;
     }
     if (!exist) {
         LogI("wrong user_name or pwd")

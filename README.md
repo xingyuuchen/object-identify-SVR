@@ -31,7 +31,7 @@ bash cmake.sh -r -d   # -d: run as a daemon.
 
 若使用Protobuf来序列化数据，请继承自`NetSceneProtobuf`，使用`POST`请求。
 
-若想自定义网络通信协议，请继承自`NetSceneCustom`类。目前只支持`GET`请求。
+若想自定义网络通信协议，请继承自`NetSceneCustom`类。支持GET, POST。
 
 定义好你的接口类并实现好具体的业务逻辑后，请将接口类注册给框架：使用
 `NetSceneDispatcher::Instance::RegisterNetScene()`方法。

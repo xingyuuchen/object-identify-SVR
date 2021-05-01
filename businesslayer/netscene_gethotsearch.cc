@@ -7,7 +7,7 @@
 #include "connection.h"
 #include "dbitem_recognition.h"
 #include <queue>
-#include <stdlib.h>
+#include <cstdlib>
 
 
 

@@ -6,6 +6,7 @@
 #include <string>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include "dbitem_recognition.h"
 #include "connection.h"
 #include "timeutil.h"
