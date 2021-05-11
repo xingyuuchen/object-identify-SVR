@@ -16,13 +16,15 @@ int main(int ac, char **argv) {
     
     logger::OpenLog(argv[0]);
 
-    LogI("Launching Server...")
+    WebServer::Instance().Config();
     
     registry::RegisterNetScenes();
     
+    LogI("Launching Web Server...")
+
     WebServer::Instance().Serve();
     
-    LogI("Server Down")
+    LogI("Web Server Down")
     return 0;
 }
 
