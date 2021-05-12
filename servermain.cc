@@ -8,7 +8,7 @@
 
 int main(int ac, char **argv) {
 #ifdef DAEMON
-    if (Daemon::Daemonize() < 0) {
+    if (unixtar::Daemonize() < 0) {
         printf("Daemonize failed\n");
         return 0;
     }
@@ -20,11 +20,11 @@ int main(int ac, char **argv) {
     
     registry::RegisterNetScenes();
     
-    LogI("Launching Web Server...")
+    LogI("Launching Webserver...")
 
     WebServer::Instance().Serve();
     
-    LogI("Web Server Down")
+    LogI("Webserver Down")
     return 0;
 }
 
