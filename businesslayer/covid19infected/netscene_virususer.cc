@@ -54,7 +54,7 @@ int NetSceneVirusUser::NetSceneVirusLogin::DoSceneImpl(const std::string &_in_bu
     user.SetEmail(email);
     user.SetUserPwd(password);
     bool exist = false;
-    if (Dao::QueryExist(user, exist) < 0) {
+    if (dao::QueryExist(user, exist) < 0) {
         LogE("db query failed")
         resp_ = (char *) kUnknownErrResp;
         return -1;
@@ -104,7 +104,7 @@ int NetSceneVirusUser::NetSceneVirusRegister::DoSceneImpl(const std::string &_in
     DBItem_VirusUser neo;
     neo.SetEmail(email);
     bool registered = false;
-    if (Dao::QueryExist(neo, registered)) {
+    if (dao::QueryExist(neo, registered)) {
         LogE("db QueryExist failed")
         resp_ = (char *) kUnknownErrResp;
         return -1;
@@ -116,7 +116,7 @@ int NetSceneVirusUser::NetSceneVirusRegister::DoSceneImpl(const std::string &_in
     }
     neo.SetUserPwd(password);
     
-    if (Dao::Insert(neo) < 0) {
+    if (dao::Insert(neo) < 0) {
         LogE("db insert failed")
         resp_ = (char *) kUnknownErrResp;
         return 0;
@@ -149,7 +149,7 @@ int NetSceneVirusUser::NetSceneVirusForgetPwd::DoSceneImpl(const std::string &_i
     DBItem_VirusUser old;
     old.SetEmail(email);
     bool registered = false;
-    if (Dao::QueryExist(old, registered)) {
+    if (dao::QueryExist(old, registered)) {
         LogE("db QueryExist failed")
         resp_ = (char *) kUnknownErrResp;
         return -1;
@@ -161,7 +161,7 @@ int NetSceneVirusUser::NetSceneVirusForgetPwd::DoSceneImpl(const std::string &_i
     DBItem_VirusUser neo;
     neo.SetEmail(email);
     neo.SetUserPwd(password);
-    if (Dao::Update(old, neo) < 0) {
+    if (dao::Update(old, neo) < 0) {
         LogE("db update failed")
         resp_ = (char *) kUnknownErrResp;
         return 0;

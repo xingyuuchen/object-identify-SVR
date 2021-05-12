@@ -22,7 +22,7 @@ int NetSceneRegister::DoSceneImpl(const std::string &_in_buffer) {
     DBItem_UserInfo new_usr;
     new_usr.SetNickname("NULL");
     new_usr.SetAvatarPath("NULL");
-    int ret = Dao::Insert(new_usr);
+    int ret = dao::Insert(new_usr);
     
     if (ret > 0) {
         id = ret;

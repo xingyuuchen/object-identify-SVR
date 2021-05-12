@@ -29,7 +29,7 @@ int NetSceneChangeNickname::DoSceneImpl(const std::string &_in_buffer) {
     DBItem_UserInfo neo;
     neo.SetNickname(nickname);
     
-    int db_ret = Dao::Update(old, neo);
+    int db_ret = dao::Update(old, neo);
     if (db_ret < 0) {
         LogI("db err, usrid: %d, nickname: %s",
              usr_id, nickname.c_str())

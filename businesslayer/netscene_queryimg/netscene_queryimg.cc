@@ -78,7 +78,7 @@ int NetSceneQueryImg::DoSceneImpl(const std::string &_in_buffer) {
         new_row.SetItemType(type);
         new_row.SetItemDesc(std::string(item_desc_.substr(0,
                                               item_desc_.size() - 1)));
-        int db_ret = Dao::Insert(new_row);
+        int db_ret = dao::Insert(new_row);
         
         if (db_ret < 0) {
             LogE("db insert failed: %s", item_name_.c_str())

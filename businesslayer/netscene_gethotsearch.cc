@@ -62,7 +62,7 @@ void NetSceneGetHotSearch::__ComputeHotSearch() {
     snprintf(sql, sizeof(sql), "select %s from %s;",
              DBItem_Recognition::field_name_item_name_,
              DBItem_Recognition::table_);
-    int db_ret = Dao::Query(sql, query_res, 1);
+    int db_ret = dao::Query(sql, query_res, 1);
     if (db_ret < 0) {
         LogE("db query failed.")
         return;
@@ -96,7 +96,7 @@ void NetSceneGetHotSearch::__ComputeHotSearch() {
                  DBItem_Recognition::table_,
                  DBItem_Recognition::field_name_item_name_,
                  it.first.c_str());
-        db_ret = Dao::Query(sql, query_res, 2);
+        db_ret = dao::Query(sql, query_res, 2);
         if (db_ret < 0) {
             LogE("query desc failed")
             return;

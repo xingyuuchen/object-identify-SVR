@@ -67,8 +67,8 @@ int NetSceneUploadAvatar::DoSceneImpl(const std::string &_in_buffer) {
         old.SetUsrId(usr_id);
         DBItem_UserInfo neo;
         neo.SetAvatarPath(std::string(file_path));
-        Dao::Update(old, neo);
-        int db_ret = Dao::Update(old, neo);
+        dao::Update(old, neo);
+        int db_ret = dao::Update(old, neo);
         if (db_ret < 0) {
             LogI("db err, usrid: %d, file_path: %s",
                  usr_id, file_path)

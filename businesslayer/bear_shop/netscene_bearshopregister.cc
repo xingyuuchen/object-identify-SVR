@@ -80,7 +80,7 @@ int NetSceneBearShopRegister::DoSceneImpl(const std::string &_in_buffer) {
     DBItem_BearUser user;
     user.SetUserName(user_name);
     bool exist = false;
-    if (Dao::QueryExist(user, exist) < 0) {
+    if (dao::QueryExist(user, exist) < 0) {
         LogE("db query failed, ")
         return -1;
     }
@@ -91,7 +91,7 @@ int NetSceneBearShopRegister::DoSceneImpl(const std::string &_in_buffer) {
     
     user.SetUserPwd(user_pwd);
     
-    int db_ret = Dao::Insert(user);
+    int db_ret = dao::Insert(user);
     if (db_ret < 0) {
         LogE("db insert failed")
         return -1;

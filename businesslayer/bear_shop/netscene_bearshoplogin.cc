@@ -73,7 +73,7 @@ int NetSceneBearShopLogin::DoSceneImpl(const std::string &_in_buffer) {
     user.SetUserName(user_name);
     user.SetUserPwd(user_pwd);
     bool exist = false;
-    if (Dao::QueryExist(user, exist) < 0) {
+    if (dao::QueryExist(user, exist) < 0) {
         LogE("db query failed, ")
         return -1;
     }
