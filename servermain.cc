@@ -9,7 +9,7 @@
 int main(int ac, char **argv) {
 #ifdef DAEMON
     if (unixtar::Daemonize() < 0) {
-        printf("Daemonize failed\n");
+        printf("daemonize failed\n");
         return 0;
     }
 #endif
