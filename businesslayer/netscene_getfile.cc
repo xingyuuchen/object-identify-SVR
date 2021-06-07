@@ -40,6 +40,7 @@ int NetSceneGetFile::DoSceneImpl(const std::string &_in_buffer) {
         LogI("file(%s) NOT exist", file_path.c_str())
         NetScene404NotFound _404;
         resp_ = std::string((char *) _404.Data());
+        content_type_ = (char *) _404.ContentType();
         return 0;
     }
     if (!file::ReadFile(file_path.c_str(), resp_)) {
