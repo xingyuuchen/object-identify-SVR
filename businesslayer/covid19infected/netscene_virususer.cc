@@ -159,7 +159,6 @@ int NetSceneVirusUser::NetSceneVirusForgetPwd::DoSceneImpl(const std::string &_i
         return 0;
     }
     DBItem_VirusUser neo;
-    neo.SetEmail(email);
     neo.SetUserPwd(password);
     if (dao::Update(old, neo) < 0) {
         LogE("db update failed")
