@@ -1,5 +1,5 @@
 #!/bin/sh
 
-cd ../build/framework/reverseproxy
+cd ../build/framework/reverseproxy || exit
 
 ./reverse-proxy

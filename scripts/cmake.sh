@@ -24,7 +24,7 @@ if [ ! -d "./build" ]; then
   mkdir build
 fi
 
-cd build
+cd build || exit
 if ${isRun}; then
   if ${isDaemon}; then
     cmake -DDAEMON=On .. && make

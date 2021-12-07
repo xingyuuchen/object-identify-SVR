@@ -7,4 +7,4 @@ fi
 
 ip=$1
 
-scp root@${ip}:/var/log/oi-svr.log ../log/oi-svr.log
+scp root@"${ip}":/var/log/oi-svr.log ../log/oi-svr.log
